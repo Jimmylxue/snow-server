@@ -1,6 +1,3 @@
-# 进入目录
-cd snow-server/
-
 # 切换分支
 git checkout server-prod
 
