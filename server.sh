@@ -1,5 +1,5 @@
 # 进入目录
-cd snow-program/
+cd snow-server/
 
 # 切换分支
 git checkout server-prod
@@ -17,7 +17,7 @@ pnpm install
 pnpm server:build
 
 # 删除pm2 容器
-pm2 delete packages/snow-server/dist/main.js
+pm2 delete dist/main.js
 
 # pm2 运行
-pm2 start packages/snow-server/dist/main.js
+pm2 start dist/main.js
