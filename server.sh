@@ -14,7 +14,7 @@ pnpm install
 pnpm build
 
 # 删除pm2 容器
-# pm2 delete dist/main.js
+pm2 delete dist/main.js
 
 # pm2 运行
 pm2 start dist/main.js
