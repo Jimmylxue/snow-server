@@ -13,6 +13,7 @@ import { RedisInstance } from '@src/instance';
 import { LoggerService } from '@src/modules/shared/service/Logger.service';
 import { TBackWeatherInfo } from '@src/types';
 import { ConfigService } from '@nestjs/config';
+import { AxiosResponse } from 'axios';
 
 @Injectable()
 export class WxConnectService {
@@ -121,7 +122,7 @@ export class WxConnectService {
   async sendTemplateMsg(
     access_token: string,
     weather: TBackWeatherInfo['result'],
-  ) {
+  ): Promise<any> {
     const { love_message } = weChat;
 
     const base_templateId = this.configService.get(
@@ -181,7 +182,7 @@ export class WxConnectService {
     template.data = base_temp;
     template.template_id = base_templateId;
 
-    let res = await this.httpService.axiosRef.post(
+    let res = await this.httpService.axiosRef.post<any>(
       `https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=${access_token}`,
       template,
     );
@@ -193,7 +194,7 @@ export class WxConnectService {
     return res;
   }
 
-  async sendImportantTemplateMsg(access_token: string) {
+  async sendImportantTemplateMsg(access_token: string): Promise<any> {
     const base_templateId = this.configService.get(
       'WX_OFFICIAL_BASE_TEMPLATE_ID',
     );
