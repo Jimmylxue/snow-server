@@ -21,14 +21,12 @@ import { SnowMemoModule } from './modules/memo-word/memo.module';
 import { CheckInModule } from './modules/checkIn/checkIn.module';
 import { TrainModule } from './modules/12306/train.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-
-const MYSQL_HOST = process.env.MYSQL_HOST;
-console.log('MYSQL_HOST', process.env, MYSQL_HOST);
+import { resolve } from 'path';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env'],
+      envFilePath: [resolve(process.cwd(), '.env')],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
