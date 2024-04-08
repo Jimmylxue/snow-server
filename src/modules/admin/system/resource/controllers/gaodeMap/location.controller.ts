@@ -1,8 +1,18 @@
-import { Controller, Get, Query, Ip, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Ip,
+  Post,
+  Body,
+  HttpCode,
+  UseGuards,
+} from '@nestjs/common';
 import { SystemException } from '@src/exception';
 import { IpAddress } from '@src/modules/shared/decorator';
 import { LocationService } from '../../services/gaodeMap/location.service';
 import { GeoDto } from './dto/location.dto';
+import { AuthGuard } from '@nestjs/passport';
 const searcher = require('node-ip2region').create();
 
 @Controller('location')
@@ -42,6 +52,8 @@ export class LocationController {
   }
 
   @Post('/getAddress')
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(200)
   async getLocationInfo(@Body() body: GeoDto) {
     // 离线库查不到了再查有次数的在线库
     const { data } = await this.locationService.getLocationByGeo(body);
