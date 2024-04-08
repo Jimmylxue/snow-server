@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpCode, Injectable, UseGuards } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AxiosResponse } from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { TLocationByIp } from '@src/types';
 import { GeoDto } from '../../controllers/gaodeMap/dto/location.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class LocationService {
@@ -21,6 +22,8 @@ export class LocationService {
   /**
    * 逆地址解析 （根据经纬度 获取 城市等信息）
    */
+  @UseGuards(AuthGuard('jwt'))
+  @HttpCode(200)
   async getLocationByGeo(params: GeoDto): Promise<AxiosResponse<any>> {
     const key = this.configService.get('GAODE_LOCATION_KEY');
     return this.httpService.axiosRef.get(
