@@ -1,7 +1,8 @@
-import { Controller, Get, Query, Ip } from '@nestjs/common';
+import { Controller, Get, Query, Ip, Post, Body } from '@nestjs/common';
 import { SystemException } from '@src/exception';
 import { IpAddress } from '@src/modules/shared/decorator';
 import { LocationService } from '../../services/gaodeMap/location.service';
+import { GeoDto } from './dto/location.dto';
 const searcher = require('node-ip2region').create();
 
 @Controller('location')
@@ -35,6 +36,19 @@ export class LocationController {
         code: 200,
         result: data,
         requestIp: ip,
+      };
+    }
+    throw new SystemException('THIRD_PART_SERVICE_ERROR_CODE', 200, '');
+  }
+
+  @Post('/getAddress')
+  async getLocationInfo(@Body() body: GeoDto) {
+    // 离线库查不到了再查有次数的在线库
+    const { data } = await this.locationService.getLocationByGeo(body);
+    if (+data.infocode === 10000) {
+      return {
+        code: 200,
+        result: data.regeocode,
       };
     }
     throw new SystemException('THIRD_PART_SERVICE_ERROR_CODE', 200, '');
