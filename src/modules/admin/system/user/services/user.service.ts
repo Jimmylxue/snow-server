@@ -6,7 +6,6 @@ import { JwtService } from '@nestjs/jwt';
 import { UpdateMailDto, UpdatePhoneDto } from '../dto/update.dto';
 import { LoginByMiniProgram } from '../dto/login.dto';
 import { HttpService } from '@nestjs/axios';
-import { TaskTypeService } from '@src/modules/todolist/modules/taskType/taskType.service';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -16,7 +15,6 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
     private readonly httpService: HttpService,
-    private readonly taskType: TaskTypeService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -178,11 +176,5 @@ export class UserService {
    */
   addUserSuccessHandle(user: User) {
     const registerUserId = user.id;
-
-    this.taskType.addUserTaskType({
-      userId: registerUserId,
-      typeName: '工作',
-      createTime: Date.now() + '',
-    });
   }
 }

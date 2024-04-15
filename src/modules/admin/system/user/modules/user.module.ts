@@ -4,18 +4,15 @@ import { User } from '../entities/user.entity';
 import { UserService } from '../services/user.service';
 import { BcryptService } from '../../auth/auth.service';
 import { JwtStrategy } from '../../auth/jwtStrategy.service';
-// import { AuthService } from '../auth/auth.service';
 import { UserController } from '../controllers/user/user.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from '../../auth/constats';
-import { TaskTypeService } from '@src/modules/todolist/modules/taskType/taskType.service';
-import { TaskType } from '@src/modules/todolist/entities/taskType.entity';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
     HttpModule,
-    TypeOrmModule.forFeature([User, TaskType]),
+    TypeOrmModule.forFeature([User]),
     // user模块需要派发 token 所以这里必须得引用 jwt Module
     JwtModule.register({
       secret: jwtConstants.secret,
@@ -24,14 +21,7 @@ import { HttpModule } from '@nestjs/axios';
       },
     }),
   ],
-  providers: [
-    UserService,
-    BcryptService,
-    JwtStrategy,
-    TaskTypeService,
-    BcryptService,
-  ],
+  providers: [UserService, BcryptService, JwtStrategy, BcryptService],
   controllers: [UserController],
-  // exports: [TypeOrmModule],
 })
 export class UsersModule {}
