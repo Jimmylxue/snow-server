@@ -22,6 +22,7 @@ import { CheckInModule } from './modules/checkIn/checkIn.module';
 import { TrainModule } from './modules/12306/train.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { resolve } from 'path';
+import { ClubSystemModule } from './modules/clubs/clubSystem.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -57,6 +58,7 @@ import { resolve } from 'path';
     UploadModule,
     SnowMemoModule,
     TrainModule,
+    ClubSystemModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: {

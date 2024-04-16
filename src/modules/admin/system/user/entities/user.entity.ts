@@ -1,12 +1,5 @@
 import { generateRandomCode } from '@src/utils';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { SendRecord } from '../../siteLetter/entities/sendRecord.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 enum Role {
   '普通用户',

@@ -45,7 +45,7 @@ export class UserController {
         result: '账号或密码错误',
       };
     }
-    if (+user.id <= 28) {
+    if (false) {
       /**
        * id 为 28是最后一个明文密码用户
        */
