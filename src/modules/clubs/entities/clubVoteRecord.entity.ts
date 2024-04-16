@@ -9,8 +9,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Club } from './club.entity';
+import { ClubVote } from './clubVote.entity';
 
-enum EChoose {
+export enum EChoose {
   同意 = 1,
   反对,
 }
@@ -22,10 +23,22 @@ enum EChoose {
 export class clubVoteRecord {
   @PrimaryGeneratedColumn({
     type: 'int',
-    name: 'clubVoteRecordId',
+    name: 'id',
     comment: '社团投票记录id',
   })
   id: number;
+
+  @Column({ type: 'int', name: 'voteId' })
+  voteId: number;
+
+  /**
+   * 绑定 社团
+   */
+  @ManyToOne(() => ClubVote, (vote) => vote.id, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  vote: any;
 
   @Column({ type: 'int', name: 'clubId' })
   clubId: number;
@@ -55,7 +68,7 @@ export class clubVoteRecord {
     name: 'choose',
     comment: '投票的选择',
   })
-  choose: string;
+  choose: number;
 
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })
   createdTime: Date;

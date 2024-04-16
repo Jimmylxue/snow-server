@@ -17,10 +17,10 @@ import { Club } from './club.entity';
 export class ClubVote {
   @PrimaryGeneratedColumn({
     type: 'int',
-    name: 'voteId',
+    name: 'id',
     comment: '社团投票项id',
   })
-  voteId: number;
+  id: number;
 
   @Column({ type: 'int', name: 'clubId' })
   clubId: number;
@@ -33,6 +33,16 @@ export class ClubVote {
   })
   @JoinColumn()
   club: any;
+
+  @Column({ type: 'int', name: 'userId' })
+  userId: number;
+
+  /**
+   * 帖子作者的 - userId
+   */
+  @ManyToOne(() => User)
+  @JoinColumn()
+  user: number;
 
   @Column('varchar', { name: 'name', length: 45, comment: '投票的标题' })
   name: string;
