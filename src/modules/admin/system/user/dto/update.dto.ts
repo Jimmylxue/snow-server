@@ -28,3 +28,18 @@ export class UpdateMailDto {
   @IsNotEmpty({ message: '新邮箱不能为空' })
   newMail: string;
 }
+
+export class ChangePasswordDto {
+  @IsMobilePhone('zh-CN')
+  @IsNotEmpty()
+  @IsString()
+  phone: string;
+
+  @IsNotEmpty()
+  @IsString()
+  originPassword: string;
+
+  @IsNotEmpty()
+  @IsString()
+  newPassword: string;
+}

@@ -22,7 +22,11 @@ import { BcryptService } from '../../../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RedisInstance } from '@src/instance';
 import { isQQMail } from '@src/utils';
-import { UpdateMailDto, UpdatePhoneDto } from '../../dto/update.dto';
+import {
+  ChangePasswordDto,
+  UpdateMailDto,
+  UpdatePhoneDto,
+} from '../../dto/update.dto';
 
 @Controller('user')
 export class UserController {
@@ -247,5 +251,14 @@ export class UserController {
       await redis.del(key);
     }
     return this.usersService.updateUserMail(body, userId, redisCode);
+  }
+
+  /**
+   * 修改密码 - 简单版
+   *  只需要校验原密码即可
+   */
+  @Post('changePassword')
+  async changePassword(@Body() body: ChangePasswordDto) {
+    return this.usersService.changePassword(body);
   }
 }

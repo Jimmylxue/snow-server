@@ -3,11 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { UpdateMailDto, UpdatePhoneDto } from '../dto/update.dto';
+import {
+  ChangePasswordDto,
+  UpdateMailDto,
+  UpdatePhoneDto,
+} from '../dto/update.dto';
 import { LoginByMiniProgram } from '../dto/login.dto';
 import { HttpService } from '@nestjs/axios';
 import { TaskTypeService } from '@src/modules/todolist/modules/taskType/taskType.service';
 import { ConfigService } from '@nestjs/config';
+import { BcryptService } from '../../auth/auth.service';
 
 @Injectable()
 export class UserService {
@@ -18,6 +23,7 @@ export class UserService {
     private readonly httpService: HttpService,
     private readonly taskType: TaskTypeService,
     private readonly configService: ConfigService,
+    private readonly bcryptService: BcryptService,
   ) {}
 
   findAll(): Promise<User[]> {
@@ -170,6 +176,36 @@ export class UserService {
   async getLastData() {
     const qb = this.userRepository.createQueryBuilder('user');
     return await qb.orderBy('user.id', 'DESC').getOne();
+  }
+
+  /**
+   * 修改密码
+   */
+  async changePassword(body: ChangePasswordDto) {
+    const { phone, originPassword, newPassword } = body;
+    const user = await this.findUserByPhone(phone);
+    if (!user) {
+      return {
+        code: 10000,
+        result: '账号不存在，请重新输入',
+      };
+    }
+    const originUserPassword = atob(user.password).split('snow-todoList')?.[0];
+    const compareHashSuccess = await this.bcryptService.compare(
+      originUserPassword,
+      originPassword,
+    );
+    if (!compareHashSuccess) {
+      return {
+        code: 10000,
+        result: '账号或密码错误',
+      };
+    }
+    await this.updateUser({ userId: user.id, password: newPassword });
+    return {
+      code: 200,
+      message: '更新成功',
+    };
   }
 
   /**
