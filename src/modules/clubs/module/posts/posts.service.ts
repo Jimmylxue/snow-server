@@ -8,6 +8,7 @@ import { ClubPosts } from '../../entities/posts.entity';
 import {
   CommentPostsDto,
   LovePostsDto,
+  PostsListDto,
   SendPostsDto,
 } from '../../dto/posts.dto';
 import { ClubPostLove } from '../../entities/clubPostLove.entity';
@@ -24,12 +25,29 @@ export class PostsService {
     private readonly clubPostCommentRepository: Repository<ClubPostComment>,
   ) {}
 
+  async getPostsList(body: PostsListDto, userId: number) {
+    return await this.postsRepository.find({
+      // select: ['recordId', 'letter', 'status', 'createdTime'],
+      // relations: {
+      //   letter: true,
+      // },
+      where: {
+        ...body,
+        // user: userId,
+      },
+      order: {
+        id: 'DESC',
+      },
+    });
+  }
+
   async posts(body: SendPostsDto, userId: number) {
     const posts = this.postsRepository.create();
     posts.userId = userId;
     posts.user = userId;
     posts.clubId = body.clubId;
     posts.club = body.clubId;
+    posts.title = body.title;
     posts.content = body.content;
     return await this.postsRepository.save(posts);
   }

@@ -69,6 +69,8 @@ export class ClubActivityService {
     const clubActivity = this.clubActivityRepository.create();
     clubActivity.user = userId;
     clubActivity.clubId = params.clubId;
+    clubActivity.signStartTime = params.signStartTime;
+    clubActivity.signEndTime = params.signEndTime;
     clubActivity.name = params.name;
     clubActivity.desc = params.desc;
     return await this.clubActivityRepository.save(clubActivity);

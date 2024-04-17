@@ -8,6 +8,21 @@ export class ClubController {
   constructor(private readonly clubService: ClubService) {}
 
   /**
+   * 获取所有的社团
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/allList')
+  async getAllList(@Body() body: ClubListDto, @Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const records = await this.clubService.getAllList(body, userId);
+    return {
+      code: 200,
+      result: records,
+    };
+  }
+
+  /**
    * 获取用户参与的社团
    */
   @UseGuards(AuthGuard('jwt'))

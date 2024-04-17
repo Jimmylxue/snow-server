@@ -49,7 +49,10 @@ export class ClubPosts {
   // @ManyToOne(() => User)
   // @JoinColumn()
 
-  @Column('text', { name: 'desc', nullable: true, comment: '反馈内容' })
+  @Column('text', { name: 'title', nullable: true, comment: '帖子标题' })
+  title: string;
+
+  @Column('text', { name: 'content', nullable: true, comment: '帖子内容' })
   content: string;
 
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })

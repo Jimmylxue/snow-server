@@ -1,9 +1,19 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
+export class PostsListDto {
+  @IsOptional()
+  @IsNumber()
+  clubId: number;
+}
+
 export class SendPostsDto {
   @IsNotEmpty()
   @IsNumber()
   clubId: number;
+
+  @IsNotEmpty()
+  @IsString()
+  title: string;
 
   @IsNotEmpty()
   @IsString()

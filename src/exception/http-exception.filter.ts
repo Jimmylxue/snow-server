@@ -45,7 +45,7 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
       });
     } else if (exception instanceof UnauthorizedException) {
       response.status(status).json({
-        code: 400,
+        code: 401,
         message: exception.message,
         data: {
           date:

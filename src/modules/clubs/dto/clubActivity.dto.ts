@@ -24,6 +24,14 @@ export class AddClubActivityDto {
   @IsOptional()
   @IsString()
   desc: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  signStartTime: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  signEndTime: number;
 }
 
 export class FeedBackDto {

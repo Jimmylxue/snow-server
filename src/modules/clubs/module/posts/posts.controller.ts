@@ -4,12 +4,28 @@ import { PostsService } from './posts.service';
 import {
   CommentPostsDto,
   LovePostsDto,
+  PostsListDto,
   SendPostsDto,
 } from '../../dto/posts.dto';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
+
+  /**
+   * 投票列表
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/list')
+  async getPostsList(@Body() body: PostsListDto, @Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const record = await this.postsService.getPostsList(body, userId);
+    return {
+      code: 200,
+      result: record,
+    };
+  }
 
   /**
    * 发帖

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ClubVote } from '../../entities/clubVote.entity';
 import { clubVoteRecord } from '../../entities/clubVoteRecord.entity';
-import { ChoiceVoteDto, LaunchVoteDto } from '../../dto/vote.dto';
+import { ChoiceVoteDto, LaunchVoteDto, VoteListDto } from '../../dto/vote.dto';
 
 @Injectable()
 export class VoteService {
@@ -13,6 +13,22 @@ export class VoteService {
     @InjectRepository(clubVoteRecord)
     private readonly clubVoteRecordRepository: Repository<clubVoteRecord>,
   ) {}
+
+  async getVoteList(body: VoteListDto, userId: number) {
+    return await this.clubVoteRepository.find({
+      // select: ['recordId', 'letter', 'status', 'createdTime'],
+      // relations: {
+      //   letter: true,
+      // },
+      where: {
+        ...body,
+        // user: userId,
+      },
+      order: {
+        id: 'DESC',
+      },
+    });
+  }
 
   async launch(body: LaunchVoteDto, userId: number) {
     const voteItem = this.clubVoteRepository.create();

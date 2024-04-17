@@ -14,7 +14,7 @@ export class ClubService {
     private readonly clubMemberRepository: Repository<ClubMember>,
   ) {}
 
-  async getUserClub(body: ClubListDto, userId: number) {
+  async getAllList(body: ClubListDto, userId: number) {
     return await this.clubRepository.find({
       // select: ['recordId', 'letter', 'status', 'createdTime'],
       // relations: {
@@ -22,10 +22,31 @@ export class ClubService {
       // },
       where: {
         ...body,
-        user: userId,
+        // clubMemberId: userId,
       },
       order: {
         clubId: 'DESC',
+      },
+    });
+  }
+
+  async getUserClub(body: ClubListDto, userId: number) {
+    console.log('userId', userId);
+    return await this.clubMemberRepository.find({
+      // select: ['recordId', 'letter', 'status', 'createdTime'],
+      // relations: {
+      //   letter: true,
+      // },
+      where: {
+        ...body,
+        clubMemberId: userId,
+      },
+      order: {
+        clubId: 'DESC',
+      },
+      relations: {
+        // @ts-ignore
+        club: true,
       },
     });
   }
