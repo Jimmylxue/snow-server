@@ -3,7 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
   AddClubActivityDto,
+  ClubActivityFeedbackListDto,
   ClubActivityListDto,
+  ClubActivitySignListDto,
   FeedBackDto,
   SignInDto,
   SignUpActivityDto,
@@ -50,7 +52,7 @@ export class ClubActivityService {
     if (hasMember) {
       return {
         code: 500,
-        message: '该同学已经参与这个活动了',
+        message: '您已经参与这个活动了',
       };
     }
     const member = this.clubActivityMemberRepository.create();
@@ -76,6 +78,24 @@ export class ClubActivityService {
     return await this.clubActivityRepository.save(clubActivity);
   }
 
+  async getActivityFeedbackRecord(
+    body: ClubActivityFeedbackListDto,
+    userId: number,
+  ) {
+    return await this.clubFeedBackRepository.find({
+      // select: ['recordId', 'letter', 'status', 'createdTime'],
+      relations: {
+        user: true,
+      },
+      where: {
+        clubActivityId: body.clubActivityId,
+      },
+      order: {
+        id: 'DESC',
+      },
+    });
+  }
+
   async feedback(params: FeedBackDto, userId: number) {
     const clubActivity = this.clubFeedBackRepository.create();
     clubActivity.user = userId;
@@ -86,6 +106,21 @@ export class ClubActivityService {
     clubActivity.clubId = params.clubId;
     clubActivity.content = params.content;
     return await this.clubFeedBackRepository.save(clubActivity);
+  }
+
+  async getActivitySignInRecord(body: ClubActivitySignListDto, userId: number) {
+    return await this.clubSignInRecordRepository.find({
+      // select: ['recordId', 'letter', 'status', 'createdTime'],
+      relations: {
+        user: true,
+      },
+      where: {
+        activityId: body.clubActivityId,
+      },
+      order: {
+        id: 'DESC',
+      },
+    });
   }
 
   async signIn(params: SignInDto, userId: number) {

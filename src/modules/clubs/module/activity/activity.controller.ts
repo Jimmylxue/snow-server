@@ -3,7 +3,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { ClubActivityService } from './activity.service';
 import {
   AddClubActivityDto,
+  ClubActivityFeedbackListDto,
   ClubActivityListDto,
+  ClubActivitySignListDto,
   FeedBackDto,
   SignInDto,
   SignUpActivityDto,
@@ -59,6 +61,24 @@ export class ClubActivityController {
     }
   }
 
+  /**
+   * 活动签到记录
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/feedbackRecord')
+  async feedbackRecord(@Body() body: ClubActivityFeedbackListDto, @Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const records = await this.clubActivityService.getActivityFeedbackRecord(
+      body,
+      userId,
+    );
+    return {
+      code: 200,
+      result: records,
+    };
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Post('/feedback')
   async feedback(@Body() body: FeedBackDto, @Req() auth) {
@@ -71,6 +91,24 @@ export class ClubActivityController {
         result: '创建成功',
       };
     }
+  }
+
+  /**
+   * 活动签到记录
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/signInRecord')
+  async signInRecord(@Body() body: ClubActivitySignListDto, @Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const records = await this.clubActivityService.getActivitySignInRecord(
+      body,
+      userId,
+    );
+    return {
+      code: 200,
+      result: records,
+    };
   }
 
   /**

@@ -6,6 +6,26 @@ export class PostsListDto {
   clubId: number;
 }
 
+export class PostsCommentListDto {
+  @IsOptional()
+  @IsNumber()
+  clubId: number;
+
+  @IsOptional()
+  @IsNumber()
+  postId: number;
+}
+
+export class PostsLoveUserListDto {
+  @IsOptional()
+  @IsNumber()
+  clubId: number;
+
+  @IsOptional()
+  @IsNumber()
+  postId: number;
+}
+
 export class SendPostsDto {
   @IsNotEmpty()
   @IsNumber()

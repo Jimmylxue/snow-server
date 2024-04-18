@@ -55,7 +55,7 @@ export class ClubPostLove {
    */
   @ManyToOne(() => User)
   @JoinColumn()
-  user: number;
+  user: any;
 
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })
   createdTime: Date;

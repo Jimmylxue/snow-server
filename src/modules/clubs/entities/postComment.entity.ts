@@ -55,7 +55,7 @@ export class ClubPostComment {
    */
   @ManyToOne(() => User)
   @JoinColumn()
-  user: number;
+  user: any;
 
   @Column('text', { name: 'desc', nullable: true, comment: '评论内容' })
   content: string;

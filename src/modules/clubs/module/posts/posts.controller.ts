@@ -4,7 +4,9 @@ import { PostsService } from './posts.service';
 import {
   CommentPostsDto,
   LovePostsDto,
+  PostsCommentListDto,
   PostsListDto,
+  PostsLoveUserListDto,
   SendPostsDto,
 } from '../../dto/posts.dto';
 
@@ -13,7 +15,7 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   /**
-   * 投票列表
+   * 帖子列表
    */
   @UseGuards(AuthGuard('jwt'))
   @Post('/list')
@@ -51,6 +53,36 @@ export class PostsController {
     const { user } = auth;
     const userId = user.userId;
     return await this.postsService.love(body, userId);
+  }
+
+  /**
+   * 喜欢某个帖子的人
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/likePostUser')
+  async getLikePostUser(@Body() body: PostsLoveUserListDto, @Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const record = await this.postsService.getLikePostUser(body, userId);
+    return {
+      code: 200,
+      result: record,
+    };
+  }
+
+  /**
+   * 帖子评论列表
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/postCommentList')
+  async getPostsCommentList(@Body() body: PostsCommentListDto, @Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const record = await this.postsService.getPostsCommentList(body, userId);
+    return {
+      code: 200,
+      result: record,
+    };
   }
 
   /**

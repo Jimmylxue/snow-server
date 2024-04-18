@@ -6,6 +6,18 @@ export class ClubActivityListDto {
   clubActivityId?: number;
 }
 
+export class ClubActivitySignListDto {
+  @IsOptional()
+  @IsNumber()
+  clubActivityId?: number;
+}
+
+export class ClubActivityFeedbackListDto {
+  @IsOptional()
+  @IsNumber()
+  clubActivityId?: number;
+}
+
 export class SignUpActivityDto {
   @IsOptional()
   @IsNumber()

@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AddClubDto, ClubListDto, SignUpDto } from '../../dto/club.dto';
-import { Club } from '../../entities/club.entity';
-import { ClubMember } from '../../entities/clubMember.entity';
 import { ClubPosts } from '../../entities/posts.entity';
 import {
   CommentPostsDto,
   LovePostsDto,
+  PostsCommentListDto,
   PostsListDto,
+  PostsLoveUserListDto,
   SendPostsDto,
 } from '../../dto/posts.dto';
 import { ClubPostLove } from '../../entities/clubPostLove.entity';
@@ -33,6 +32,40 @@ export class PostsService {
       // },
       where: {
         ...body,
+        // user: userId,
+      },
+      order: {
+        id: 'DESC',
+      },
+    });
+  }
+
+  async getPostsCommentList(body: PostsCommentListDto, userId: number) {
+    return await this.clubPostCommentRepository.find({
+      // select: ['recordId', 'letter', 'status', 'createdTime'],
+      relations: {
+        user: true,
+      },
+      where: {
+        clubPostsId: body.postId,
+        clubId: body.clubId,
+        // user: userId,
+      },
+      order: {
+        commentId: 'DESC',
+      },
+    });
+  }
+
+  async getLikePostUser(body: PostsLoveUserListDto, userId: number) {
+    return await this.clubPostLoveRepository.find({
+      // select: ['recordId', 'letter', 'status', 'createdTime'],
+      relations: {
+        user: true,
+      },
+      where: {
+        clubPostsId: body.postId,
+        clubId: body.clubId,
         // user: userId,
       },
       order: {
