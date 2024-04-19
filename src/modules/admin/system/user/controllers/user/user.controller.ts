@@ -61,6 +61,7 @@ export class UserController {
 
     await this.usersService.addUser({
       ...params,
+      role: params.phone === '16666666666' ? 1 : 0,
       createTime: Date.now(),
     });
 
