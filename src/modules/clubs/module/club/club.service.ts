@@ -1,9 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AddClubDto, ClubListDto, SignUpDto } from '../../dto/club.dto';
+import {
+  AddClubDto,
+  ClubListDto,
+  SendNoticeDto,
+  SignUpDto,
+} from '../../dto/club.dto';
 import { Club } from '../../entities/club.entity';
 import { ClubMember } from '../../entities/clubMember.entity';
+import { SendLetterService } from '@src/modules/admin/system/siteLetter/sendLetter/sendLetter.service';
+import { LetterService } from '@src/modules/admin/system/siteLetter/letter/letter.service';
 
 @Injectable()
 export class ClubService {
@@ -12,6 +19,8 @@ export class ClubService {
     private readonly clubRepository: Repository<Club>,
     @InjectRepository(ClubMember)
     private readonly clubMemberRepository: Repository<ClubMember>,
+    private readonly sendLetterService: SendLetterService,
+    private readonly letterService: LetterService,
   ) {}
 
   async getAllList(body: ClubListDto, userId: number) {
@@ -80,6 +89,30 @@ export class ClubService {
     club.name = params.name;
     club.desc = params.desc;
     return await this.clubRepository.save(club);
+  }
+
+  async sendNotice(params: SendNoticeDto) {
+    const letter = await this.letterService.addLetter(params);
+    const users = await this.clubMemberRepository.find({
+      // select: ['clubMemberId'],
+      where: {
+        clubId: params.clubId,
+      },
+      order: {
+        clubId: 'DESC',
+      },
+    });
+    const userIds = users.map((item) => item.clubMemberId);
+    const records = await this.sendLetterService.sendToSome(
+      letter.letterId,
+      userIds,
+    );
+    if (records) {
+      return {
+        code: 200,
+        result: records.raw.affectedRows + '条数据操作成功',
+      };
+    }
   }
 
   // async updateLetter(body: UpdateHabitDto | UpdateHabitStatusDto) {

@@ -15,19 +15,40 @@ export class VoteService {
   ) {}
 
   async getVoteList(body: VoteListDto, userId: number) {
-    return await this.clubVoteRepository.find({
-      // select: ['recordId', 'letter', 'status', 'createdTime'],
-      // relations: {
-      //   letter: true,
-      // },
-      where: {
+    // const records = await this.clubVoteRepository.find({
+    //   relations: {
+    //     recordItems: true,
+    //   },
+    //   where: {
+    //     ...body,
+    //   },
+    //   order: {
+    //     id: 'DESC',
+    //   },
+    // });
+    const records = await this.clubVoteRepository
+      .createQueryBuilder('clubVote')
+      // .leftJoinAndSelect('clubVote.recordItems', 'recordItem',"recordItem.voteId > :value", { value: 10 }) 这个等于动态查 留个笔记吧
+      .leftJoinAndSelect(
+        'clubVote.recordItems',
+        'recordItem',
+        'recordItem.voteId = clubVote.id',
+      )
+      .leftJoinAndSelect('recordItem.user', 'user') // 两层关联
+      .where({
         ...body,
-        // user: userId,
-      },
-      order: {
-        id: 'DESC',
-      },
+      })
+      .orderBy('clubVote.id', 'DESC')
+      .getMany();
+    const newRecords = records.map((item) => {
+      return {
+        ...item,
+        voteStatus: this.getVoteStatus(item),
+        myVote:
+          item.recordItems?.find((it) => it.userId === userId)?.choose || -1,
+      };
     });
+    return newRecords;
   }
 
   async launch(body: LaunchVoteDto, userId: number) {
@@ -38,6 +59,8 @@ export class VoteService {
     voteItem.club = body.clubId;
     voteItem.name = body.name;
     voteItem.desc = body.desc;
+    voteItem.voteStartTime = body.voteStartTime;
+    voteItem.voteEndTime = body.voteEndTime;
     return await this.clubVoteRepository.save(voteItem);
   }
 
@@ -66,5 +89,16 @@ export class VoteService {
       code: 200,
       result: '投票成功',
     };
+  }
+
+  getVoteStatus(item: ClubVote) {
+    const now = Date.now() / 1000;
+    if (now < item.voteStartTime) {
+      return 1;
+    }
+    if (now >= item.voteStartTime && now < item.voteEndTime) {
+      return 2;
+    }
+    return 3;
   }
 }

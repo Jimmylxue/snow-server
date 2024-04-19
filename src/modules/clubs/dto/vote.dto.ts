@@ -25,6 +25,14 @@ export class LaunchVoteDto {
   @IsNotEmpty()
   @IsString()
   desc: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  voteStartTime: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  voteEndTime: number;
 }
 
 export class ChoiceVoteDto {

@@ -1,7 +1,12 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ClubService } from './club.service';
-import { AddClubDto, ClubListDto, SignUpDto } from '../../dto/club.dto';
+import {
+  AddClubDto,
+  ClubListDto,
+  SendNoticeDto,
+  SignUpDto,
+} from '../../dto/club.dto';
 
 @Controller('club')
 export class ClubController {
@@ -65,31 +70,12 @@ export class ClubController {
     }
   }
 
-  // @UseGuards(AuthGuard('jwt'))
-  // @Post('/updateStatus')
-  // async updateStatus(@Body() body: UpdateHabitStatusDto) {
-  //   const letter = await this.habitService.updateLetter(body);
-  //   if (letter) {
-  //     return {
-  //       code: 200,
-  //       result: '更新成功',
-  //     };
-  //   }
-  // }
-
-  // @UseGuards(AuthGuard('jwt'))
-  // @Post('/del')
-  // async delLetter(@Body() body: DelHabitDto) {
-  //   const res = await this.habitService.delLetter(body);
-  //   if (res.affected === 0) {
-  //     return {
-  //       code: 500,
-  //       result: '检查删除内容是否存在',
-  //     };
-  //   }
-  //   return {
-  //     code: 200,
-  //     result: '删除成功',
-  //   };
-  // }
+  /**
+   * 管理员-添加社团
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/sendNotice')
+  async sendNotice(@Body() body: SendNoticeDto) {
+    return await this.clubService.sendNotice(body);
+  }
 }

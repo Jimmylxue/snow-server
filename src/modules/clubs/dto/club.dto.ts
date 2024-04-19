@@ -21,3 +21,21 @@ export class AddClubDto {
   @IsString()
   desc: string;
 }
+
+export class SendNoticeDto {
+  @IsNotEmpty()
+  @IsNumber()
+  clubId: number;
+
+  @IsNotEmpty()
+  @IsString()
+  title: string;
+
+  @IsOptional()
+  @IsString()
+  content: string;
+
+  @IsOptional()
+  @IsNumber()
+  platform: number;
+}
