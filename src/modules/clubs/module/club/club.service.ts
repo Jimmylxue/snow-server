@@ -103,6 +103,12 @@ export class ClubService {
       },
     });
     const userIds = users.map((item) => item.clubMemberId);
+    if (userIds.length === 0) {
+      return {
+        code: 500,
+        result: '该社团还没有成员，无需发通知',
+      };
+    }
     const records = await this.sendLetterService.sendToSome(
       letter.letterId,
       userIds,
