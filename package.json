@@ -43,6 +43,7 @@
     "class-validator": "^0.13.2",
     "dayjs": "^1.11.10",
     "error-stack-parser": "^2.1.4",
+    "express": "^4.19.2",
     "ioredis": "^5.2.3",
     "md5": "^2.3.0",
     "mysql2": "^2.3.3",
