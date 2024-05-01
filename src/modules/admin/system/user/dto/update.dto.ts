@@ -1,9 +1,56 @@
 import {
+  IsEnum,
   IsMobilePhone,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
+import { Role, Sex } from '../entities/user.entity';
+
+export class UserListDto {
+  @IsOptional()
+  @IsMobilePhone('zh-CN')
+  phone: string;
+
+  @IsOptional()
+  @IsString()
+  openid: string;
+
+  @IsOptional()
+  @IsEnum(Role)
+  role: number;
+
+  @IsOptional()
+  @IsEnum(Sex)
+  sex: number;
+
+  @IsOptional()
+  @IsString()
+  mail: string;
+
+  @IsOptional()
+  @IsString()
+  startTime: string;
+
+  @IsOptional()
+  @IsString()
+  endTime: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  page: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  pageSize: number;
+}
+
+export class DelUserDto {
+  @IsNotEmpty()
+  @IsNumber()
+  id: number;
+}
 
 export class UpdatePhoneDto {
   @IsMobilePhone('zh-CN')

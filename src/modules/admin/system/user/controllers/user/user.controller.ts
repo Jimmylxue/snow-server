@@ -24,8 +24,10 @@ import { RedisInstance } from '@src/instance';
 import { isQQMail } from '@src/utils';
 import {
   ChangePasswordDto,
+  DelUserDto,
   UpdateMailDto,
   UpdatePhoneDto,
+  UserListDto,
 } from '../../dto/update.dto';
 
 @Controller('user')
@@ -187,6 +189,16 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Post('list')
+  async userList(@Body() body: UserListDto, @Req() auth) {
+    const list = await this.usersService.getUserList(body);
+    return {
+      code: 200,
+      result: list,
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Post('update')
   async updateUser(@Body() body: UpdateDto, @Req() auth) {
     // 注册时 传的密码 使用的是 btoa 处理过的密码
@@ -195,6 +207,22 @@ export class UserController {
     const userId = user.userId;
     const params = body;
     await this.usersService.updateUser({ ...params, userId });
+    return {
+      code: 200,
+      message: '更新成功',
+    };
+  }
+
+  /**
+   * 管理员端使用的更新
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('edit')
+  async editUser(@Body() body: UpdateDto, @Req() auth) {
+    // 注册时 传的密码 使用的是 btoa 处理过的密码
+    // const  = body;
+    const params = body;
+    await this.usersService.editUser({ ...params });
     return {
       code: 200,
       message: '更新成功',
@@ -212,6 +240,19 @@ export class UserController {
     return {
       code: 200,
       result: userDetail,
+    };
+  }
+
+  /**
+   * 管理员删除用户
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/del')
+  async delLetter(@Body() body: DelUserDto) {
+    await this.usersService.delUser(body);
+    return {
+      code: 200,
+      result: '删除成功',
     };
   }
 

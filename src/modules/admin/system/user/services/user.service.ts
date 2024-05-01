@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import {
   ChangePasswordDto,
+  DelUserDto,
   UpdateMailDto,
   UpdatePhoneDto,
+  UserListDto,
 } from '../dto/update.dto';
 import { LoginByMiniProgram } from '../dto/login.dto';
 import { HttpService } from '@nestjs/axios';
@@ -51,6 +53,26 @@ export class UserService {
     return await this.userRepository.findOneBy({ openid });
   }
 
+  async getUserList(body: UserListDto) {
+    const { page, pageSize, startTime, endTime, ...where } = body;
+    const [result, total] = await this.userRepository.findAndCount({
+      where: {
+        ...where,
+        createTime: startTime ? Between(startTime, endTime) : undefined,
+      },
+      order: {
+        id: 'DESC',
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
+    return {
+      page: page,
+      result,
+      total,
+    };
+  }
+
   async updateUser(updateParams: any) {
     const { userId, ...params } = updateParams;
     const qb = this.userRepository.createQueryBuilder('user');
@@ -59,6 +81,20 @@ export class UserService {
       .where('user.id = :userId', { userId })
       .execute();
     return { status: 1, message: '更新成功' };
+  }
+
+  async editUser(updateParams: any) {
+    const { id: userId, ...params } = updateParams;
+    const qb = this.userRepository.createQueryBuilder('user');
+    qb.update(User)
+      .set(params)
+      .where('user.id = :userId', { userId })
+      .execute();
+    return { status: 1, message: '更新成功' };
+  }
+
+  async delUser(body: DelUserDto) {
+    return await this.userRepository.delete({ id: body.id });
   }
 
   /**

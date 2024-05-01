@@ -1,12 +1,12 @@
 import { generateRandomCode } from '@src/utils';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-enum Role {
+export enum Role {
   '普通用户',
   '管理员',
 }
 
-enum Sex {
+export enum Sex {
   '未知',
   '男',
   '女',
