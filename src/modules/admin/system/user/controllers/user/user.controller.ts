@@ -1,7 +1,23 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Req,
+  HttpCode,
+} from '@nestjs/common';
 import { UserService } from '../../services/user.service';
-import { RegisterDto } from '../../dto/register.dto';
-import { LoginDto } from '../../dto/login.dto';
+import {
+  RegisterByMailDto,
+  RegisterDto,
+  UpdateDto,
+} from '../../dto/register.dto';
+import {
+  LoginByMailDto,
+  LoginByMiniProgram,
+  LoginDto,
+} from '../../dto/login.dto';
 import { BcryptService } from '../../../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RedisInstance } from '@src/instance';
@@ -31,19 +47,74 @@ export class UserController {
         result: '账号或密码错误',
       };
     }
-
-    const originUserPassword = atob(user.password).split('snow-todoList')?.[0];
-    const compareHashSuccess = await this.bcryptService.compare(
-      originUserPassword,
-      password,
-    );
-    if (compareHashSuccess) {
-      return await this.usersService.createToken(user);
+    if (false) {
+      /**
+       * id 为 28是最后一个明文密码用户
+       */
+      const compareRes = await this.bcryptService.compare(
+        user.password,
+        password,
+      );
+      if (compareRes) {
+        return await this.usersService.createToken(user);
+      }
+      return {
+        code: 10000,
+        result: '账号或密码错误',
+      };
+    } else {
+      /**
+       * id 大于 28 都是 加密密码 使用 atob 获取原密码
+       */
+      const originUserPassword = atob(user.password).split(
+        'snow-todoList',
+      )?.[0];
+      const compareHashSuccess = await this.bcryptService.compare(
+        originUserPassword,
+        password,
+      );
+      if (compareHashSuccess) {
+        return await this.usersService.createToken(user);
+      }
+      return {
+        code: 10000,
+        result: '账号或密码错误',
+      };
     }
-    return {
-      code: 10000,
-      result: '账号或密码错误',
-    };
+  }
+
+  @Post('login_by_mail')
+  async loginByMail(@Body() body: LoginByMailDto) {
+    const { code, mail } = body;
+    if (!isQQMail(mail)) {
+      return { code: 500, result: '邮箱格式验证异常，请校验' };
+    }
+    let user = await this.usersService.findUserByMail(mail);
+    if (!user) {
+      return {
+        code: 10000,
+        result: '该邮箱未创建用户，请检查地址，或为该邮箱注册一个用户',
+      };
+    }
+    const redis = await RedisInstance.initRedis();
+    const key = `snow-server-mail-verification-code-${mail}`;
+    const redisCode = await redis.get(key);
+    if (redisCode !== code.toUpperCase()) {
+      return {
+        code: 500,
+        result: '验证码校验失败，请重新发送验证码进行校验',
+      };
+    }
+    if (redisCode) {
+      await redis.del(key);
+    }
+    return await this.usersService.createToken(user);
+  }
+
+  @Post('login_by_mini_program')
+  @HttpCode(200)
+  async loginByMiniProgram(@Body() body: LoginByMiniProgram) {
+    return await this.usersService.miniProgramLogin(body);
   }
 
   @Post('register')
@@ -61,9 +132,12 @@ export class UserController {
 
     await this.usersService.addUser({
       ...params,
-      role: params.phone === '16666666666' ? 1 : 0,
       createTime: Date.now(),
     });
+
+    let user = await this.usersService.findUserByPhone(body.phone);
+
+    this.usersService.addUserSuccessHandle(user);
 
     return {
       code: 200,
