@@ -6,12 +6,26 @@ import {
   AddQuestionTypeDto,
   DelQuestionDto,
   DelQuestionTypeDto,
+  QuestionListDto,
+  QuestionTypeListDto,
   RandomQuestionDto,
 } from '../../dto/question.dto';
 
 @Controller('question')
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/listType')
+  async getTypeList(@Body() body: QuestionTypeListDto) {
+    const list = await this.questionService.getAllList(body);
+    if (list) {
+      return {
+        code: 200,
+        result: list,
+      };
+    }
+  }
 
   /**
    * 管理员-添加题目类型
@@ -45,6 +59,18 @@ export class QuestionController {
       code: 200,
       result: '删除成功',
     };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/listQuestion')
+  async getQuestionList(@Body() body: QuestionListDto) {
+    const list = await this.questionService.getAllQuestionList(body);
+    if (list) {
+      return {
+        code: 200,
+        result: list,
+      };
+    }
   }
 
   /**

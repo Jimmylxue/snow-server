@@ -7,9 +7,11 @@ import {
   AddQuestionTypeDto,
   DelQuestionDto,
   DelQuestionTypeDto,
+  QuestionListDto,
+  QuestionTypeListDto,
   RandomQuestionDto,
 } from '../../dto/question.dto';
-import { Question } from '../../entities/question.entity copy';
+import { Question } from '../../entities/question.entity';
 
 @Injectable()
 export class QuestionService {
@@ -19,6 +21,22 @@ export class QuestionService {
     @InjectRepository(Question)
     private readonly questionRepository: Repository<Question>,
   ) {}
+
+  async getAllList(body: QuestionTypeListDto) {
+    return await this.questionTypeRepository.find({
+      // select: ['recordId', 'letter', 'status', 'createdTime'],
+      // relations: {
+      //   letter: true,
+      // },
+      where: {
+        ...body,
+        // clubMemberId: userId,
+      },
+      order: {
+        id: 'DESC',
+      },
+    });
+  }
 
   async addQuestionType(params: AddQuestionTypeDto) {
     const type = this.questionTypeRepository.create();
@@ -31,6 +49,22 @@ export class QuestionService {
     return await this.questionTypeRepository.delete({ id: params.id });
   }
 
+  async getAllQuestionList(body: QuestionListDto) {
+    return await this.questionRepository.find({
+      // select: ['recordId', 'letter', 'status', 'createdTime'],
+      // relations: {
+      //   letter: true,
+      // },
+      where: {
+        ...body,
+        // clubMemberId: userId,
+      },
+      order: {
+        id: 'DESC',
+      },
+    });
+  }
+
   async addQuestion(params: AddQuestionDto) {
     const question = this.questionRepository.create();
     question.name = params.name;
@@ -40,7 +74,7 @@ export class QuestionService {
     question.type = params.typeId;
     question.option = params.option;
     question.answer = params.answer;
-    return await this.questionTypeRepository.save(question);
+    return await this.questionRepository.save(question);
   }
 
   async delQuestion(params: DelQuestionDto) {

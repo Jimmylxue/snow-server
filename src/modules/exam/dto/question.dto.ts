@@ -5,7 +5,13 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { EExamType } from '../entities/question.entity copy';
+import { EExamType } from '../entities/question.entity';
+
+export class QuestionTypeListDto {
+  @IsOptional()
+  @IsString()
+  name: string;
+}
 
 export class AddQuestionTypeDto {
   @IsNotEmpty()
@@ -21,6 +27,16 @@ export class DelQuestionTypeDto {
   @IsNotEmpty()
   @IsNumber()
   id: number;
+}
+
+export class QuestionListDto {
+  @IsOptional()
+  @IsNumber()
+  typeId: number;
+
+  @IsOptional()
+  @IsEnum(EExamType)
+  examType: number;
 }
 
 export class AddQuestionDto {

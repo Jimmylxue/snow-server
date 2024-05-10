@@ -49,7 +49,7 @@ export class Question {
   @JoinColumn({ name: 'typeId' })
   type: any;
 
-  @Column('text', { name: 'desc', nullable: true, comment: '题目的选项内容' })
+  @Column('text', { name: 'option', nullable: true, comment: '题目的选项内容' })
   option: string;
 
   @Column('varchar', { name: 'answer', length: 45, comment: '题目答案' })

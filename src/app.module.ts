@@ -24,6 +24,7 @@ import { resolve } from 'path';
 import { ClubSystemModule } from './modules/clubs/clubSystem.module';
 import { ExamSystemModule } from './modules/exam/examSystem.module';
 import { StaticModule } from './modules/static/static.module';
+import { CourseSystemModule } from './modules/course/CourseSystem.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -62,6 +63,7 @@ import { StaticModule } from './modules/static/static.module';
     ClubSystemModule,
     ExamSystemModule,
     StaticModule,
+    CourseSystemModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: {
