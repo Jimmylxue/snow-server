@@ -12,7 +12,6 @@ import {
 } from '../dto/update.dto';
 import { LoginByMiniProgram } from '../dto/login.dto';
 import { HttpService } from '@nestjs/axios';
-import { TaskTypeService } from '@src/modules/todolist/modules/taskType/taskType.service';
 import { ConfigService } from '@nestjs/config';
 import { BcryptService } from '../../auth/auth.service';
 
@@ -22,9 +21,6 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-    private readonly httpService: HttpService,
-    private readonly taskType: TaskTypeService,
-    private readonly configService: ConfigService,
     private readonly bcryptService: BcryptService,
   ) {}
 
@@ -172,40 +168,6 @@ export class UserService {
     };
   }
 
-  async miniProgramLogin(body: LoginByMiniProgram) {
-    const appID = this.configService.get('WX_MINI_PROGRAM_APPID');
-    const AppSecret = this.configService.get('WX_MINI_PROGRAM_APPSECRET');
-    const { code, ...userInfo } = body;
-    const res = await this.httpService.axiosRef.get<{
-      openid: string;
-      session_key: string;
-    }>(
-      `https://api.weixin.qq.com/sns/jscode2session?appid=${appID}&secret=${AppSecret}&js_code=${code}&grant_type=authorization_code`,
-    );
-    if (res.status === 200 && res.data.openid) {
-      /**
-       * 判断是否是系统内用户
-       *  如果是 -> 返回用户信息
-       *  如果不是 -> 根据openid 注册一个
-       */
-      const checkUser = await this.getUserByOpenId(res.data.openid);
-      if (checkUser?.id) {
-        return await this.createToken(checkUser);
-      } else {
-        const lastData = await this.getLastData();
-        await this.addUser({
-          ...userInfo,
-          openid: res.data.openid,
-          createTime: Date.now(),
-          username: userInfo.username || `游客${lastData.id + 1}`,
-        });
-        let user = await this.getUserByOpenId(res.data.openid);
-        this.addUserSuccessHandle(user);
-        return await this.createToken(user);
-      }
-    }
-  }
-
   /**
    * 获取表中最后一条数据
    */
@@ -242,19 +204,5 @@ export class UserService {
       code: 200,
       message: '更新成功',
     };
-  }
-
-  /**
-   * 注册成功后副作用
-   * @param user
-   */
-  addUserSuccessHandle(user: User) {
-    const registerUserId = user.id;
-
-    this.taskType.addUserTaskType({
-      userId: registerUserId,
-      typeName: '工作',
-      createTime: Date.now() + '',
-    });
   }
 }
