@@ -7,7 +7,6 @@ import { WxModule } from './modules/wx/wx.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './schedule/task.module';
 import { EventsModule } from './modules/socket/event.module';
-import { MiniProgramModule } from './modules/mini-program/miniProgram.module';
 import { GptModule } from './modules/gpt/gpt.module';
 import { TodoListModule } from './modules/todolist/todolist.module';
 import { UploadModule } from './modules/upload/upload.module';
@@ -23,6 +22,8 @@ import { TrainModule } from './modules/12306/train.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { resolve } from 'path';
 import { ClubSystemModule } from './modules/clubs/clubSystem.module';
+import { ExamSystemModule } from './modules/exam/examSystem.module';
+import { StaticModule } from './modules/static/static.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -59,6 +60,8 @@ import { ClubSystemModule } from './modules/clubs/clubSystem.module';
     SnowMemoModule,
     TrainModule,
     ClubSystemModule,
+    ExamSystemModule,
+    StaticModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: {

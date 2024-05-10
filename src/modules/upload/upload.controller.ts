@@ -16,7 +16,6 @@ export class UploadController {
   @Post('/')
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file) {
-    console.log('service', this.configService.get('UP_SERVICE_NAME'));
     const service = new upyun.Service(
       this.configService.get('UP_SERVICE_NAME'),
       this.configService.get('UP_OPERATOR_NAME'),
