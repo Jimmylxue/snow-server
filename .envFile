@@ -1,6 +1,0 @@
-# MYSQL 相关配置
-MYSQL_HOST='localhost'
-MYSQL_PORT=3306
-MYSQL_USERNAME='root'
-MYSQL_PASSWORD='yshzx171107.'
-MYSQL_DATABASE='snow_server'
