@@ -14,10 +14,10 @@ export class QuestionType {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id', comment: '题目类型id' })
   id: number;
 
-  @Column('varchar', { name: 'name', length: 45, comment: '社团名称' })
+  @Column('varchar', { name: 'name', length: 45, comment: '题目类型' })
   name: string;
 
-  @Column('text', { name: 'desc', nullable: true, comment: '社团描述' })
+  @Column('text', { name: 'desc', nullable: true, comment: '类型描述' })
   desc: string;
 
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })

@@ -7,7 +7,27 @@ import {
 } from 'class-validator';
 import { EExamType } from '../entities/course.entity';
 
+export class CourseTypeListDto {
+  @IsOptional()
+  @IsString()
+  name: string;
+}
+
 export class AddCourseTypeDto {
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  desc: string;
+}
+
+export class EditCourseTypeDto {
+  @IsNotEmpty()
+  @IsNumber()
+  id: string;
+
   @IsNotEmpty()
   @IsString()
   name: string;
@@ -23,7 +43,39 @@ export class DelCourseTypeDto {
   id: number;
 }
 
+export class CourseListDto {
+  @IsOptional()
+  @IsNumber()
+  typeId: number;
+}
+
 export class AddCourseDto {
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  desc: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  typeId: number;
+
+  @IsNotEmpty()
+  @IsString()
+  cover: string;
+
+  @IsNotEmpty()
+  @IsString()
+  source: string;
+}
+
+export class EditCourseDto {
+  @IsNotEmpty()
+  @IsNumber()
+  id: string;
+
   @IsNotEmpty()
   @IsString()
   name: string;

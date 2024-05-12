@@ -6,6 +6,8 @@ import {
   AddQuestionTypeDto,
   DelQuestionDto,
   DelQuestionTypeDto,
+  EditQuestionDto,
+  EditQuestionTypeDto,
   QuestionListDto,
   QuestionTypeListDto,
   RandomQuestionDto,
@@ -62,6 +64,18 @@ export class QuestionController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Post('/editType')
+  async editQuestionType(@Body() body: EditQuestionTypeDto) {
+    const letter = await this.questionService.editQuestionType(body);
+    if (letter) {
+      return {
+        code: 200,
+        result: '创建成功',
+      };
+    }
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Post('/listQuestion')
   async getQuestionList(@Body() body: QuestionListDto) {
     const list = await this.questionService.getAllQuestionList(body);
@@ -105,6 +119,18 @@ export class QuestionController {
       code: 200,
       result: '删除成功',
     };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/editQuestion')
+  async editCourse(@Body() body: EditQuestionDto) {
+    const letter = await this.questionService.editQuestion(body);
+    if (letter) {
+      return {
+        code: 200,
+        result: '创建成功',
+      };
+    }
   }
 
   /**

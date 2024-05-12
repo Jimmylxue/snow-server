@@ -8,6 +8,10 @@ import {
   AddCourseDto,
   DelCourseDto,
   RandomCourseDto,
+  CourseTypeListDto,
+  CourseListDto,
+  EditCourseDto,
+  EditCourseTypeDto,
 } from '../../dto/course.dto';
 import { Course } from '../../entities/course.entity';
 
@@ -20,6 +24,22 @@ export class CourseService {
     private readonly courseRepository: Repository<Course>,
   ) {}
 
+  async getAllList(body: CourseTypeListDto) {
+    return await this.courseTypeRepository.find({
+      // select: ['recordId', 'letter', 'status', 'createdTime'],
+      // relations: {
+      //   letter: true,
+      // },
+      where: {
+        ...body,
+        // clubMemberId: userId,
+      },
+      order: {
+        id: 'DESC',
+      },
+    });
+  }
+
   async addCourseType(params: AddCourseTypeDto) {
     const type = this.courseTypeRepository.create();
     type.name = params.name;
@@ -29,6 +49,32 @@ export class CourseService {
 
   async delCourseType(params: DelCourseTypeDto) {
     return await this.courseTypeRepository.delete({ id: params.id });
+  }
+
+  async editCourseType(updateParams: EditCourseTypeDto) {
+    const { id, ...params } = updateParams;
+    const qb = this.courseTypeRepository.createQueryBuilder('courseType');
+    qb.update(CourseType)
+      .set(params)
+      .where('courseType.id = :id', { id })
+      .execute();
+    return { status: 1, message: '更新成功' };
+  }
+
+  async getAllCourseList(body: CourseListDto) {
+    return await this.courseRepository.find({
+      // select: ['recordId', 'letter', 'status', 'createdTime'],
+      // relations: {
+      //   letter: true,
+      // },
+      where: {
+        ...body,
+        // clubMemberId: userId,
+      },
+      order: {
+        id: 'DESC',
+      },
+    });
   }
 
   async addCourse(params: AddCourseDto, userId: number) {
@@ -46,6 +92,13 @@ export class CourseService {
 
   async delCourse(params: DelCourseDto) {
     return await this.courseRepository.delete({ id: params.id });
+  }
+
+  async editCourse(updateParams: EditCourseDto) {
+    const { id, ...params } = updateParams;
+    const qb = this.courseRepository.createQueryBuilder('course');
+    qb.update(Course).set(params).where('course.id = :id', { id }).execute();
+    return { status: 1, message: '更新成功' };
   }
 
   async getRandomCourse(params: RandomCourseDto) {

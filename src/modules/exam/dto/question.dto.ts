@@ -29,6 +29,20 @@ export class DelQuestionTypeDto {
   id: number;
 }
 
+export class EditQuestionTypeDto {
+  @IsNotEmpty()
+  @IsNumber()
+  id: number;
+
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  desc: string;
+}
+
 export class QuestionListDto {
   @IsOptional()
   @IsNumber()
@@ -53,6 +67,36 @@ export class AddQuestionDto {
   examType: number;
 
   @IsNotEmpty()
+  @IsNumber()
+  typeId: number;
+
+  @IsOptional()
+  @IsString()
+  option: string;
+
+  @IsOptional()
+  @IsString()
+  answer: string;
+}
+
+export class EditQuestionDto {
+  @IsNotEmpty()
+  @IsNumber()
+  id: number;
+
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  desc: string;
+
+  @IsOptional()
+  @IsEnum(EExamType)
+  examType: number;
+
+  @IsOptional()
   @IsNumber()
   typeId: number;
 

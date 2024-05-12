@@ -27,7 +27,7 @@ export class Course {
   @Column('varchar', { name: 'name', length: 45, comment: '题目标题' })
   name: string;
 
-  @Column('text', { name: 'desc', nullable: true, comment: '题目意义' })
+  @Column('text', { name: 'desc', nullable: true, comment: '课程描述' })
   desc: string;
 
   @Column({ type: 'int', name: 'typeId' })

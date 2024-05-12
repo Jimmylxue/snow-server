@@ -7,6 +7,10 @@ import {
   AddCourseDto,
   DelCourseDto,
   RandomCourseDto,
+  CourseTypeListDto,
+  CourseListDto,
+  EditCourseTypeDto,
+  EditCourseDto,
 } from '../../dto/course.dto';
 
 @Controller('course')
@@ -17,9 +21,39 @@ export class CourseController {
    * 管理员-添加题目类型
    */
   @UseGuards(AuthGuard('jwt'))
+  @Post('/listType')
+  async getTypeList(@Body() body: CourseTypeListDto) {
+    const list = await this.courseService.getAllList(body);
+    if (list) {
+      return {
+        code: 200,
+        result: list,
+      };
+    }
+  }
+
+  /**
+   * 管理员-添加题目类型
+   */
+  @UseGuards(AuthGuard('jwt'))
   @Post('/addType')
   async addCourseType(@Body() body: AddCourseTypeDto) {
     const letter = await this.courseService.addCourseType(body);
+    if (letter) {
+      return {
+        code: 200,
+        result: '创建成功',
+      };
+    }
+  }
+
+  /**
+   * 管理员-添加题目类型
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/editType')
+  async editCourseType(@Body() body: EditCourseTypeDto) {
+    const letter = await this.courseService.editCourseType(body);
     if (letter) {
       return {
         code: 200,
@@ -45,6 +79,18 @@ export class CourseController {
       code: 200,
       result: '删除成功',
     };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/listCourse')
+  async getCourseList(@Body() body: CourseListDto) {
+    const list = await this.courseService.getAllCourseList(body);
+    if (list) {
+      return {
+        code: 200,
+        result: list,
+      };
+    }
   }
 
   /**
@@ -84,10 +130,25 @@ export class CourseController {
   }
 
   /**
+   * 管理员-添加题目类型
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/editCourse')
+  async editCourse(@Body() body: EditCourseDto) {
+    const letter = await this.courseService.editCourse(body);
+    if (letter) {
+      return {
+        code: 200,
+        result: '创建成功',
+      };
+    }
+  }
+
+  /**
    * 随机获取 题目
    */
   @UseGuards(AuthGuard('jwt'))
-  @Post('/randomQuestion')
+  @Post('/randomCourse')
   async getRandomCourse(@Body() body: RandomCourseDto) {
     const questionList = await this.courseService.getRandomCourse(body);
     if (questionList) {

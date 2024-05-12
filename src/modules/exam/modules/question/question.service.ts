@@ -7,6 +7,8 @@ import {
   AddQuestionTypeDto,
   DelQuestionDto,
   DelQuestionTypeDto,
+  EditQuestionDto,
+  EditQuestionTypeDto,
   QuestionListDto,
   QuestionTypeListDto,
   RandomQuestionDto,
@@ -49,6 +51,16 @@ export class QuestionService {
     return await this.questionTypeRepository.delete({ id: params.id });
   }
 
+  async editQuestionType(updateParams: EditQuestionTypeDto) {
+    const { id, ...params } = updateParams;
+    const qb = this.questionRepository.createQueryBuilder('questionType');
+    qb.update(QuestionType)
+      .set(params)
+      .where('questionType.id = :id', { id })
+      .execute();
+    return { status: 1, message: '更新成功' };
+  }
+
   async getAllQuestionList(body: QuestionListDto) {
     return await this.questionRepository.find({
       // select: ['recordId', 'letter', 'status', 'createdTime'],
@@ -79,6 +91,16 @@ export class QuestionService {
 
   async delQuestion(params: DelQuestionDto) {
     return await this.questionRepository.delete({ id: params.id });
+  }
+
+  async editQuestion(updateParams: EditQuestionDto) {
+    const { id, ...params } = updateParams;
+    const qb = this.questionRepository.createQueryBuilder('question');
+    qb.update(Question)
+      .set(params)
+      .where('question.id = :id', { id })
+      .execute();
+    return { status: 1, message: '更新成功' };
   }
 
   async getRandomQuestion(params: RandomQuestionDto) {
