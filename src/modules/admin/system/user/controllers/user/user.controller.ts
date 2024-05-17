@@ -22,13 +22,7 @@ import { BcryptService } from '../../../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RedisInstance } from '@src/instance';
 import { isQQMail } from '@src/utils';
-import {
-  ChangePasswordDto,
-  DelUserDto,
-  UpdateMailDto,
-  UpdatePhoneDto,
-  UserListDto,
-} from '../../dto/update.dto';
+import { DelUserDto, UpdatePhoneDto, UserListDto } from '../../dto/update.dto';
 
 @Controller('user')
 export class UserController {
@@ -83,40 +77,6 @@ export class UserController {
     }
   }
 
-  @Post('login_by_mail')
-  async loginByMail(@Body() body: LoginByMailDto) {
-    const { code, mail } = body;
-    if (!isQQMail(mail)) {
-      return { code: 500, result: '邮箱格式验证异常，请校验' };
-    }
-    let user = await this.usersService.findUserByMail(mail);
-    if (!user) {
-      return {
-        code: 10000,
-        result: '该邮箱未创建用户，请检查地址，或为该邮箱注册一个用户',
-      };
-    }
-    const redis = await RedisInstance.initRedis();
-    const key = `snow-server-mail-verification-code-${mail}`;
-    const redisCode = await redis.get(key);
-    if (redisCode !== code.toUpperCase()) {
-      return {
-        code: 500,
-        result: '验证码校验失败，请重新发送验证码进行校验',
-      };
-    }
-    if (redisCode) {
-      await redis.del(key);
-    }
-    return await this.usersService.createToken(user);
-  }
-
-  @Post('login_by_mini_program')
-  @HttpCode(200)
-  async loginByMiniProgram(@Body() body: LoginByMiniProgram) {
-    return await this.usersService.miniProgramLogin(body);
-  }
-
   @Post('register')
   async register(@Body() body: RegisterDto) {
     // 注册时 传的密码 使用的是 btoa 处理过的密码
@@ -136,8 +96,6 @@ export class UserController {
     });
 
     let user = await this.usersService.findUserByPhone(body.phone);
-
-    this.usersService.addUserSuccessHandle(user);
 
     return {
       code: 200,
@@ -183,8 +141,6 @@ export class UserController {
     let user = await this.usersService.findUserByMail(body.mail);
 
     /** todo-list 项目副作用，用户自动创建基础数据 */
-    this.usersService.addUserSuccessHandle(user);
-
     return await this.usersService.createToken(user);
   }
 
@@ -267,39 +223,5 @@ export class UserController {
     const { user } = auth;
     const userId = user.userId;
     return this.usersService.updateUserPhone(body, userId);
-  }
-
-  /**
-   * 修改邮箱
-   */
-  @UseGuards(AuthGuard('jwt'))
-  @Post('update_mail')
-  async updateMail(@Body() body: UpdateMailDto, @Req() auth) {
-    // 注册时 传的密码 使用的是 btoa 处理过的密码
-    // const  = body;
-    const { user } = auth;
-    const userId = user.userId;
-    if (body.mail && !isQQMail(body.mail)) {
-      return { code: 500, result: '邮箱格式验证异常，请校验' };
-    }
-    if (!isQQMail(body.newMail)) {
-      return { code: 500, result: '邮箱格式验证异常，请校验' };
-    }
-    const redis = await RedisInstance.initRedis();
-    const key = `snow-server-mail-verification-code-${body.newMail}`;
-    const redisCode = await redis.get(key);
-    if (redisCode) {
-      await redis.del(key);
-    }
-    return this.usersService.updateUserMail(body, userId, redisCode);
-  }
-
-  /**
-   * 修改密码 - 简单版
-   *  只需要校验原密码即可
-   */
-  @Post('changePassword')
-  async changePassword(@Body() body: ChangePasswordDto) {
-    return this.usersService.changePassword(body);
   }
 }
