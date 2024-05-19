@@ -11,11 +11,27 @@ import { jwtConstants } from '../../auth/constats';
 import { TaskTypeService } from '@src/modules/todolist/modules/taskType/taskType.service';
 import { TaskType } from '@src/modules/todolist/entities/taskType.entity';
 import { HttpModule } from '@nestjs/axios';
+import { UserGeoController } from '../controllers/user/userGeo.controller';
+import { UserGeoService } from '../services/userGeo.service';
+import { UserGeoRecord } from '../entities/geoRecord.entity';
+import { LocationService } from '../../resource/services/gaodeMap/location.service';
+import { ChildrenRecord } from '../entities/childrenRecord.entity';
+import { ChildrenRecordService } from '../services/childrenRecord.service';
+import { ChildrenRecordController } from '../controllers/user/childrenRecord.controller';
+import { ManagerSettingService } from '../services/managerSetting.service';
+import { ManagerSettingController } from '../controllers/user/managerSetting.controller';
+import { ManagerSetting } from '../entities/managerSetting.entity';
 
 @Module({
   imports: [
     HttpModule,
-    TypeOrmModule.forFeature([User, TaskType]),
+    TypeOrmModule.forFeature([
+      User,
+      TaskType,
+      UserGeoRecord,
+      ChildrenRecord,
+      ManagerSetting,
+    ]),
     // user模块需要派发 token 所以这里必须得引用 jwt Module
     JwtModule.register({
       secret: jwtConstants.secret,
@@ -30,8 +46,17 @@ import { HttpModule } from '@nestjs/axios';
     JwtStrategy,
     TaskTypeService,
     BcryptService,
+    UserGeoService,
+    LocationService,
+    ChildrenRecordService,
+    ManagerSettingService,
   ],
-  controllers: [UserController],
+  controllers: [
+    UserController,
+    UserGeoController,
+    ChildrenRecordController,
+    ManagerSettingController,
+  ],
   // exports: [TypeOrmModule],
 })
 export class UsersModule {}

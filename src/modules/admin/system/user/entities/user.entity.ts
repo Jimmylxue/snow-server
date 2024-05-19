@@ -2,6 +2,7 @@ import { generateRandomCode } from '@src/utils';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Role {
+  '未定义',
   '普通用户',
   '管理员',
 }
@@ -34,7 +35,7 @@ export class User {
   @Column({
     type: 'enum',
     enum: Role,
-    default: Role.普通用户,
+    default: Role.未定义,
     name: 'role',
   })
   role: number;
