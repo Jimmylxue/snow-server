@@ -12,8 +12,10 @@ import {
   CourseListDto,
   EditCourseDto,
   EditCourseTypeDto,
+  BuyCourseDto,
 } from '../../dto/course.dto';
 import { Course } from '../../entities/course.entity';
+import { CourseOrder } from '../../entities/courseOrder.entity';
 
 @Injectable()
 export class CourseService {
@@ -22,6 +24,8 @@ export class CourseService {
     private readonly courseTypeRepository: Repository<CourseType>,
     @InjectRepository(Course)
     private readonly courseRepository: Repository<Course>,
+    @InjectRepository(CourseOrder)
+    private readonly courseOrderRepository: Repository<CourseOrder>,
   ) {}
 
   async getAllList(body: CourseTypeListDto) {
@@ -107,5 +111,49 @@ export class CourseService {
       .orderBy('RAND()')
       .take(params.count || 10)
       .getMany();
+  }
+
+  /**
+   * 是否有这个订单数据
+   */
+  async whetherHasCourse(courseId: number, userId: number) {
+    return await this.courseOrderRepository.findOneBy({
+      userId,
+      courseId,
+    });
+  }
+
+  async buyCourse(params: BuyCourseDto, userId: number) {
+    const whetherOrder = await this.whetherHasCourse(params.courseId, userId);
+    if (whetherOrder?.id) {
+      return {
+        code: 500,
+        result: '您已经购买该课程',
+      };
+    }
+    const order = this.courseOrderRepository.create();
+    order.user = userId;
+    order.userId = userId;
+    order.course = params.courseId;
+    order.courseId = params.courseId;
+    await this.courseOrderRepository.save(order);
+    return {
+      code: 200,
+      result: '操作成功',
+    };
+  }
+
+  async getUserCourseOrder(userId: number) {
+    return await this.courseOrderRepository.find({
+      relations: {
+        course: true,
+      },
+      where: {
+        userId,
+      },
+      order: {
+        id: 'DESC',
+      },
+    });
   }
 }

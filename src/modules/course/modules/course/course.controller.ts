@@ -11,6 +11,7 @@ import {
   CourseListDto,
   EditCourseTypeDto,
   EditCourseDto,
+  BuyCourseDto,
 } from '../../dto/course.dto';
 
 @Controller('course')
@@ -157,5 +158,49 @@ export class CourseController {
         result: questionList,
       };
     }
+  }
+
+  /**
+   * 购买课程
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/buyCourse')
+  async buyCourse(@Body() body: BuyCourseDto, @Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    return await this.courseService.buyCourse(body, userId);
+  }
+
+  /**
+   * 购买课程
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/checkBuy')
+  async checkBuy(@Body() body: BuyCourseDto, @Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const order = await this.courseService.whetherHasCourse(
+      body.courseId,
+      userId,
+    );
+    return {
+      code: 200,
+      result: !!order?.id,
+    };
+  }
+
+  /**
+   * 已买课程
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/courseOrder')
+  async courseOrder(@Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const list = await this.courseService.getUserCourseOrder(userId);
+    return {
+      code: 200,
+      result: list,
+    };
   }
 }
