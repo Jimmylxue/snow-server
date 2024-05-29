@@ -108,3 +108,9 @@ export class RandomCourseDto {
   @IsNumber()
   count: number;
 }
+
+export class BuyCourseDto {
+  @IsNotEmpty()
+  @IsNumber()
+  courseId: number;
+}
