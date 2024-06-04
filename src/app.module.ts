@@ -25,6 +25,7 @@ import { ClubSystemModule } from './modules/clubs/clubSystem.module';
 import { ExamSystemModule } from './modules/exam/examSystem.module';
 import { StaticModule } from './modules/static/static.module';
 import { CourseSystemModule } from './modules/course/CourseSystem.module';
+import { ShoppingSystemModule } from './modules/shopping/shoppingSystem.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -64,6 +65,7 @@ import { CourseSystemModule } from './modules/course/CourseSystem.module';
     ExamSystemModule,
     StaticModule,
     CourseSystemModule,
+    ShoppingSystemModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: {
