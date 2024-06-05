@@ -11,7 +11,7 @@ import {
 import { ProductType } from './productType.entity';
 
 export enum EProductStatus {
-  销售中 = 1,
+  有库存 = 1,
   售罄,
 }
 
@@ -70,7 +70,7 @@ export class Product {
     enum: EProductStatus,
     name: 'status',
     comment: '商品的销售状态 -> 售卖中 & 售罄',
-    default: EProductStatus.销售中,
+    default: EProductStatus.有库存,
   })
   status: number;
 

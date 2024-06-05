@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { EProductStatus, ESaleStatus } from '../entities/product.entity';
 
 export class ProductListDto {
   @IsOptional()
@@ -8,6 +15,26 @@ export class ProductListDto {
   @IsOptional()
   @IsString()
   title?: string;
+
+  @IsOptional()
+  @IsNumber()
+  price?: number;
+
+  @IsOptional()
+  @IsEnum(EProductStatus)
+  status: number;
+
+  @IsOptional()
+  @IsEnum(ESaleStatus)
+  saleStatue: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  page: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  pageSize: number;
 }
 
 export class DelProductDto {
@@ -44,6 +71,14 @@ export class AddProductDto {
   @IsNotEmpty()
   @IsNumber()
   price: number;
+
+  @IsOptional()
+  @IsEnum(EProductStatus)
+  status: number;
+
+  @IsOptional()
+  @IsEnum(ESaleStatus)
+  saleStatue: number;
 }
 
 export class EditProductDto extends AddProductDto {

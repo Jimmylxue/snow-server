@@ -18,19 +18,28 @@ export class ProductTypeService {
   ) {}
 
   async getAllList(body: ProductTypeListDto) {
-    return await this.productTypeRepository.find({
-      // select: ['recordId', 'letter', 'status', 'createdTime'],
-      // relations: {
-      //   letter: true,
-      // },
+    const { page, pageSize, ...where } = body;
+    const whereConditions = {};
+    for (const key in where) {
+      if (where[key] !== '') {
+        whereConditions[key] = where[key];
+      }
+    }
+    const [result, total] = await this.productTypeRepository.findAndCount({
       where: {
-        ...body,
-        // clubMemberId: userId,
+        ...whereConditions,
       },
       order: {
         id: 'DESC',
       },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
+    return {
+      page: page,
+      result,
+      total,
+    };
   }
 
   async add(params: AddProductTypeDto, userId: number) {

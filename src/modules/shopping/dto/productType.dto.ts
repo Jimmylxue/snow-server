@@ -8,6 +8,14 @@ export class ProductTypeListDto {
   @IsOptional()
   @IsString()
   title?: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  page: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  pageSize: number;
 }
 
 export class DelProductTypeDto {
