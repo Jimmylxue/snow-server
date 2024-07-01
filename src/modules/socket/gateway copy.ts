@@ -3,17 +3,10 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  WsResponse,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { formatUserInfoV2, getSocketIdByUserId } from './core/core';
-import {
-  MESSAGE_TYPE,
-  TMessage,
-  TSendSomeOneMessage,
-  TUser,
-  TUserV2,
-} from './type';
+import { formatUserInfoV2 } from './core/core';
+import { MESSAGE_TYPE, TMessage, TSendSomeOneMessage, TUser } from './type';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from './core/jwt-auth.guard';
 
@@ -25,7 +18,7 @@ import { JwtAuthGuard } from './core/jwt-auth.guard';
 })
 export class EventsGateway {
   @WebSocketServer() server: Server;
-  userList: Set<TUserV2> = new Set();
+  userList: Set<TUser> = new Set();
 
   @SubscribeMessage('identity')
   async identity(@MessageBody() data: number): Promise<number> {
@@ -96,11 +89,8 @@ export class EventsGateway {
 
   @SubscribeMessage('sendSomeOneMessage')
   sendSomeOneMessage(_: Socket, payload: TSendSomeOneMessage) {
-    const toSocketId = getSocketIdByUserId(
-      payload.toUserId,
-      Array.from(this.userList),
-    );
-    this.server.to(toSocketId).emit('someOneMessage', payload);
+    // @ts-ignore
+    this.server.to(payload.toSocketId).emit('someOneMessage', payload);
   }
 
   @SubscribeMessage('addCart')

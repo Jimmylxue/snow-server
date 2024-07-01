@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io';
-import { TUser } from '../type';
+import { TUser, TUserV2 } from '../type';
 import { getFilterAvatarList, getFilterNameList, randomListOne } from './utils';
 
 /**
@@ -18,7 +18,7 @@ export function formatUserInfo(socketId: string, userList: TUser[]): TUser {
 /**
  *
  */
-export function formatUserInfoV2(socket: Socket): TUser {
+export function formatUserInfoV2(socket: Socket): TUserV2 {
   const socketId = socket.id;
   // @ts-ignore
   const user = socket.user;
@@ -28,4 +28,8 @@ export function formatUserInfoV2(socket: Socket): TUser {
     avatar: user.avatar,
     userId: user.userId,
   };
+}
+
+export function getSocketIdByUserId(userId: number, userList: TUserV2[]) {
+  return userList.find((user) => user.userId === userId)?.socketId;
 }

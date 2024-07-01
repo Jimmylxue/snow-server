@@ -2,7 +2,13 @@ export type TUser = {
   socketId: string;
   name: string;
   avatar: string;
-  userId?: number;
+};
+
+export type TUserV2 = {
+  socketId: string;
+  name: string;
+  avatar: string;
+  userId: number;
 };
 
 export enum MESSAGE_TYPE {
@@ -23,7 +29,7 @@ export type TMessage = {
 export type TSendSomeOneMessage = {
   type: MESSAGE_TYPE.个人消息;
   text: string;
-  toSocketId: string;
-  fromSocketId: string;
+  toUserId: number;
+  fromUserId: number;
   createTime: string;
 };
