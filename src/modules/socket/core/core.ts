@@ -1,6 +1,10 @@
+import { Socket } from 'socket.io';
 import { TUser } from '../type';
 import { getFilterAvatarList, getFilterNameList, randomListOne } from './utils';
 
+/**
+ * 获取所需的用户信息
+ */
 export function formatUserInfo(socketId: string, userList: TUser[]): TUser {
   const filterNameList = getFilterNameList(userList);
   const filterAvatarList = getFilterAvatarList(userList);
@@ -8,5 +12,20 @@ export function formatUserInfo(socketId: string, userList: TUser[]): TUser {
     socketId,
     name: randomListOne(filterNameList),
     avatar: randomListOne(filterAvatarList).source,
+  };
+}
+
+/**
+ *
+ */
+export function formatUserInfoV2(socket: Socket): TUser {
+  const socketId = socket.id;
+  // @ts-ignore
+  const user = socket.user;
+  return {
+    socketId,
+    name: user.username,
+    avatar: user.avatar,
+    userId: user.userId,
   };
 }

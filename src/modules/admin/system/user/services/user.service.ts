@@ -158,16 +158,22 @@ export class UserService {
   }
 
   async createToken(user) {
-    const payload = { username: user.username, userId: user.id };
+    const payload = {
+      username: user.username,
+      userId: user.id,
+      avatar: user.avatar,
+    };
     delete user.password;
     delete user.openid;
+    const token = await this.jwtService.sign(payload);
+    console.log('token~', token);
     return {
       msg: '登录成功',
       code: 200,
       result: {
         user: user,
         //得到token
-        token: await this.jwtService.sign(payload),
+        token,
       },
     };
   }

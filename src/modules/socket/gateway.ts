@@ -6,8 +6,10 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { formatUserInfo } from './core/core';
-import { MESSAGE_TYPE, TMessage, TUser } from './type';
+import { formatUserInfoV2 } from './core/core';
+import { MESSAGE_TYPE, TMessage, TSendSomeOneMessage, TUser } from './type';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from './core/jwt-auth.guard';
 
 @WebSocketGateway(8080, {
   transports: ['websocket'],
@@ -30,12 +32,21 @@ export class EventsGateway {
     }, 1000);
   }
 
+  @UseGuards(JwtAuthGuard)
   @SubscribeMessage('login')
   login(client: Socket) {
-    const user = formatUserInfo(client.id, Array.from(this.userList));
+    const user = formatUserInfoV2(client);
     if (!this.userList.has(user)) {
       this.userList.add(user);
       // 广播一下 有新用户登录了
+      this.server.emit('loginAndLogOut', {
+        type: MESSAGE_TYPE.登录消息,
+        text: `${user.name}进入了小黑屋`,
+        memberCount: this.userList.size,
+        memberInfo: user,
+        userList: Array.from(this.userList),
+      });
+
       this.server.emit('message', {
         type: MESSAGE_TYPE.登录消息,
         text: `${user.name}进入了小黑屋`,
@@ -44,6 +55,9 @@ export class EventsGateway {
         userList: Array.from(this.userList),
       });
     }
+    /**
+     * 这个 disconnect 是不可更改的 就是断开socket 会触发的事件
+     */
     client.on('disconnect', () => {
       const deleteUser = Array.from(this.userList).find(
         (user) => user.socketId === client.id,
@@ -51,7 +65,7 @@ export class EventsGateway {
       if (deleteUser && this.userList.has(deleteUser)) {
         this.userList.delete(deleteUser);
         // 广播一下 有用户退出登录了
-        this.server.emit('message', {
+        this.server.emit('loginAndLogOut', {
           type: MESSAGE_TYPE.登出消息,
           text: `${deleteUser.name}退出了小黑屋`,
           memberCount: this.userList.size,
@@ -62,15 +76,21 @@ export class EventsGateway {
     });
   }
 
-  @SubscribeMessage('logout')
-  logout(client: Socket) {}
-
+  /**
+   * 广播数据 - 旧的版本 为了兼容 蛮留着一下
+   */
   @SubscribeMessage('sendMessage')
   sendMessage(_: Socket, payload: TMessage) {
     this.server.emit('message', {
       ...payload,
+      type: MESSAGE_TYPE.个人消息,
       userList: Array.from(this.userList),
     });
+  }
+
+  @SubscribeMessage('sendSomeOneMessage')
+  sendSomeOneMessage(_: Socket, payload: TSendSomeOneMessage) {
+    this.server.to(payload.toSocketId).emit('someOneMessage', payload);
   }
 
   @SubscribeMessage('addCart')
