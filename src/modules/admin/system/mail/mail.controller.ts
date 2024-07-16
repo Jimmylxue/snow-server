@@ -19,8 +19,15 @@ export class MailController {
     const key = `snow-server-mail-verification-code-${mail}`;
     redis.set(key, code);
     redis.expire(key, 600); // 单位是秒
-    await this.nodemailerService.sendVerificationCode({ to: mail, code });
-    return { code: 200, result: '发送成功' };
+    const status = await this.nodemailerService.sendVerificationCode({
+      to: mail,
+      code,
+    });
+    if (status) {
+      return { code: 200, result: '发送成功' };
+    } else {
+      return { code: 500, result: '发送失败，请检查' };
+    }
   }
 
   @Get('test')
