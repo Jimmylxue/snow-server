@@ -15,12 +15,9 @@ export class AddressController {
   /**
    * 添加商品
    */
-  @UseGuards(AuthGuard('jwt'))
   @Post('/add')
-  async signIn(@Body() body: AddAddressDto, @Req() auth) {
-    const { user } = auth;
-    const userId = user.userId;
-    await this.addressService.addAddress(body, userId);
+  async signIn(@Body() body: AddAddressDto) {
+    await this.addressService.addAddress(body);
     return {
       code: 200,
       result: '操作成功',
@@ -30,9 +27,8 @@ export class AddressController {
   /**
    * 查看商品列表
    */
-  @UseGuards(AuthGuard('jwt'))
   @Post('/list')
-  async getSignList(@Body() body: AddressListDto, @Req() auth) {
+  async getSignList(@Body() body: AddressListDto) {
     const list = await this.addressService.getAllList(body);
     if (list) {
       return {

@@ -12,7 +12,6 @@ import {
 } from '../dto/update.dto';
 import { LoginByMiniProgram } from '../dto/login.dto';
 import { HttpService } from '@nestjs/axios';
-import { TaskTypeService } from '@src/modules/todolist/modules/taskType/taskType.service';
 import { ConfigService } from '@nestjs/config';
 import { BcryptService } from '../../auth/auth.service';
 
@@ -23,7 +22,6 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
     private readonly httpService: HttpService,
-    private readonly taskType: TaskTypeService,
     private readonly configService: ConfigService,
     private readonly bcryptService: BcryptService,
   ) {}
@@ -248,13 +246,5 @@ export class UserService {
    * 注册成功后副作用
    * @param user
    */
-  addUserSuccessHandle(user: User) {
-    const registerUserId = user.id;
-
-    this.taskType.addUserTaskType({
-      userId: registerUserId,
-      typeName: '工作',
-      createTime: Date.now() + '',
-    });
-  }
+  addUserSuccessHandle(user: User) {}
 }

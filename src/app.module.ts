@@ -3,28 +3,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminModule } from './modules/admin/admin.module';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './exception/http-exception.filter';
-import { WxModule } from './modules/wx/wx.module';
 import { ScheduleModule } from '@nestjs/schedule';
-import { TasksModule } from './schedule/task.module';
-import { EventsModule } from './modules/socket/event.module';
-import { GptModule } from './modules/gpt/gpt.module';
-import { TodoListModule } from './modules/todolist/todolist.module';
-import { UploadModule } from './modules/upload/upload.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './modules/admin/system/auth/constats';
 import { BcryptService } from './modules/admin/system/auth/auth.service';
 import { JwtStrategy } from './modules/admin/system/auth/jwtStrategy.service';
 import { CatchErrorController } from './modules/admin/system/catchError/catchError.controller';
 import { LoggerService } from './modules/shared/service/Logger.service';
-import { SnowMemoModule } from './modules/memo-word/memo.module';
-import { CheckInModule } from './modules/checkIn/checkIn.module';
-import { TrainModule } from './modules/12306/train.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { resolve } from 'path';
-import { ClubSystemModule } from './modules/clubs/clubSystem.module';
-import { ExamSystemModule } from './modules/exam/examSystem.module';
 import { StaticModule } from './modules/static/static.module';
-import { CourseSystemModule } from './modules/course/CourseSystem.module';
 import { ShoppingSystemModule } from './modules/shopping/shoppingSystem.module';
 @Module({
   imports: [
@@ -50,21 +38,8 @@ import { ShoppingSystemModule } from './modules/shopping/shoppingSystem.module';
       },
     }),
     AdminModule,
-    WxModule,
-    TodoListModule,
-    CheckInModule,
-    // MiniProgramModule,
-    GptModule,
     ScheduleModule.forRoot(),
-    TasksModule,
-    EventsModule,
-    UploadModule,
-    SnowMemoModule,
-    TrainModule,
-    ClubSystemModule,
-    ExamSystemModule,
     StaticModule,
-    CourseSystemModule,
     ShoppingSystemModule,
     JwtModule.register({
       secret: jwtConstants.secret,

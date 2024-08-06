@@ -1,23 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Role, User } from '../entities/user.entity';
-import { Between, Repository } from 'typeorm';
-import { JwtService } from '@nestjs/jwt';
-import {
-  ChangePasswordDto,
-  DelUserDto,
-  UpdateMailDto,
-  UpdatePhoneDto,
-  UserListDto,
-} from '../dto/update.dto';
-import { LoginByMiniProgram } from '../dto/login.dto';
-import { HttpService } from '@nestjs/axios';
-import { TaskTypeService } from '@src/modules/todolist/modules/taskType/taskType.service';
-import { ConfigService } from '@nestjs/config';
-import { BcryptService } from '../../auth/auth.service';
-import { UserGeoRecord } from '../entities/geoRecord.entity';
-import { AddGeoRecordDto, GeoRecordListDto } from '../dto/geo.dto';
-import { LocationService } from '../../resource/services/gaodeMap/location.service';
+import { Role } from '../entities/user.entity';
+import { Repository } from 'typeorm';
 import { ChildrenRecord } from '../entities/childrenRecord.entity';
 import { AddRecordDto, RemoveRecordDto } from '../dto/childrenRecord.dto';
 import { UserService } from './user.service';

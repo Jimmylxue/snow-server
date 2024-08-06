@@ -17,31 +17,32 @@ export class AddressService {
   ) {}
 
   async getAllList(body: AddressListDto) {
-    return await this.addressRepository.find({
-      // select: ['recordId', 'letter', 'status', 'createdTime'],
-      // relations: {
-      //   letter: true,
-      // },
+    const { page, pageSize, ...where } = body;
+    const [result, total] = await this.addressRepository.findAndCount({
       where: {
-        ...body,
-        // clubMemberId: userId,
+        ...where,
       },
       order: {
         addressId: 'DESC',
       },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     });
+    return {
+      page: page,
+      result,
+      total,
+    };
   }
 
-  async addAddress(params: AddAddressDto, userId: number) {
+  async addAddress(params: AddAddressDto) {
     const type = this.addressRepository.create();
     type.province = params.province;
     type.city = params.city;
     type.area = params.area;
     type.detail = params.detail;
-    type.user = userId;
     type.username = params.username;
     type.phone = params.phone;
-    type.userId = userId;
     return await this.addressRepository.save(type);
   }
 

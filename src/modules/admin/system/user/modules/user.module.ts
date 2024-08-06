@@ -8,13 +8,10 @@ import { JwtStrategy } from '../../auth/jwtStrategy.service';
 import { UserController } from '../controllers/user/user.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from '../../auth/constats';
-import { TaskTypeService } from '@src/modules/todolist/modules/taskType/taskType.service';
-import { TaskType } from '@src/modules/todolist/entities/taskType.entity';
 import { HttpModule } from '@nestjs/axios';
 import { UserGeoController } from '../controllers/user/userGeo.controller';
 import { UserGeoService } from '../services/userGeo.service';
 import { UserGeoRecord } from '../entities/geoRecord.entity';
-import { LocationService } from '../../resource/services/gaodeMap/location.service';
 import { ChildrenRecord } from '../entities/childrenRecord.entity';
 import { ChildrenRecordService } from '../services/childrenRecord.service';
 import { ChildrenRecordController } from '../controllers/user/childrenRecord.controller';
@@ -27,7 +24,6 @@ import { ManagerSetting } from '../entities/managerSetting.entity';
     HttpModule,
     TypeOrmModule.forFeature([
       User,
-      TaskType,
       UserGeoRecord,
       ChildrenRecord,
       ManagerSetting,
@@ -44,18 +40,16 @@ import { ManagerSetting } from '../entities/managerSetting.entity';
     UserService,
     BcryptService,
     JwtStrategy,
-    TaskTypeService,
     BcryptService,
     UserGeoService,
-    LocationService,
     ChildrenRecordService,
     ManagerSettingService,
   ],
   controllers: [
-    UserController,
-    UserGeoController,
-    ChildrenRecordController,
-    ManagerSettingController,
+    // UserController,
+    // UserGeoController,
+    // ChildrenRecordController,
+    // ManagerSettingController,
   ],
   // exports: [TypeOrmModule],
 })

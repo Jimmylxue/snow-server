@@ -21,7 +21,7 @@ export class AddAddressDto {
   @IsString()
   city: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   area: string;
 
@@ -33,7 +33,7 @@ export class AddAddressDto {
   @IsString()
   username: string;
 
-  @IsMobilePhone('zh-CN')
+  // @IsMobilePhone('zh-CN')
   @IsNotEmpty()
   phone: string;
 }
@@ -64,4 +64,12 @@ export class AddressListDto extends EditAddressDto {
   @IsOptional()
   @IsNumber()
   addressId?: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  page: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  pageSize: number;
 }

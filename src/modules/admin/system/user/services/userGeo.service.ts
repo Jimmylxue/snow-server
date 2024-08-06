@@ -3,17 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserGeoRecord } from '../entities/geoRecord.entity';
 import { AddGeoRecordDto, GeoRecordListDto } from '../dto/geo.dto';
-import { LocationService } from '../../resource/services/gaodeMap/location.service';
 
 @Injectable()
 export class UserGeoService {
   constructor(
     @InjectRepository(UserGeoRecord)
     private readonly userGeoRepository: Repository<UserGeoRecord>,
-    private readonly locationService: LocationService,
   ) {}
 
   async addGeoRecord(params: AddGeoRecordDto, userId: number) {
+    // @ts-ignore
     const { data } = await this.locationService.getLocationByGeo(params);
     if (+data.infocode === 10000) {
       const res = data.regeocode;

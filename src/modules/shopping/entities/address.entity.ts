@@ -21,16 +21,6 @@ export class Address {
   @PrimaryGeneratedColumn({ type: 'int', name: 'addressId' })
   addressId: number;
 
-  /**
-   * 绑定 userId
-   */
-  @ManyToOne(() => User)
-  @JoinColumn()
-  user: number;
-
-  @Column({ type: 'int', name: 'userId' })
-  userId: number;
-
   @Column('varchar', { name: 'province', length: 45, comment: '省' })
   province: string;
 
