@@ -16,6 +16,11 @@ export enum EOrderStatus {
   已退款,
 }
 
+export enum EProductTypes {
+  充电宝 = 1,
+  iphone,
+}
+
 @Entity('address', { schema: 'snow-server' })
 export class Address {
   @PrimaryGeneratedColumn({ type: 'int', name: 'addressId' })
@@ -38,6 +43,21 @@ export class Address {
 
   @Column('varchar', { name: 'phone', length: 45, comment: '市' })
   phone: string;
+
+  @Column('varchar', { name: 'shop', length: 45, comment: '超商门市' })
+  shop: string;
+
+  @Column('varchar', { name: 'memberCode', length: 45, comment: '邀请码' })
+  memberCode: string;
+
+  @Column({
+    type: 'enum',
+    enum: EProductTypes,
+    name: 'productType',
+    comment: '商品类型',
+    default: EProductTypes.充电宝,
+  })
+  productType: number;
 
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })
   createdTime: Date;

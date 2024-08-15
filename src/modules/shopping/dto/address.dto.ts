@@ -4,7 +4,9 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsEnum,
 } from 'class-validator';
+import { EProductTypes } from '../entities/address.entity';
 
 export class DelAddressDto {
   @IsNotEmpty()
@@ -36,6 +38,28 @@ export class AddAddressDto {
   // @IsMobilePhone('zh-CN')
   @IsNotEmpty()
   phone: string;
+
+  @IsNotEmpty()
+  @IsString()
+  shop: string;
+
+  @IsNotEmpty()
+  @IsString()
+  memberCode: string;
+
+  @IsOptional()
+  @IsEnum(EProductTypes)
+  productType: number;
+}
+
+export class EditConfigDto {
+  @IsOptional()
+  @IsString()
+  lineCode: string;
+
+  @IsOptional()
+  @IsString()
+  inviteCode: string;
 }
 
 export class EditAddressDto {
