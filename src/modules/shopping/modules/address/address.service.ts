@@ -11,6 +11,7 @@ import {
 } from '../../dto/address.dto';
 // @ts-ignore
 import { SystemConfig } from '../../entities/systemConfig.entity';
+import * as XLSX from 'xlsx';
 
 @Injectable()
 export class AddressService {
@@ -99,5 +100,22 @@ export class AddressService {
       .where('systemConfig.configId = :configId', { configId: 1 })
       .execute();
     return { status: 1, message: '更新成功' };
+  }
+
+  /**
+   * 导出表格
+   */
+  async exportUsersToExcel() {
+    const address = await this.addressRepository.find();
+
+    const worksheet = XLSX.utils.json_to_sheet(address);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Address');
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'buffer',
+    });
+    return excelBuffer;
   }
 }

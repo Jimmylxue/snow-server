@@ -1,4 +1,11 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Response,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AddressService } from './address.service';
 import {
@@ -8,6 +15,7 @@ import {
   EditAddressDto,
   EditConfigDto,
 } from '../../dto/address.dto';
+import { Response as Res } from 'express';
 
 @Controller('address')
 export class AddressController {
@@ -108,5 +116,16 @@ export class AddressController {
       code: 200,
       result: '删除成功',
     };
+  }
+
+  @Get('export')
+  async exportUsers(@Response() res: Res) {
+    const excelBuffer = await this.addressService.exportUsersToExcel();
+    res.set({
+      'Content-Type':
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': 'attachment; filename=Address.xlsx',
+    });
+    res.send(excelBuffer);
   }
 }
