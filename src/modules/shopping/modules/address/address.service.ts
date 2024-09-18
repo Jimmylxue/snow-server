@@ -13,6 +13,8 @@ import {
 import { SystemConfig } from '../../entities/systemConfig.entity';
 import * as XLSX from 'xlsx';
 
+import * as geoip from 'geoip-lite';
+
 @Injectable()
 export class AddressService {
   constructor(
@@ -117,5 +119,11 @@ export class AddressService {
       type: 'buffer',
     });
     return excelBuffer;
+  }
+
+  getCountryByIp(ip: string) {
+    const geo = geoip.lookup(ip);
+    console.log('geo', geo, ip);
+    return geo ? geo.country : 'Unknown';
   }
 }

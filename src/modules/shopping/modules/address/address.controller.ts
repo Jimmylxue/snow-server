@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Request,
   Response,
   UseGuards,
 } from '@nestjs/common';
@@ -127,5 +128,11 @@ export class AddressController {
       'Content-Disposition': 'attachment; filename=Address.xlsx',
     });
     res.send(excelBuffer);
+  }
+
+  @Get('country')
+  getCountry(@Request() req): string {
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    return this.addressService.getCountryByIp(ip);
   }
 }
