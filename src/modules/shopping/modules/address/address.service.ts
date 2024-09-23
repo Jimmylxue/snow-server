@@ -69,6 +69,7 @@ export class AddressService {
     type.memberCode = params.memberCode;
     type.shop = params.shop;
     type.productType = params.productType;
+    type.sku = params.sku;
     return await this.addressRepository.save(type);
   }
 

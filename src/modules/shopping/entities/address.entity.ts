@@ -50,6 +50,9 @@ export class Address {
   @Column('varchar', { name: 'memberCode', length: 45, comment: '邀请码' })
   memberCode: string;
 
+  @Column('varchar', { name: 'sku', length: 300, comment: 'sku属性' })
+  sku: string;
+
   @Column({
     type: 'enum',
     enum: EProductTypes,

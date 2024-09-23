@@ -50,6 +50,10 @@ export class AddAddressDto {
   @IsOptional()
   @IsEnum(EProductTypes)
   productType: number;
+
+  @IsOptional()
+  @IsString()
+  sku: string;
 }
 
 export class EditConfigDto {
