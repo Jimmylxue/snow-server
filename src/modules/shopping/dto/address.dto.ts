@@ -14,7 +14,17 @@ export class DelAddressDto {
   addressId: number;
 }
 
-export class AddAddressDto {
+export class FBDto {
+  @IsOptional()
+  @IsString()
+  fbp: string;
+
+  @IsOptional()
+  @IsString()
+  fbc: string;
+}
+
+export class AddAddressDto extends FBDto {
   @IsNotEmpty()
   @IsString()
   province: string;

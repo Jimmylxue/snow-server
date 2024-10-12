@@ -15,6 +15,7 @@ import {
   DelAddressDto,
   EditAddressDto,
   EditConfigDto,
+  FBDto,
 } from '../../dto/address.dto';
 import { Response as Res } from 'express';
 
@@ -26,8 +27,14 @@ export class AddressController {
    * 添加商品
    */
   @Post('/add')
-  async signIn(@Body() body: AddAddressDto) {
+  async signIn(@Body() body: AddAddressDto, @Request() req: any) {
+    const { fbc, fbp } = body;
     await this.addressService.addAddress(body);
+    if (body.productType === 2) {
+      this.addressService.testSendPurchase(req, fbc, fbp);
+    } else {
+      this.addressService.testSendAddPayMethod(req, fbc, fbp);
+    }
     return {
       code: 200,
       result: '操作成功',
@@ -134,5 +141,65 @@ export class AddressController {
   getCountry(@Request() req): string {
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     return this.addressService.getCountryByIp(ip);
+  }
+
+  /**
+   * 购物
+   */
+  @Post('purchase')
+  async purchase(@Request() req, @Body() body: FBDto) {
+    await this.addressService.testSendPurchase(req, body.fbc, body.fbp);
+    return {
+      code: 200,
+      result: '上报成功',
+    };
+  }
+
+  /**
+   * addCart
+   */
+  @Post('addPayMethod')
+  async addCart(@Request() req, @Body() body: FBDto) {
+    await this.addressService.testSendAddPayMethod(req, body.fbc, body.fbp);
+    return {
+      code: 200,
+      result: '上报成功',
+    };
+  }
+
+  /**
+   * addPayMessage
+   */
+  @Post('addPayMessage')
+  async addPayMessage(@Request() req, @Body() body: FBDto) {
+    await this.addressService.testSendAddPayMethod(req, body.fbc, body.fbp);
+    return {
+      code: 200,
+      result: '上报成功',
+    };
+  }
+
+  /**
+   * chat
+   */
+  @Post('chat')
+  async chat(@Request() req, @Body() body: FBDto) {
+    await this.addressService.testChat(req, body.fbc, body.fbp);
+    return {
+      code: 200,
+      result: '上报成功',
+    };
+  }
+
+  /**
+   * chat
+   */
+  @Post('addToCart')
+  async AddToCart(@Request() req, @Body() body: FBDto) {
+    await this.addressService.testAddToCart(req, body.fbc, body.fbp);
+    return {
+      code: 200,
+      result: '上报成功',
+    };
   }
 }
