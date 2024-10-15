@@ -13,6 +13,7 @@ import {
   AddAddressDto,
   AddressListDto,
   DelAddressDto,
+  ECheckLinkDto,
   EditAddressDto,
   EditConfigDto,
   FBDto,
@@ -201,5 +202,29 @@ export class AddressController {
       code: 200,
       result: '上报成功',
     };
+  }
+
+  /**
+   * 生成链接
+   */
+  @Post('generate')
+  async generate() {
+    return await this.addressService.generateLink();
+  }
+
+  /**
+   * 检查链接
+   */
+  @Post('checkLink')
+  async checkLink(@Body() body: ECheckLinkDto) {
+    return await this.addressService.checkLink(body);
+  }
+
+  /**
+   * 更新
+   */
+  @Post('updateLink')
+  async updateLink(@Body() body: ECheckLinkDto) {
+    return await this.addressService.updateLink(body);
   }
 }

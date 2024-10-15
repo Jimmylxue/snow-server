@@ -6,6 +6,7 @@ import {
   AddAddressDto,
   AddressListDto,
   DelAddressDto,
+  ECheckLinkDto,
   EditAddressDto,
   EditConfigDto,
 } from '../../dto/address.dto';
@@ -14,6 +15,9 @@ import { SystemConfig } from '../../entities/systemConfig.entity';
 import * as XLSX from 'xlsx';
 
 import * as geoip from 'geoip-lite';
+import { ELinkStatus, TempLink } from '../../entities/tempLink.entity';
+import { v4 as uuidv4 } from 'uuid';
+import { ConfigService } from '@nestjs/config';
 
 const bizSdk = require('facebook-nodejs-business-sdk');
 
@@ -47,6 +51,9 @@ export class AddressService {
     private readonly addressRepository: Repository<Address>,
     @InjectRepository(SystemConfig)
     private readonly systemConfigRepository: Repository<SystemConfig>,
+    @InjectRepository(TempLink)
+    private readonly tempLinkRepository: Repository<TempLink>,
+    private readonly configService: ConfigService,
   ) {}
 
   async getAllList(body: AddressListDto) {
@@ -493,5 +500,78 @@ export class AddressService {
     );
 
     return { code: 200, result: '成功' };
+  }
+
+  async generateLink() {
+    const uuid = uuidv4();
+    const link = this.tempLinkRepository.create();
+    link.linkCode = uuid;
+    link.linkStatus = ELinkStatus.未消费;
+    const linkUrl = this.configService.get('LINK_URL');
+    const isSubSite = this.configService.get('SUB_SITE') == '1';
+    try {
+      await this.tempLinkRepository.save(link);
+      return {
+        code: 200,
+        result: `${linkUrl}/#/luck?shareMemberCode=${uuid}${
+          isSubSite ? '&subSite=1' : ''
+        }`,
+      };
+    } catch (error) {
+      return {
+        code: 500,
+        result: '临时链接生成失败',
+      };
+    }
+  }
+
+  async checkLink(params: ECheckLinkDto) {
+    try {
+      const link = await this.tempLinkRepository.findOneBy({
+        linkCode: params.linkCode,
+      });
+      if (!link?.linkId) {
+        return {
+          code: 500,
+          result: false,
+          message: '无效链接',
+        };
+      }
+      return {
+        code: 200,
+        result:
+          link.linkId && link.linkStatus === ELinkStatus.未消费 ? true : false,
+      };
+    } catch (error) {
+      return {
+        code: 500,
+        result: false,
+        message: error.message,
+      };
+    }
+  }
+
+  async updateLink(params: ECheckLinkDto) {
+    const link = await this.tempLinkRepository.findOneBy({
+      linkCode: params.linkCode,
+    });
+
+    if (link?.linkId) {
+      const { linkId, ...params } = link;
+      const qb = this.tempLinkRepository.createQueryBuilder('tempLink');
+      qb.update(TempLink)
+        .set({ ...params, linkStatus: ELinkStatus.已消费 })
+        .where('tempLink.linkId = :linkId', { linkId })
+        .execute();
+      return {
+        code: 200,
+        result: '消费成功',
+      };
+    } else {
+      return {
+        code: 500,
+        result: '无效链接',
+      };
+    }
   }
 }

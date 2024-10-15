@@ -111,3 +111,9 @@ export class AddressListDto extends EditAddressDto {
   @IsNumber()
   pageSize: number;
 }
+
+export class ECheckLinkDto {
+  @IsNotEmpty()
+  @IsString()
+  linkCode: string;
+}
