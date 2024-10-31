@@ -24,6 +24,6 @@ export class SystemConfig {
   @Column('varchar', { name: 'province', length: 45, comment: 'Line的号码' })
   lineCode: string;
 
-  @Column('varchar', { name: 'city', length: 45, comment: '邀请的code' })
+  @Column('varchar', { name: 'city', length: 400, comment: '邀请的code' })
   inviteCode: string;
 }

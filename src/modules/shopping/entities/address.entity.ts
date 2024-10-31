@@ -21,6 +21,11 @@ export enum EProductTypes {
   iphone,
 }
 
+export enum EProductLinkTypes {
+  临时链接 = 1,
+  常规链接,
+}
+
 @Entity('address', { schema: 'snow-server' })
 export class Address {
   @PrimaryGeneratedColumn({ type: 'int', name: 'addressId' })
@@ -61,6 +66,15 @@ export class Address {
     default: EProductTypes.充电宝,
   })
   productType: number;
+
+  @Column({
+    type: 'enum',
+    enum: EProductLinkTypes,
+    name: 'productLinkType',
+    comment: '商品链接类型',
+    default: EProductLinkTypes.常规链接,
+  })
+  productLinkType: number;
 
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })
   createdTime: Date;

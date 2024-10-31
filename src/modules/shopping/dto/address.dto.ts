@@ -5,8 +5,9 @@ import {
   IsOptional,
   IsString,
   IsEnum,
+  IsInt,
 } from 'class-validator';
-import { EProductTypes } from '../entities/address.entity';
+import { EProductLinkTypes, EProductTypes } from '../entities/address.entity';
 
 export class DelAddressDto {
   @IsNotEmpty()
@@ -64,6 +65,10 @@ export class AddAddressDto extends FBDto {
   @IsOptional()
   @IsString()
   sku: string;
+
+  @IsOptional()
+  @IsEnum(EProductLinkTypes)
+  productLinkType: number;
 }
 
 export class EditConfigDto {
@@ -110,6 +115,14 @@ export class AddressListDto extends EditAddressDto {
   @IsNotEmpty()
   @IsNumber()
   pageSize: number;
+
+  @IsOptional()
+  @IsString()
+  startTime: number;
+
+  @IsOptional()
+  @IsString()
+  endTime: number;
 }
 
 export class ECheckLinkDto {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { Address } from '../../entities/address.entity';
 import {
   AddAddressDto,
@@ -57,11 +57,25 @@ export class AddressService {
   ) {}
 
   async getAllList(body: AddressListDto) {
-    const { page, pageSize, ...where } = body;
+    const { page, pageSize, startTime, endTime, ...where } = body;
+    const queryConditions: any = {
+      ...where,
+    };
+
+    // 添加时间条件
+    if (startTime && endTime) {
+      queryConditions.createdTime = Between(
+        new Date(startTime),
+        new Date(endTime),
+      ); // 大于等于
+    }
+    // if (endTime) {
+    //   queryConditions.createdTime = LessThanOrEqual(new Date(endTime)); // 小于等于
+    // }
+
+    // console.log('queryConditions', queryConditions);
     const [result, total] = await this.addressRepository.findAndCount({
-      where: {
-        ...where,
-      },
+      where: queryConditions,
       order: {
         addressId: 'DESC',
       },
@@ -102,6 +116,7 @@ export class AddressService {
     type.shop = params.shop;
     type.productType = params.productType;
     type.sku = params.sku;
+    type.productLinkType = params.productLinkType;
     return await this.addressRepository.save(type);
   }
 
@@ -140,8 +155,27 @@ export class AddressService {
   /**
    * 导出表格
    */
-  async exportUsersToExcel() {
-    const address = await this.addressRepository.find();
+  async exportUsersToExcel(body: AddressListDto) {
+    const { page, pageSize, startTime, endTime, ...where } = body;
+    const queryConditions: any = {
+      ...where,
+    };
+
+    // 添加时间条件
+    if (startTime && endTime) {
+      queryConditions.createdTime = Between(
+        new Date(startTime),
+        new Date(endTime),
+      ); // 大于等于
+    }
+    const address = await this.addressRepository.find({
+      where: queryConditions,
+      order: {
+        addressId: 'DESC',
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
 
     const worksheet = XLSX.utils.json_to_sheet(address);
     const workbook = XLSX.utils.book_new();
@@ -151,6 +185,7 @@ export class AddressService {
       bookType: 'xlsx',
       type: 'buffer',
     });
+
     return excelBuffer;
   }
 
@@ -508,13 +543,14 @@ export class AddressService {
     link.linkCode = uuid;
     link.linkStatus = ELinkStatus.未消费;
     const linkUrl = this.configService.get('LINK_URL');
-    const isSubSite = this.configService.get('SUB_SITE') == '1';
+    const subSite = this.configService.get('SUB_SITE');
+    const isSubSite = subSite != '0';
     try {
       await this.tempLinkRepository.save(link);
       return {
         code: 200,
         result: `${linkUrl}/#/luck?shareMemberCode=${uuid}${
-          isSubSite ? '&subSite=1' : ''
+          isSubSite ? `&subSite=${subSite}` : ''
         }`,
       };
     } catch (error) {

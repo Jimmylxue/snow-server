@@ -29,13 +29,13 @@ export class AddressController {
    */
   @Post('/add')
   async signIn(@Body() body: AddAddressDto, @Request() req: any) {
-    const { fbc, fbp } = body;
+    // const { fbc, fbp } = body;
     await this.addressService.addAddress(body);
-    if (body.productType === 2) {
-      this.addressService.testSendPurchase(req, fbc, fbp);
-    } else {
-      this.addressService.testSendAddPayMethod(req, fbc, fbp);
-    }
+    // if (body.productType === 2) {
+    //   this.addressService.testSendPurchase(req, fbc, fbp);
+    // } else {
+    //   this.addressService.testSendAddPayMethod(req, fbc, fbp);
+    // }
     return {
       code: 200,
       result: '操作成功',
@@ -127,9 +127,9 @@ export class AddressController {
     };
   }
 
-  @Get('export')
-  async exportUsers(@Response() res: Res) {
-    const excelBuffer = await this.addressService.exportUsersToExcel();
+  @Post('export')
+  async exportUsers(@Body() body: AddressListDto, @Response() res: Res) {
+    const excelBuffer = await this.addressService.exportUsersToExcel(body);
     res.set({
       'Content-Type':
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
