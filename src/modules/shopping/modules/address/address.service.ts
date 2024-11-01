@@ -173,8 +173,8 @@ export class AddressService {
       order: {
         addressId: 'DESC',
       },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
+      // skip: (page - 1) * pageSize,
+      // take: pageSize,
     });
 
     const worksheet = XLSX.utils.json_to_sheet(address);
