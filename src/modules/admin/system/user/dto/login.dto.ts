@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsIn,
   IsMobilePhone,
   IsNotEmpty,
@@ -13,6 +14,10 @@ export class LoginDto {
   @IsNotEmpty({ message: '密码不能为空' })
   @IsString({ message: '类型错误' })
   password: string;
+
+  @IsOptional()
+  @IsBoolean()
+  noEncrypt: boolean;
 }
 
 export class LoginByMailDto {

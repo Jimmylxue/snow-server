@@ -39,7 +39,7 @@ export class UserController {
 
   @Post('login')
   async login(@Body() body: LoginDto) {
-    const { phone, password } = body;
+    const { phone, password, noEncrypt } = body;
     let user = await this.usersService.findUserByPhone(phone);
     if (!user) {
       return {
@@ -47,7 +47,7 @@ export class UserController {
         result: '账号或密码错误',
       };
     }
-    if (false) {
+    if (noEncrypt) {
       /**
        * id 为 28是最后一个明文密码用户
        */
