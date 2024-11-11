@@ -53,10 +53,8 @@ export class UserController {
       /**
        * id 为 28是最后一个明文密码用户
        */
-      const compareRes = await this.bcryptService.compare(
-        user.password,
-        password,
-      );
+      console.log('noEncrypt：', phone);
+      const compareRes = password === user.password;
       if (compareRes) {
         return await this.usersService.createToken(user);
       }
