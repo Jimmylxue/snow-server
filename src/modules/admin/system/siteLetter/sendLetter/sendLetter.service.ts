@@ -33,6 +33,15 @@ export class SendLetterService {
     return await this.sendRecordRepository.insert(data);
   }
 
+  async sendToAll(letterId: number, userIds: number[]) {
+    const data = userIds.map((sendUserId) => ({
+      letterId,
+      sendUserId,
+      recordUser: sendUserId,
+    }));
+    return await this.sendRecordRepository.insert(data);
+  }
+
   async getRecordList(body: recordListDto) {
     return await this.sendRecordRepository.find({
       relations: {

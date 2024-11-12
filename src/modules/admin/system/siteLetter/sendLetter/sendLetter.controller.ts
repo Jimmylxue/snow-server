@@ -4,18 +4,21 @@ import { AuthGuard } from '@nestjs/passport';
 import {
   recordListDto,
   recordUserDto,
+  sendAllDto,
   sendLetterDto,
   sendSomeDto,
   userReadDto,
   userRecordDto,
 } from '../dto/send.dto';
 import { LetterService } from '../letter/letter.service';
+import { UserService } from '../../user/services/user.service';
 
 @Controller('letter')
 export class SendLetterController {
   constructor(
     private readonly sendLetterService: SendLetterService,
     private readonly letterService: LetterService,
+    private readonly userService: UserService,
   ) {}
 
   @UseGuards(AuthGuard('jwt'))
@@ -37,6 +40,21 @@ export class SendLetterController {
     const records = await this.sendLetterService.sendToSome(
       body.letterId,
       body.userIds,
+    );
+    if (records) {
+      return {
+        code: 200,
+        result: records.raw.affectedRows + '条数据操作成功',
+      };
+    }
+  }
+
+  @Post('/sendAll')
+  async sendAll(@Body() body: sendAllDto) {
+    const allUserIds = await this.userService.findAllId();
+    const records = await this.sendLetterService.sendToSome(
+      body.letterId,
+      allUserIds,
     );
     if (records) {
       return {

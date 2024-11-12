@@ -13,6 +13,11 @@ export enum Sex {
   '女',
 }
 
+export enum Level {
+  新人 = 1,
+  专职,
+}
+
 @Entity('user', { schema: 'snow-server' })
 export class User {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
@@ -21,8 +26,23 @@ export class User {
   @Column({ type: 'varchar', name: 'openid', nullable: true })
   openid: string;
 
-  @Column('varchar', { name: 'username', length: 45 })
+  @Column('varchar', { name: 'username', length: 45, nullable: true })
   username: string;
+
+  @Column('varchar', {
+    name: 'wxName',
+    length: 45,
+    nullable: true,
+    comment: '微信号',
+  })
+  wxName: string;
+
+  @Column('varchar', {
+    name: 'nickname',
+    length: 45,
+    default: `游客${Math.floor(Date.now() / 1000)}`,
+  })
+  nickname: string;
 
   @Column('varchar', {
     name: 'avatar',
@@ -39,6 +59,14 @@ export class User {
     name: 'role',
   })
   role: number;
+
+  @Column({
+    type: 'enum',
+    enum: Level,
+    default: Level.新人,
+    name: 'level',
+  })
+  level: number;
 
   @Column({
     type: 'enum',
@@ -60,6 +88,9 @@ export class User {
    */
   @Column('varchar', { name: 'mail', length: 60, nullable: true })
   mail: string;
+
+  @Column('int', { name: 'coin', default: 0 })
+  coin: number;
 
   @Column('varchar', { name: 'createTime', length: 45 })
   createTime: string;

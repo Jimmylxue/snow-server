@@ -28,6 +28,11 @@ export class sendSomeDto {
   letterId: number;
 }
 
+export class sendAllDto {
+  @IsNumber()
+  letterId: number;
+}
+
 export class recordListDto {
   @IsNumber()
   letterId: number;

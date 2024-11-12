@@ -6,9 +6,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SendRecord } from '../entities/sendRecord.entity';
 import { Letter } from '../entities/letter.entity';
 import { User } from '../../user/entities/user.entity';
+import { UsersModule } from '../../user/modules/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SendRecord, Letter, User])],
+  imports: [UsersModule, TypeOrmModule.forFeature([SendRecord, Letter, User])],
   providers: [LetterService, SendLetterService],
   controllers: [SendLetterController],
 })

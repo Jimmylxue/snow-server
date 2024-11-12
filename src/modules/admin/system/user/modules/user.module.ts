@@ -57,6 +57,6 @@ import { ManagerSetting } from '../entities/managerSetting.entity';
     ChildrenRecordController,
     ManagerSettingController,
   ],
-  // exports: [TypeOrmModule],
+  exports: [UserService],
 })
 export class UsersModule {}

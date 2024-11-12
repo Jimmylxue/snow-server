@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from '../../services/user.service';
 import {
+  GenerateDto,
   RegisterByMailDto,
   RegisterDto,
   UpdateDto,
@@ -16,6 +17,7 @@ import {
 import {
   LoginByMailDto,
   LoginByMiniProgram,
+  LoginByUserNameDto,
   LoginDto,
 } from '../../dto/login.dto';
 import { BcryptService } from '../../../auth/auth.service';
@@ -66,6 +68,43 @@ export class UserController {
       /**
        * id 大于 28 都是 加密密码 使用 atob 获取原密码
        */
+      const originUserPassword = atob(user.password).split(
+        'snow-todoList',
+      )?.[0];
+      const compareHashSuccess = await this.bcryptService.compare(
+        originUserPassword,
+        password,
+      );
+      if (compareHashSuccess) {
+        return await this.usersService.createToken(user);
+      }
+      return {
+        code: 10000,
+        result: '账号或密码错误',
+      };
+    }
+  }
+
+  @Post('login_by_username')
+  async loginByUserName(@Body() body: LoginByUserNameDto) {
+    const { username, password, noEncrypt } = body;
+    let user = await this.usersService.findUserByPhone(username);
+    if (!user) {
+      return {
+        code: 10000,
+        result: '账号或密码错误',
+      };
+    }
+    if (noEncrypt) {
+      const compareRes = password === user.password;
+      if (compareRes) {
+        return await this.usersService.createToken(user);
+      }
+      return {
+        code: 10000,
+        result: '账号或密码错误',
+      };
+    } else {
       const originUserPassword = atob(user.password).split(
         'snow-todoList',
       )?.[0];
@@ -144,6 +183,73 @@ export class UserController {
       result: '注册成功',
     };
   }
+
+  @Post('generate')
+  async generates(@Body() body: GenerateDto) {
+    // 注册时 传的密码 使用的是 btoa 处理过的密码
+    const params = body;
+
+    let res1 = await this.usersService.findUserByPhone(body.phone);
+    if (res1) {
+      return {
+        code: 10000,
+        result: '该手机号已被注册',
+      };
+    }
+
+    const _password = this.usersService.generateUserNameNonceStr();
+
+    await this.usersService.addUser({
+      ...params,
+      password: _password,
+      createTime: Date.now(),
+    });
+
+    let user = await this.usersService.findUserByPhone(body.phone);
+
+    this.usersService.addUserSuccessHandle(user);
+
+    return {
+      code: 200,
+      result: {
+        ...body,
+        password: _password,
+      },
+    };
+  }
+
+  // @Post('generate')
+  // async generate() {
+  //   // 注册时 传的密码 使用的是 btoa 处理过的密码
+  //   let _username: string;
+  //   const checkOnly = async () => {
+  //     _username = this.usersService.generateUserNameNonceStr();
+  //     const _user = await this.usersService.findUserByUserName(_username);
+  //     if (_user?.id) {
+  //       checkOnly();
+  //     }
+  //   };
+  //   checkOnly();
+  //   const _password = this.usersService.generateUserNameNonceStr();
+  //   await this.usersService.addUser({
+  //     username: _username,
+  //     password: _password,
+  //     createTime: Date.now(),
+  //   });
+
+  //   let user = await this.usersService.findUserByUserName(_username);
+
+  //   this.usersService.addUserSuccessHandle(user);
+
+  //   return {
+  //     code: 200,
+  //     result: {
+  //       username: _username,
+  //       password: _password,
+  //     },
+  //     message: '注册成功',
+  //   };
+  // }
 
   @Post('register_by_mail')
   async registerByMail(@Body() body: RegisterByMailDto) {

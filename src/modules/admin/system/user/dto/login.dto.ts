@@ -5,11 +5,27 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Length,
 } from 'class-validator';
 
 export class LoginDto {
   @IsMobilePhone('zh-CN')
   phone: string;
+
+  @IsNotEmpty({ message: '密码不能为空' })
+  @IsString({ message: '类型错误' })
+  password: string;
+
+  @IsOptional()
+  @IsBoolean()
+  noEncrypt: boolean;
+}
+
+export class LoginByUserNameDto {
+  @IsNotEmpty()
+  @IsString()
+  @Length(8, 8)
+  username: string;
 
   @IsNotEmpty({ message: '密码不能为空' })
   @IsString({ message: '类型错误' })

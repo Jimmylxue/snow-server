@@ -11,6 +11,7 @@ import { SendRecord } from './sendRecord.entity';
 export enum EPlatform {
   todoList,
   snowMemo,
+  quickApp,
 }
 
 @Entity('letter', { schema: 'snow-server' })

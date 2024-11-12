@@ -32,9 +32,20 @@ export class UserService {
     return this.userRepository.find();
   }
 
+  async findAllId(): Promise<number[]> {
+    const ids = await this.userRepository.find({
+      select: ['id'],
+    });
+    return ids.map((item) => item.id);
+  }
+
   addUser(params) {
     // this.userRepository.createQueryBuilder().ins
     return this.userRepository.insert(params);
+  }
+
+  async findUserByUserName(username: string) {
+    return await this.userRepository.findOneBy({ username });
   }
 
   async findUserByPhone(phone: string) {
@@ -262,5 +273,15 @@ export class UserService {
       typeName: '工作',
       createTime: Date.now() + '',
     });
+  }
+
+  generateUserNameNonceStr() {
+    const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let nonceStr = '';
+    for (let i = 0; i < 8; i++) {
+      nonceStr += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return nonceStr;
   }
 }

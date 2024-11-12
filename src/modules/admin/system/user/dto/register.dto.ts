@@ -23,6 +23,10 @@ export class RegisterDto {
   @IsNotEmpty({ message: '用户名不能为空' })
   @IsString({ message: '类型错误' })
   username: string;
+
+  @IsOptional()
+  @IsString()
+  wxName: string;
 }
 
 export class RegisterByMailDto {
@@ -67,4 +71,14 @@ export class UpdateDto {
   @IsNotEmpty({ message: '用户名不能为空' })
   @IsString({ message: '类型错误' })
   username: string;
+}
+
+export class GenerateDto {
+  @IsMobilePhone('zh-CN')
+  @IsNotEmpty({ message: 'phone不能为空' })
+  phone: string;
+
+  @IsOptional()
+  @IsString()
+  wxName: string;
 }
