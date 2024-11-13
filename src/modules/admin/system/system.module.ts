@@ -15,6 +15,7 @@ import { GithubService } from './resource/controllers/github/github.service';
 import { SiteCookiesModule } from './siteCookies/siteCookies.modules';
 import { MailModule } from './mail/mail.module';
 import { SiteLetterModule } from './siteLetter/siteLetter.module';
+import { CoinModule } from './coinRecord/coinRecord.modules';
 @Module({
   imports: [
     ResourceModule,
@@ -23,6 +24,7 @@ import { SiteLetterModule } from './siteLetter/siteLetter.module';
     UsersModule,
     MailModule,
     SiteLetterModule,
+    CoinModule,
   ],
   controllers: [
     WeatherController,

@@ -31,6 +31,7 @@ import {
   UpdatePhoneDto,
   UserListDto,
 } from '../../dto/update.dto';
+import { Role } from '../../entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -49,6 +50,58 @@ export class UserController {
         result: '账号或密码错误',
       };
     }
+    if (noEncrypt) {
+      /**
+       * id 为 28是最后一个明文密码用户
+       */
+      console.log('noEncrypt：', phone);
+      const compareRes = password === user.password;
+      if (compareRes) {
+        return await this.usersService.createToken(user);
+      }
+      return {
+        code: 10000,
+        result: '账号或密码错误',
+      };
+    } else {
+      /**
+       * id 大于 28 都是 加密密码 使用 atob 获取原密码
+       */
+      const originUserPassword = atob(user.password).split(
+        'snow-todoList',
+      )?.[0];
+      const compareHashSuccess = await this.bcryptService.compare(
+        originUserPassword,
+        password,
+      );
+      if (compareHashSuccess) {
+        return await this.usersService.createToken(user);
+      }
+      return {
+        code: 10000,
+        result: '账号或密码错误',
+      };
+    }
+  }
+
+  @Post('login_by_admin')
+  async loginByAdmin(@Body() body: LoginDto) {
+    const { phone, password, noEncrypt } = body;
+    let user = await this.usersService.findUserByPhone(phone);
+    if (!user) {
+      return {
+        code: 10000,
+        result: '账号或密码错误',
+      };
+    }
+
+    if (user.role !== Role.管理员) {
+      return {
+        code: 10000,
+        result: '请登录管理员员账号',
+      };
+    }
+
     if (noEncrypt) {
       /**
        * id 为 28是最后一个明文密码用户

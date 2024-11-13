@@ -88,3 +88,25 @@ export function getNearWeekDateMessage() {
   }
   return result.reverse();
 }
+
+export function getCurrentMonthTimestamps() {
+  // 获取当前日期
+  const now = new Date();
+
+  // 获取本月的开始时间
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startTime = startOfMonth.getTime(); // 开始时间的时间戳
+
+  // 获取本月的结束时间
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const endTime = endOfMonth.getTime(); // 结束时间的时间戳
+
+  return {
+    startTime,
+    endTime,
+  };
+}
+
+export function formatFullTime(timeStamps: number | string) {
+  return dayjs(timeStamps).format('YYYY-MM-DD HH:mm:ss');
+}

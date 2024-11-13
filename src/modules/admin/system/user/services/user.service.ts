@@ -64,6 +64,15 @@ export class UserService {
     return await this.userRepository.findOneBy({ openid });
   }
 
+  async getUserCoin(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
+    return user.coin;
+  }
+
+  async updateUserCoin(userId: number, coin: number) {
+    await this.userRepository.update(userId, { coin });
+  }
+
   async getUserList(body: UserListDto) {
     const { page, pageSize, startTime, endTime, ...where } = body;
     const [result, total] = await this.userRepository.findAndCount({

@@ -101,4 +101,7 @@ export class User {
     default: generateRandomCode(),
   })
   password: string;
+
+  @Column('int', { name: 'inviter', nullable: true, comment: '邀请注册人' })
+  inviter: number;
 }
