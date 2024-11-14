@@ -1,4 +1,4 @@
-name: 打包server
+name: 打包quick_app
 
 on:
   push:
