@@ -4,7 +4,7 @@ on:
   push:
     # push 代码的时候 哪个分支会受到影响 这里是 master 主分支
     branches:
-      - server-prod
+      - app/quick_app
   workflow_dispatch:
 
 # 推送之后执行一系列的任务
@@ -17,9 +17,9 @@ jobs:
         # 使用action库 action/checkout获取代码
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.PRIVATE_HOST }}
+          host: ${{ secrets.QUICK_APP_HOST }}
           username: root
-          password: ${{ secrets.PASSWORD }}
+          password: ${{ secrets.QUICK_APP_PASSWORD }}
           port: 22
           script: |
             cd /me/snow-server/
