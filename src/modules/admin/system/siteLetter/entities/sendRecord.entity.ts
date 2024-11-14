@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
 import { Letter } from './letter.entity';
 
 export enum EStatus {
@@ -31,18 +30,14 @@ export class SendRecord {
   })
   status: number;
 
-  @Column({ type: 'int', name: 'sendUserId' })
-  sendUserId: number;
+  @Column({ type: 'varchar', name: 'sendPhone' })
+  sendPhone: string;
 
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })
   createdTime: Date;
 
   @UpdateDateColumn({ comment: '更新时间', type: 'timestamp' })
   updateTime: Date;
-
-  @ManyToOne(() => User)
-  @JoinColumn()
-  recordUser: number;
 
   // 当letter表的 letterId删除之后 这边会同步一起删除掉
   @ManyToOne(() => Letter, (letter) => letter.sendRecords, {

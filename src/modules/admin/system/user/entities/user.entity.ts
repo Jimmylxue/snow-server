@@ -1,10 +1,11 @@
 import { generateRandomCode } from '@src/utils';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Role {
   '未定义',
   '普通用户',
   '管理员',
+  '超级管理员',
 }
 
 export enum Sex {
@@ -89,9 +90,6 @@ export class User {
   @Column('varchar', { name: 'mail', length: 60, nullable: true })
   mail: string;
 
-  @Column('int', { name: 'coin', default: 0 })
-  coin: number;
-
   @Column('varchar', { name: 'createTime', length: 45 })
   createTime: string;
 
@@ -102,6 +100,11 @@ export class User {
   })
   password: string;
 
-  @Column('int', { name: 'inviter', nullable: true, comment: '邀请注册人' })
-  inviter: number;
+  @Column('varchar', {
+    name: 'inviterPhone',
+    length: 45,
+    nullable: true,
+    comment: '邀请人手机号',
+  })
+  inviterPhone: string;
 }

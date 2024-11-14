@@ -74,9 +74,13 @@ export class UpdateDto {
 }
 
 export class GenerateDto {
+  @IsNotEmpty()
   @IsMobilePhone('zh-CN')
-  @IsNotEmpty({ message: 'phone不能为空' })
   phone: string;
+
+  @IsOptional()
+  @IsMobilePhone('zh-CN')
+  inviterPhone: string;
 
   @IsOptional()
   @IsString()

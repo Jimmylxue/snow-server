@@ -9,9 +9,9 @@ import {
 import { SendRecord } from './sendRecord.entity';
 
 export enum EPlatform {
-  todoList,
-  snowMemo,
-  quickApp,
+  系统消息,
+  公告栏,
+  客服消息,
 }
 
 @Entity('letter', { schema: 'snow-server' })

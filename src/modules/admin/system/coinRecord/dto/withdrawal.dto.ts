@@ -29,6 +29,10 @@ export class CWithdrawalRecordDto {
   @IsNotEmpty()
   @IsNumber()
   pageSize: number;
+
+  @IsOptional()
+  @IsString()
+  phone: string;
 }
 
 export class WithdrawalRecordDto extends CWithdrawalRecordDto {

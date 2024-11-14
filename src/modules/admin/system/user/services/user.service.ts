@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../entities/user.entity';
+import { Level, User } from '../entities/user.entity';
 import { Between, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import {
@@ -12,9 +12,10 @@ import {
 } from '../dto/update.dto';
 import { LoginByMiniProgram } from '../dto/login.dto';
 import { HttpService } from '@nestjs/axios';
-import { TaskTypeService } from '@src/modules/todolist/modules/taskType/taskType.service';
 import { ConfigService } from '@nestjs/config';
 import { BcryptService } from '../../auth/auth.service';
+import { SendLetterService } from '../../siteLetter/sendLetter/sendLetter.service';
+import { EPlatform } from '../../siteLetter/entities/letter.entity';
 
 @Injectable()
 export class UserService {
@@ -23,8 +24,8 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
     private readonly httpService: HttpService,
-    private readonly taskType: TaskTypeService,
     private readonly configService: ConfigService,
+    private readonly sendLetterService: SendLetterService,
     private readonly bcryptService: BcryptService,
   ) {}
 
@@ -62,15 +63,6 @@ export class UserService {
 
   async getUserByOpenId(openid: string) {
     return await this.userRepository.findOneBy({ openid });
-  }
-
-  async getUserCoin(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
-    return user.coin;
-  }
-
-  async updateUserCoin(userId: number, coin: number) {
-    await this.userRepository.update(userId, { coin });
   }
 
   async getUserList(body: UserListDto) {
@@ -186,7 +178,7 @@ export class UserService {
     delete user.password;
     delete user.openid;
     const token = await this.jwtService.sign(payload);
-    console.log('token~', token);
+    console.log('颁发token', token);
     return {
       msg: '登录成功',
       code: 200,
@@ -276,12 +268,6 @@ export class UserService {
    */
   addUserSuccessHandle(user: User) {
     const registerUserId = user.id;
-
-    this.taskType.addUserTaskType({
-      userId: registerUserId,
-      typeName: '工作',
-      createTime: Date.now() + '',
-    });
   }
 
   generateUserNameNonceStr() {
@@ -292,5 +278,51 @@ export class UserService {
       nonceStr += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return nonceStr;
+  }
+
+  /**
+   * 新增一个账户之后，将这个账户的下的 前一个账号解锁
+   */
+  async subAccountCallBack(phone: string) {
+    const ids = await this.userRepository.find({
+      select: ['id'],
+      where: {
+        level: Level.新人,
+        phone: phone,
+      },
+    });
+    if (ids?.length === 2) {
+      const updateId = ids[0].id;
+      await this.updateUser({ level: Level.专职, userId: updateId });
+    }
+  }
+
+  /**
+   * 账号生成成功之后的 对邀请人 的 副作用
+   */
+  async successInviterCallBack(user: User) {
+    const [result, total] = await this.userRepository.findAndCount({
+      select: ['id'],
+      where: {
+        phone: user.phone,
+      },
+    });
+
+    const registerPhoneCount = result.length;
+
+    /**
+     * 是否 是 10 的倍数
+     */
+    const isFullPlusOne = registerPhoneCount % 3 === 0;
+    if (isFullPlusOne) {
+      const superManagerPhone = '13344445555';
+      const managerPhone = '14455556666';
+      await this.sendLetterService.sendQuickLetterToPhone({
+        title: '条件达成通知',
+        content: `手机号：${user.phone}已达成邀请${total}个账号成就，额外获得一个账号`,
+        platform: EPlatform.系统消息,
+        phones: [superManagerPhone, managerPhone, user.inviterPhone],
+      });
+    }
   }
 }

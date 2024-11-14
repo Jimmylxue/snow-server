@@ -70,15 +70,15 @@ export class SendLetterController {
     return this.sendLetterService.getRecordList(body);
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Post('/record/user')
-  async recordUser(@Body() body: recordUserDto) {
-    const records = await this.sendLetterService.getRecordUser(body);
-    return {
-      code: 200,
-      result: records,
-    };
-  }
+  // @UseGuards(AuthGuard('jwt'))
+  // @Post('/record/user')
+  // async recordUser(@Body() body: recordUserDto) {
+  //   const records = await this.sendLetterService.getRecordUser(body);
+  //   return {
+  //     code: 200,
+  //     result: records,
+  //   };
+  // }
 
   /**
    * 获取用户的 消息列表
@@ -88,10 +88,20 @@ export class SendLetterController {
   async userRecord(@Body() body: userRecordDto, @Req() auth) {
     const { user } = auth;
     const userId = user.userId;
-    const records = await this.sendLetterService.getUserLetter(body, userId);
+    const _userInfo = await this.userService.getDetailById(userId);
+    if (!_userInfo?.phone) {
+      return {
+        code: 10000,
+        result: '账号异常 - 账户未绑定手机号',
+      };
+    }
+    const records = await this.sendLetterService.getUserLetter(
+      body,
+      _userInfo.phone,
+    );
     return {
       code: 200,
-      result: records.filter((item) => item.letter.platform === body.platform),
+      result: records,
     };
   }
 

@@ -10,7 +10,7 @@ export class JwtAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const client = context.switchToWs().getClient<Socket>();
     const token = this.extractTokenFromSocket(client);
-
+    console.log('11111222');
     try {
       const user = this.jwtService.verify(token, {
         secret: jwtConstants.secret,

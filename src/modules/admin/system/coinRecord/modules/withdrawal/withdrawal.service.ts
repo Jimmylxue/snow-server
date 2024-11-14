@@ -20,16 +20,17 @@ export class WithdrawalService {
     private readonly withdrawalRepository: Repository<WithdrawalRecord>,
   ) {}
 
-  async getUserWithdrawalRecord(
+  /**
+   * 手机号账户下的 提现 发起 记录
+   */
+  async getUserPhoneWithdrawalRecord(
     body: CWithdrawalRecordDto,
-    userId?: number,
     relations?: boolean,
   ) {
     const { page, pageSize, startTime, endTime, ...where } = body;
     const [result, total] = await this.withdrawalRepository.findAndCount({
       where: {
         ...where,
-        userId,
         createdTime: startTime
           ? Between(
               formatFullTime(Number(startTime)),
@@ -58,6 +59,7 @@ export class WithdrawalService {
     params: CarryWithdrawalDto,
     userId: number,
     originCoin: number,
+    phone: string,
   ) {
     const withdrawalRecord = this.withdrawalRepository.create();
     withdrawalRecord.user = userId;
@@ -66,6 +68,7 @@ export class WithdrawalService {
     withdrawalRecord.withdrawalCoin = params.withdrawalCoin;
     withdrawalRecord.surplusCoin = originCoin - params.withdrawalCoin;
     withdrawalRecord.payStatus = EPayStatus.未支付;
+    withdrawalRecord.phone = phone;
     return await this.withdrawalRepository.save(withdrawalRecord);
   }
 

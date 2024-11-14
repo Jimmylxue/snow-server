@@ -8,19 +8,21 @@ import {
   userReadDto,
   userRecordDto,
 } from '../dto/send.dto';
+import { LetterService } from '../letter/letter.service';
 
 @Injectable()
 export class SendLetterService {
   constructor(
     @InjectRepository(SendRecord)
     private readonly sendRecordRepository: Repository<SendRecord>,
+    private readonly letterService: LetterService,
   ) {}
 
   async sendLetter(letterId: number) {
     const record = this.sendRecordRepository.create();
     record.letterId = letterId;
-    record.sendUserId = 1;
-    record.recordUser = 1;
+    // record.sendUserId = 1;
+    // record.recordUser = 1;
     return await this.sendRecordRepository.save(record);
   }
 
@@ -52,13 +54,13 @@ export class SendLetterService {
     });
   }
 
-  async getRecordUser(body: recordUserDto) {
-    const records = await this.getRecordList(body);
-    const userList = records.map((record) => record.recordUser);
-    return userList;
-  }
+  // async getRecordUser(body: recordUserDto) {
+  //   const records = await this.getRecordList(body);
+  //   const userList = records.map((record) => record.recordUser);
+  //   return userList;
+  // }
 
-  async getUserLetter(body: userRecordDto, userId: number) {
+  async getUserLetter(body: userRecordDto, phone: string) {
     return await this.sendRecordRepository.find({
       select: ['recordId', 'letter', 'status', 'createdTime'],
       relations: {
@@ -66,7 +68,10 @@ export class SendLetterService {
       },
       where: {
         status: body.status,
-        sendUserId: userId,
+        sendPhone: phone,
+        letter: {
+          platform: body.platform,
+        },
       },
       order: {
         recordId: 'DESC',
@@ -82,5 +87,25 @@ export class SendLetterService {
       .set(params)
       .where('sendRecord.recordId = :recordId', { recordId })
       .execute();
+  }
+
+  async sendToPhone(letterId: number, phones: string[]) {
+    const data = phones.map((sendPhone) => ({
+      letterId,
+      sendPhone,
+    }));
+    return await this.sendRecordRepository.insert(data);
+  }
+
+  /**
+   * 发送快速消息
+   */
+  async sendQuickLetterToPhone({ title, content, phones, platform }) {
+    const letter = await this.letterService.addLetter({
+      content,
+      title,
+      platform,
+    });
+    await this.sendToPhone(letter.letterId, phones);
   }
 }
