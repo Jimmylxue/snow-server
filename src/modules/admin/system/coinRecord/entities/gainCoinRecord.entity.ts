@@ -23,6 +23,9 @@ export class GainCoinRecord {
   @Column({ type: 'int', name: 'userId' })
   userId: number;
 
+  @Column({ type: 'varchar', name: 'phone' })
+  phone: string;
+
   @Column({ type: 'int', name: 'originCoin', comment: '初始金币' })
   originCoin: number;
 

@@ -120,3 +120,15 @@ export class UpdateLinkDto {
   @Max(60)
   visitTime: number;
 }
+
+export class CLinkListDto {
+  @IsOptional()
+  @IsNumber()
+  pageSize: number;
+}
+
+export class LinkDetailDto {
+  @IsNotEmpty()
+  @IsInt()
+  linkId: number;
+}

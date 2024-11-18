@@ -5,7 +5,9 @@ import { Link } from '../entities/links.entity';
 import { formatFullTime } from '@src/utils';
 import {
   AddLinkDto,
+  CLinkListDto,
   DelLinkDto,
+  LinkDetailDto,
   LinkListDto,
   UpdateLinkDto,
 } from '../dto/link.dto';
@@ -44,6 +46,13 @@ export class LinkService {
     };
   }
 
+  async getLinkDetail(body: LinkDetailDto) {
+    const data = await this.linkRepository.findOneBy({
+      linkId: body.linkId,
+    });
+    return data;
+  }
+
   async addLink(params: AddLinkDto) {
     const letter = this.linkRepository.create();
     letter.title = params.title;
@@ -66,5 +75,21 @@ export class LinkService {
     await this.linkRepository.update(body.linkId, {
       logicDel: ELogicDel.逻辑删除,
     });
+  }
+
+  async getRandomPageData(body: CLinkListDto) {
+    const pageSize = body?.pageSize || 15;
+    const totalRecords = await this.linkRepository.count();
+
+    const totalPages = Math.ceil(totalRecords / pageSize);
+    const randomPage = Math.floor(Math.random() * totalPages);
+
+    // 查询数据
+    const data = await this.linkRepository.find({
+      skip: randomPage * pageSize,
+      take: pageSize,
+    });
+
+    return data;
   }
 }

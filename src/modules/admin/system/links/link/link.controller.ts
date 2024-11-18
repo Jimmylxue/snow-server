@@ -3,7 +3,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { LinkService } from './link.service';
 import {
   AddLinkDto,
+  CLinkListDto,
   DelLinkDto,
+  LinkDetailDto,
   LinkListDto,
   UpdateLinkDto,
 } from '../dto/link.dto';
@@ -19,6 +21,16 @@ export class LinkController {
   @Post('/list')
   async getList(@Body() body: LinkListDto) {
     const lists = await this.linkService.getLinkList(body);
+    return {
+      code: 200,
+      result: lists,
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/detail')
+  async getLinkDetail(@Body() body: LinkDetailDto) {
+    const lists = await this.linkService.getLinkDetail(body);
     return {
       code: 200,
       result: lists,
@@ -52,6 +64,19 @@ export class LinkController {
     return {
       code: 200,
       result: '删除成功',
+    };
+  }
+
+  /**
+   * 获取C端的 随机获取数据
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/c_list')
+  async getCList(@Body() body: CLinkListDto) {
+    const lists = await this.linkService.getRandomPageData(body);
+    return {
+      code: 200,
+      result: lists,
     };
   }
 }
