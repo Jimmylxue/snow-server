@@ -129,9 +129,9 @@ export class UserController {
   }
 
   @Post('login_by_admin')
-  async loginByAdmin(@Body() body: LoginDto) {
-    const { phone, password, noEncrypt } = body;
-    let user = await this.usersService.findUserByPhone(phone);
+  async loginByAdmin(@Body() body: LoginByIdDto) {
+    const { id, password, noEncrypt } = body;
+    let user = await this.usersService.getDetailById(Number(id));
     if (!user) {
       return {
         code: 10000,
@@ -150,7 +150,6 @@ export class UserController {
       /**
        * id 为 28是最后一个明文密码用户
        */
-      console.log('noEncrypt：', phone);
       const compareRes = password === user.password;
       if (compareRes) {
         return await this.usersService.createToken(user);

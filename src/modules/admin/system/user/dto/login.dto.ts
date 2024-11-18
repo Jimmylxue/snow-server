@@ -22,12 +22,12 @@ export class LoginDto {
 }
 
 export class LoginByIdDto {
-  @IsNotEmpty({ message: '密码不能为空' })
-  @IsString({ message: '类型错误' })
+  @IsNotEmpty()
+  @IsString()
   id: string;
 
-  @IsNotEmpty({ message: '密码不能为空' })
-  @IsString({ message: '类型错误' })
+  @IsNotEmpty()
+  @IsString()
   password: string;
 
   @IsOptional()

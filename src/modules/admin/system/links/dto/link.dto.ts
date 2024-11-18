@@ -5,6 +5,8 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Max,
+  Min,
 } from 'class-validator';
 
 export class LinkListDto {
@@ -37,6 +39,14 @@ export class LinkListDto {
   price: number;
 
   @IsOptional()
+  @IsNumber()
+  coin: number;
+
+  @IsOptional()
+  @IsNumber()
+  visitTime: number;
+
+  @IsOptional()
   @IsString()
   startTime: string;
 
@@ -61,6 +71,16 @@ export class AddLinkDto {
   @IsNotEmpty()
   @IsNumber()
   price: number;
+
+  @IsOptional()
+  @Min(0.01)
+  @Max(50)
+  coin: number;
+
+  @IsOptional()
+  @Min(1)
+  @Max(60)
+  visitTime: number;
 }
 
 export class DelLinkDto {
@@ -69,8 +89,34 @@ export class DelLinkDto {
   linkId: number;
 }
 
-export class UpdateLinkDto extends AddLinkDto {
+export class UpdateLinkDto {
   @IsNotEmpty()
   @IsNumber()
   linkId: number;
+
+  @IsOptional()
+  @IsString()
+  title: string;
+
+  @IsOptional()
+  @IsString()
+  mainImage: string;
+
+  @IsOptional()
+  @IsString()
+  fullLink: string;
+
+  @IsOptional()
+  @IsNumber()
+  price: number;
+
+  @IsOptional()
+  @Min(0.01)
+  @Max(50)
+  coin: number;
+
+  @IsOptional()
+  @Min(1)
+  @Max(60)
+  visitTime: number;
 }

@@ -50,6 +50,8 @@ export class LinkService {
     letter.mainImage = params.mainImage;
     letter.fullLink = params.fullLink;
     letter.price = params.price;
+    letter.coin = params.coin;
+    letter.visitTime = params.visitTime;
     return await this.linkRepository.save(letter);
   }
 
