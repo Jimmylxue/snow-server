@@ -30,6 +30,7 @@ import {
   DelUserDto,
   UpdateMailDto,
   UpdatePhoneDto,
+  UserListByPhoneDto,
   UserListDto,
 } from '../../dto/update.dto';
 import { Role } from '../../entities/user.entity';
@@ -472,5 +473,15 @@ export class UserController {
   @Post('changePassword')
   async changePassword(@Body() body: ChangePasswordDto) {
     return this.usersService.changePassword(body);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('list_by_phone')
+  async userListByPhone(@Body() body: UserListByPhoneDto, @Req() auth) {
+    const list = await this.usersService.getUserListByPhone(body);
+    return {
+      code: 200,
+      result: list,
+    };
   }
 }

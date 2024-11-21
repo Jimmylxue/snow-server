@@ -8,6 +8,7 @@ import {
   DelUserDto,
   UpdateMailDto,
   UpdatePhoneDto,
+  UserListByPhoneDto,
   UserListDto,
 } from '../dto/update.dto';
 import { LoginByMiniProgram } from '../dto/login.dto';
@@ -324,5 +325,80 @@ export class UserService {
         phones: [superManagerPhone, managerPhone, user.inviterPhone],
       });
     }
+  }
+
+  /**
+   * 旧版本 没有返回具体children里面的内容  性能会高一点 如果后续性能跟不上就用这个
+   *  具体下面的内容就再调用一次接口获取children
+   */
+  async getUserListByPhoneV1(body: UserListByPhoneDto) {
+    const { page, pageSize, ...where } = body;
+    // 获取分组后的结果
+    const result = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.phone, COUNT(user.id) as count')
+      .where(where)
+      .groupBy('user.phone')
+      .orderBy('user.phone', 'DESC')
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+      .getRawMany();
+
+    // 获取总的不同 phone 的数量
+    const total = await this.userRepository
+      .createQueryBuilder('user')
+      .select('COUNT(DISTINCT user.phone)', 'count')
+      .where(where)
+      .getRawOne();
+
+    return {
+      page: page,
+      result: result.map((item) => ({
+        phone: item.phone,
+        count: parseInt(item.count, 10), // 转换为整数
+      })),
+      total: total.count,
+    };
+  }
+
+  async getUserListByPhone(body: UserListByPhoneDto) {
+    const { page, pageSize, ...where } = body;
+    // 获取分组后的结果
+    const result = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.phone, COUNT(user.id) as count')
+      .where(where)
+      .groupBy('user.phone')
+      .orderBy('user.phone', 'DESC')
+      .skip((page - 1) * pageSize)
+      .take(pageSize)
+      .getRawMany();
+
+    // 获取每个 phone 对应的实际用户数据
+    const phones = result.map((item) => item.phone);
+    const childrenData = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.phone IN (:...phones)', { phones })
+      .getMany();
+
+    // 将结果格式化为需要的结构
+    const formattedResult = result.map((item) => ({
+      phone: item.phone,
+      count: parseInt(item.count, 10), // 转换为整数
+      children: childrenData.filter((child) => child.phone === item.phone), // 过滤出对应的用户数据
+    }));
+
+    // 获取总的不同 phone 的数量
+    const total = await this.userRepository
+      .createQueryBuilder('user')
+      .select('COUNT(DISTINCT user.phone)', 'count')
+      .where(where)
+      .getRawOne();
+
+    return {
+      page: page,
+      result: formattedResult,
+      total: total.count,
+    };
   }
 }

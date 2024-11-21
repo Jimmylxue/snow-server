@@ -90,3 +90,17 @@ export class ChangePasswordDto {
   @IsString()
   newPassword: string;
 }
+
+export class UserListByPhoneDto {
+  @IsOptional()
+  @IsMobilePhone('zh-CN')
+  phone: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  page: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  pageSize: number;
+}

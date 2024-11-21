@@ -21,9 +21,6 @@ export class StaticController {
     private readonly configService: ConfigService,
   ) {}
 
-  /**
-   * 上传是上传到 dist 下的文件夹
-   */
   @Post('/uploadfile')
   @UseInterceptors(FileInterceptor('file'))
   async getBaseInfos(@UploadedFile() file, @Body() stream) {
@@ -38,12 +35,15 @@ export class StaticController {
 
     const fileName = Date.now() + file.originalname;
 
-    const writeRes = writeAFile(file, `${originPath}/${fileName}`);
+    const writeRes = writeAFile(
+      file,
+      `${originPath}/${Date.now()}_${fileName}`,
+    );
     if (writeRes) {
       return {
         code: 200,
         message: '文件写入成功',
-        result: `${baseUrl}/${fileName}`,
+        result: `${baseUrl}/${Date.now()}_${fileName}`,
       };
     }
     return { code: 500, message: '文件写入失败' };
