@@ -63,6 +63,7 @@
     "upyun": "^3.4.6",
     "urllib": "^3.21.0",
     "webpack": "^5.0.0",
+    "puppeteer": "^23.8.0",
     "winston": "^3.9.0"
   },
   "devDependencies": {
