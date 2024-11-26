@@ -46,10 +46,6 @@ export class SendLetterService {
 
   async getRecordList(body: recordListDto) {
     return await this.sendRecordRepository.find({
-      relations: {
-        // @ts-ignore
-        recordUser: true,
-      },
       where: body,
     });
   }
