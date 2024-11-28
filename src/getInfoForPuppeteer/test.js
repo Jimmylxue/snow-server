@@ -4,7 +4,7 @@ const axios = require('axios');
 
 let config = {
   method: 'post',
-  url: 'http://localhost:3001/upload/link',
+  url: 'http://localhost:9998/link/upload',
   params: {
     // links: [
     //   "aaa",
@@ -46,9 +46,9 @@ const getConfig = () => {
 axios
   .request(getConfig())
   .then(function (response) {
-    console.log(response.data);
+    console.log(response);
   })
   .catch(function (error) {
     // console.log("请求失败！", error.status, error?.response.statusText)
-    console.log('请求失败！');
+    console.log('请求失败！', error);
   });

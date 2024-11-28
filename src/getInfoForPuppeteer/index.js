@@ -17,6 +17,7 @@ app.use(bodyParser.json());
 
 const globalProductLinkList = [];
 let isRunning = false;
+let count = 0;
 
 // -1 无效URL 0 需要重试 1 识别成功
 async function scrapePage(url) {
@@ -38,54 +39,63 @@ async function scrapePage(url) {
     }
   });
 
-  let attempt = 0;
-  const maxAttempts = 3;
-
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded' });
   } catch (error) {
     return -1;
   }
 
-  while (attempt < maxAttempts) {
-    try {
-      await page.waitForSelector('img[class^="mainPic"]', { timeout: 3000 });
+  try {
+    await page.waitForSelector('div');
+    await page.waitForSelector('span');
+    await page.waitForSelector('img', { timeout: 20000 });
 
-      const images = await page.evaluate(() => {
-        const labels = document.querySelectorAll('img[class^="mainPic"]');
-        return Array.from(labels).map((item) => item.src);
-      });
+    const images = await page.evaluate(() => {
+      const labels = document.querySelectorAll('img[class*="Pic--"]');
+      return Array.from(labels).map((item) => item.src);
+    });
 
-      if (images.length > 0) {
-        await browser.close();
-        // images[0] 图片链接。coin。second。
+    const price = await page.evaluate(() => {
+      const labels = document.querySelectorAll('span');
+      return Array.from(labels).map((item) => item);
+    });
 
-        return 1;
-      }
-    } catch (error) {
-      attempt++;
-      if (attempt === maxAttempts) {
-        await browser.close();
-        return 0;
-      }
+    if (images.length > 0) {
+      console.log('读取成功', images[0], await page.title(), price, ++count);
+
+      await browser.close();
+      // images[0] 图片链接。coin。second。
+
+      return 1;
     }
+  } catch (error) {
+    console.log(error);
+
+    await browser.close();
+    return 0;
   }
 
   await browser.close();
 }
 
 async function startTask() {
+  const st = +new Date();
   isRunning = true;
   while (globalProductLinkList.length !== 0) {
     const res = await scrapePage(globalProductLinkList[0].url);
     if (res === -1 || res === 1) {
       globalProductLinkList.shift();
+    } else {
+      console.log('读取失败，重试中...');
+      let temp = globalProductLinkList.shift();
+      globalProductLinkList.push(temp);
     }
   }
+  console.log('读取完成，耗时', (+new Date() - st) / 1000);
   isRunning = false;
 }
 
-router.post('/upload/link', async (req, res) => {
+router.post('/link/upload', async (req, res) => {
   const { links, coin, second } = req.body;
 
   links.forEach((url) => globalProductLinkList.push({ url, coin, second }));
@@ -102,6 +112,6 @@ router.post('/upload/link', async (req, res) => {
 
 app.use(router);
 
-app.listen(3001, '0.0.0.0', () => {
-  console.log('Server is running on port 3000');
+app.listen(9998, '0.0.0.0', () => {
+  console.log('Server is running on port 9998');
 });
