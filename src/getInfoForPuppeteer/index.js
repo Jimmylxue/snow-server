@@ -1,12 +1,10 @@
-/**
- * 动态获取链接中的指定内容
- */
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
-const puppeteer = require('puppeteer');
+const { chromium } = require('playwright');
 const router = express.Router();
+const axios = require('axios');
 
 require('dotenv').config();
 
@@ -14,84 +12,98 @@ app.use(cors());
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+console.log(process.env.STATIC_BASE_URL);
+
+async function uploadProductionInfo(data) {
+  await axios.post(`${process.env.STATIC_BASE_URL}/link/add`, data);
+}
 
 const globalProductLinkList = [];
 let isRunning = false;
-let count = 0;
 
-// -1 无效URL 0 需要重试 1 识别成功
-async function scrapePage(url) {
-  console.log('在执行', url);
-
-  const browser = await puppeteer.launch({
+async function scrapePage(item) {
+  const { url, coin, second } = item;
+  const browser = await chromium.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
     headless: true,
   });
 
   const page = await browser.newPage();
-  await page.setRequestInterception(true);
 
-  page.on('request', (req) => {
-    if (req.resourceType() === 'font') {
-      req.abort();
+  page.route('**/*', (route, request) => {
+    if (request.resourceType() === 'font') {
+      route.abort();
     } else {
-      req.continue();
+      route.continue();
     }
   });
 
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(3000);
   } catch (error) {
+    await browser.close();
     return -1;
   }
 
   try {
-    await page.waitForSelector('div');
-    await page.waitForSelector('span');
-    await page.waitForSelector('img', { timeout: 20000 });
+    await page.waitForSelector('div:visible');
+    await page.waitForSelector('span:visible');
+    await page.waitForSelector('img:visible', { timeout: 3000 });
 
-    const images = await page.evaluate(() => {
-      const labels = document.querySelectorAll('img[class*="Pic--"]');
-      return Array.from(labels).map((item) => item.src);
-    });
+    const firstImgElement = page.locator('img[class*=Pic--]').first();
+    const firstImgSrc = await firstImgElement.getAttribute('src');
 
-    const price = await page.evaluate(() => {
-      const labels = document.querySelectorAll('span');
-      return Array.from(labels).map((item) => item);
-    });
+    let priceText = '';
+    const price = await page.$$('span[class*="--"]');
+    for (const spanElement of price) {
+      const textContent = await spanElement.textContent();
+      if (textContent.includes('￥')) {
+        const nextSiblingElementHandle = await page.evaluateHandle(
+          (el) => el.nextElementSibling,
+          spanElement,
+        );
+        const nextSiblingElement = nextSiblingElementHandle.asElement();
+        if (nextSiblingElement) {
+          priceText = (await nextSiblingElement.textContent()) || '';
+        }
+      }
+    }
 
-    if (images.length > 0) {
-      console.log('读取成功', images[0], await page.title(), price, ++count);
+    if (firstImgSrc && priceText) {
+      console.log('调用了！');
+
+      await uploadProductionInfo({
+        title: await page.title(),
+        mainImage: firstImgSrc,
+        fullLink: url,
+        price: Number(price) || 0,
+        coin,
+        visitTime: Number(second),
+      });
 
       await browser.close();
-      // images[0] 图片链接。coin。second。
-
       return 1;
     }
-  } catch (error) {
-    console.log(error);
 
+    throw new Error('Error');
+  } catch (error) {
     await browser.close();
     return 0;
   }
-
-  await browser.close();
 }
 
 async function startTask() {
-  const st = +new Date();
   isRunning = true;
   while (globalProductLinkList.length !== 0) {
-    const res = await scrapePage(globalProductLinkList[0].url);
+    const res = await scrapePage(globalProductLinkList[0]);
     if (res === -1 || res === 1) {
       globalProductLinkList.shift();
     } else {
-      console.log('读取失败，重试中...');
       let temp = globalProductLinkList.shift();
       globalProductLinkList.push(temp);
     }
   }
-  console.log('读取完成，耗时', (+new Date() - st) / 1000);
   isRunning = false;
 }
 
