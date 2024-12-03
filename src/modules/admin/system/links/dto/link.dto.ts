@@ -1,4 +1,5 @@
 import {
+  IsEnum,
   IsIn,
   IsInt,
   IsNotEmpty,
@@ -8,6 +9,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
+import { ELinkType } from '../entities/links.entity';
 
 export class LinkListDto {
   @IsNotEmpty()
@@ -35,6 +37,10 @@ export class LinkListDto {
   linkId: number;
 
   @IsOptional()
+  @IsEnum(ELinkType)
+  linkType: number;
+
+  @IsOptional()
   @IsNumber()
   price: number;
 
@@ -59,6 +65,10 @@ export class AddLinkDto {
   @IsNotEmpty()
   @IsString()
   title: string;
+
+  @IsNotEmpty()
+  @IsEnum(ELinkType)
+  linkType: number;
 
   @IsNotEmpty()
   @IsString()
@@ -125,6 +135,10 @@ export class CLinkListDto {
   @IsOptional()
   @IsNumber()
   pageSize: number;
+
+  @IsNotEmpty()
+  @IsEnum(ELinkType)
+  linkType: number;
 }
 
 export class LinkDetailDto {

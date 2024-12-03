@@ -401,4 +401,22 @@ export class UserService {
       total: total.count,
     };
   }
+
+  /**
+   * 获取所有的手机号集合
+   */
+  async getPhoneList() {
+    // 获取分组后的结果
+    const result = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.phone, COUNT(user.id) as count')
+      .groupBy('user.phone')
+      .orderBy('user.phone', 'DESC')
+      .getRawMany();
+
+    // 获取每个 phone 对应的实际用户数据
+    const phones = result.map((item) => item.phone);
+
+    return { phones };
+  }
 }

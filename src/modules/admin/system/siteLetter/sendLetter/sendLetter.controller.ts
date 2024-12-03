@@ -2,11 +2,13 @@ import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { SendLetterService } from './sendLetter.service';
 import { AuthGuard } from '@nestjs/passport';
 import {
+  quickSendDto,
   recordListDto,
-  recordUserDto,
   sendAllDto,
   sendLetterDto,
   sendSomeDto,
+  sendToAllPhoneDto,
+  sendToPhoneDto,
   userReadDto,
   userRecordDto,
 } from '../dto/send.dto';
@@ -40,6 +42,54 @@ export class SendLetterController {
     const records = await this.sendLetterService.sendToSome(
       body.letterId,
       body.userIds,
+    );
+    if (records) {
+      return {
+        code: 200,
+        result: records.raw.affectedRows + '条数据操作成功',
+      };
+    }
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/sendToPhone')
+  async sendToPhone(@Body() body: sendToPhoneDto) {
+    const records = await this.sendLetterService.sendToPhone(
+      body.letterId,
+      body.phones,
+    );
+    if (records) {
+      return {
+        code: 200,
+        result: records.raw.affectedRows + '条数据操作成功',
+      };
+    }
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/sendToAllPhone')
+  async sendToAllPhone(@Body() body: sendToAllPhoneDto) {
+    const { phones } = await this.userService.getPhoneList();
+    const records = await this.sendLetterService.sendToPhone(
+      body.letterId,
+      phones,
+    );
+    if (records) {
+      return {
+        code: 200,
+        result: records.raw.affectedRows + '条数据操作成功',
+      };
+    }
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/quickSend')
+  async quickSend(@Body() body: quickSendDto) {
+    const { phones, ...params } = body;
+    const letter = await this.letterService.addLetter(params);
+    const records = await this.sendLetterService.sendToPhone(
+      letter.letterId,
+      body.phones,
     );
     if (records) {
       return {

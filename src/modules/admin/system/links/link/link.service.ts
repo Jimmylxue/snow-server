@@ -61,6 +61,7 @@ export class LinkService {
     letter.price = params.price;
     letter.coin = params.coin;
     letter.visitTime = params.visitTime;
+    letter.linkType = params.linkType;
     return await this.linkRepository.save(letter);
   }
 
