@@ -19,6 +19,11 @@ export enum Level {
   专职,
 }
 
+export enum AccountType {
+  自己注册 = 1,
+  满赠,
+}
+
 @Entity('user', { schema: 'snow-server' })
 export class User {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
@@ -60,6 +65,14 @@ export class User {
     name: 'role',
   })
   role: number;
+
+  @Column({
+    type: 'enum',
+    enum: AccountType,
+    default: AccountType.自己注册,
+    name: 'accountType',
+  })
+  accountType: number;
 
   @Column({
     type: 'enum',

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Level, User } from '../entities/user.entity';
+import { AccountType, Level, User } from '../entities/user.entity';
 import { Between, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import {
@@ -306,6 +306,7 @@ export class UserService {
       select: ['id'],
       where: {
         phone: user.phone,
+        accountType: AccountType.自己注册,
       },
     });
 

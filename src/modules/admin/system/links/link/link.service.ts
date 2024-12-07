@@ -87,6 +87,9 @@ export class LinkService {
 
     // 查询数据
     const data = await this.linkRepository.find({
+      where: {
+        linkType: body.linkType,
+      },
       skip: randomPage * pageSize,
       take: pageSize,
     });

@@ -91,6 +91,26 @@ export class ChangePasswordDto {
   newPassword: string;
 }
 
+export class ChangePassDto {
+  @IsNotEmpty()
+  @IsNumber()
+  userId: number;
+
+  @IsNotEmpty()
+  @IsString()
+  newPassword: string;
+}
+
+export class CChangePassDto {
+  @IsNotEmpty()
+  @IsString()
+  originPassword: string;
+
+  @IsNotEmpty()
+  @IsString()
+  newPassword: string;
+}
+
 export class UserListByPhoneDto {
   @IsOptional()
   @IsMobilePhone('zh-CN')

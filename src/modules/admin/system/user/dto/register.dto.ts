@@ -1,4 +1,5 @@
 import {
+  IsEnum,
   IsIn,
   IsMobilePhone,
   IsNotEmpty,
@@ -6,6 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { AccountType } from '../entities/user.entity';
 
 export class RegisterDto {
   @IsMobilePhone('zh-CN')
@@ -77,6 +79,10 @@ export class GenerateDto {
   @IsNotEmpty()
   @IsMobilePhone('zh-CN')
   phone: string;
+
+  @IsNotEmpty()
+  @IsEnum(AccountType)
+  accountType: number;
 
   @IsOptional()
   @IsMobilePhone('zh-CN')

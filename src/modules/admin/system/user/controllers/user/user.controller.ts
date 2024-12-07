@@ -26,6 +26,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { RedisInstance } from '@src/instance';
 import { isQQMail } from '@src/utils';
 import {
+  CChangePassDto,
+  ChangePassDto,
   ChangePasswordDto,
   DelUserDto,
   UpdateMailDto,
@@ -33,7 +35,7 @@ import {
   UserListByPhoneDto,
   UserListDto,
 } from '../../dto/update.dto';
-import { Role } from '../../entities/user.entity';
+import { AccountType, Role } from '../../entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -304,7 +306,7 @@ export class UserController {
 
     this.usersService.subAccountCallBack(body.phone);
 
-    if (_user?.inviterPhone) {
+    if (_user?.inviterPhone && params.accountType === AccountType.自己注册) {
       this.usersService.successInviterCallBack(_user);
     }
 
@@ -464,6 +466,60 @@ export class UserController {
       await redis.del(key);
     }
     return this.usersService.updateUserMail(body, userId, redisCode);
+  }
+
+  /**
+   * quick_app 后台使用的修改账号
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('change_pass')
+  async changePass(@Body() body: ChangePassDto) {
+    const userId = body.userId;
+    const user = await this.usersService.getDetailById(userId);
+    if (!user?.id) {
+      return {
+        code: 500,
+        result: '账号异常，请联系管理员',
+      };
+    }
+
+    await this.usersService.updateUser({ userId, password: body.newPassword });
+
+    return {
+      code: 200,
+      result: '更新成功',
+    };
+  }
+
+  /**
+   * c 端使用的修改密码
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('c_change_pass')
+  async cChangePass(@Body() body: CChangePassDto, @Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const _user = await this.usersService.getDetailById(userId);
+    if (!_user?.id) {
+      return {
+        code: 500,
+        result: '账号异常，请联系管理员',
+      };
+    }
+
+    if (_user.password !== body.originPassword) {
+      return {
+        code: 500,
+        result: '密码校验失败，请检查原密码',
+      };
+    }
+
+    await this.usersService.updateUser({ userId, password: body.newPassword });
+
+    return {
+      code: 200,
+      result: '更新成功',
+    };
   }
 
   /**
