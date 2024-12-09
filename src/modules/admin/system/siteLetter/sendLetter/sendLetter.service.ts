@@ -4,11 +4,12 @@ import { SendRecord } from '../entities/sendRecord.entity';
 import { Repository } from 'typeorm';
 import {
   recordListDto,
-  recordUserDto,
+  userPlatformReadDto,
   userReadDto,
   userRecordDto,
 } from '../dto/send.dto';
 import { LetterService } from '../letter/letter.service';
+import { EPlatform } from '../entities/letter.entity';
 
 @Injectable()
 export class SendLetterService {
@@ -85,10 +86,28 @@ export class SendLetterService {
       .execute();
   }
 
-  async sendToPhone(letterId: number, phones: string[]) {
+  async updatePlatformRecord(body: userPlatformReadDto, sendPhone: string) {
+    const { platform, status } = body;
+    const qb = this.sendRecordRepository.createQueryBuilder('sendRecord');
+    const query = qb
+      .update(SendRecord)
+      .set({ status })
+      .where('sendRecord.sendPhone = :sendPhone', { sendPhone })
+      .andWhere('sendRecord.platform = :platform', { platform });
+    // .andWhere(
+    //   'sendRecord.letterId In (SELECT letterId FROM `quick-app`.letter WHERE letter.platform = :platform)',
+    //   {
+    //     platform,
+    //   },
+    // );
+    return await query.execute();
+  }
+
+  async sendToPhone(letterId: number, phones: string[], platform: EPlatform) {
     const data = phones.map((sendPhone) => ({
       letterId,
       sendPhone,
+      platform,
     }));
     return await this.sendRecordRepository.insert(data);
   }
@@ -102,6 +121,6 @@ export class SendLetterService {
       title,
       platform,
     });
-    await this.sendToPhone(letter.letterId, phones);
+    await this.sendToPhone(letter.letterId, phones, platform);
   }
 }

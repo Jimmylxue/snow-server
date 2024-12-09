@@ -64,4 +64,8 @@ export class LetterService {
   async delLetter(body: DelLetterDto) {
     return await this.letterRepository.delete({ letterId: body.letterId });
   }
+
+  async getLetterById(id: number) {
+    return await this.letterRepository.findOneBy({ letterId: id });
+  }
 }

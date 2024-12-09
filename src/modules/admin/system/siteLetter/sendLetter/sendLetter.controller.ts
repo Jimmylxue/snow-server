@@ -9,6 +9,7 @@ import {
   sendSomeDto,
   sendToAllPhoneDto,
   sendToPhoneDto,
+  userPlatformReadDto,
   userReadDto,
   userRecordDto,
 } from '../dto/send.dto';
@@ -54,9 +55,11 @@ export class SendLetterController {
   @UseGuards(AuthGuard('jwt'))
   @Post('/sendToPhone')
   async sendToPhone(@Body() body: sendToPhoneDto) {
+    const letter = await this.letterService.getLetterById(body.letterId);
     const records = await this.sendLetterService.sendToPhone(
       body.letterId,
       body.phones,
+      letter.platform,
     );
     if (records) {
       return {
@@ -70,9 +73,11 @@ export class SendLetterController {
   @Post('/sendToAllPhone')
   async sendToAllPhone(@Body() body: sendToAllPhoneDto) {
     const { phones } = await this.userService.getPhoneList();
+    const letter = await this.letterService.getLetterById(body.letterId);
     const records = await this.sendLetterService.sendToPhone(
       body.letterId,
       phones,
+      letter.platform,
     );
     if (records) {
       return {
@@ -90,6 +95,7 @@ export class SendLetterController {
     const records = await this.sendLetterService.sendToPhone(
       letter.letterId,
       body.phones,
+      letter.platform,
     );
     if (records) {
       return {
@@ -162,6 +168,29 @@ export class SendLetterController {
   @Post('/user/read')
   async userRead(@Body() body: userReadDto, @Req() auth) {
     await this.sendLetterService.updateRecord(body);
+    return {
+      code: 200,
+      result: '操作成功',
+    };
+  }
+
+  /**
+   * 阅读一个平台的所有消息
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/user/read_platform')
+  async userReadPlatform(@Body() body: userPlatformReadDto, @Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const _userInfo = await this.userService.getDetailById(userId);
+    if (!_userInfo?.phone) {
+      return {
+        code: 10000,
+        result: '账号异常 - 账户未绑定手机号',
+      };
+    }
+    console.log(')____', _userInfo.phone);
+    await this.sendLetterService.updatePlatformRecord(body, _userInfo.phone);
     return {
       code: 200,
       result: '操作成功',

@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Letter } from './letter.entity';
+import { EPlatform, Letter } from './letter.entity';
 
 export enum EStatus {
   未读 = 1,
@@ -29,6 +29,14 @@ export class SendRecord {
     default: EStatus.未读,
   })
   status: number;
+
+  @Column({
+    type: 'enum',
+    enum: EPlatform,
+    name: 'platform',
+    nullable: true,
+  })
+  platform: number;
 
   @Column({ type: 'varchar', name: 'sendPhone' })
   sendPhone: string;

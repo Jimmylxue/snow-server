@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsEnum,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -93,4 +94,14 @@ export class userReadDto {
   @IsOptional()
   @IsNumber()
   recordId: number;
+}
+
+export class userPlatformReadDto {
+  @IsOptional()
+  @IsEnum(EStatus)
+  status: number;
+
+  @IsNotEmpty()
+  @IsEnum(EPlatform)
+  platform: number;
 }

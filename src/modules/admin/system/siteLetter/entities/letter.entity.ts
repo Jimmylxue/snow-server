@@ -9,7 +9,7 @@ import {
 import { SendRecord } from './sendRecord.entity';
 
 export enum EPlatform {
-  系统消息,
+  系统消息 = 1,
   公告栏,
   客服消息,
 }
