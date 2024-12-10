@@ -189,7 +189,6 @@ export class SendLetterController {
         result: '账号异常 - 账户未绑定手机号',
       };
     }
-    console.log(')____', _userInfo.phone);
     await this.sendLetterService.updatePlatformRecord(body, _userInfo.phone);
     return {
       code: 200,
