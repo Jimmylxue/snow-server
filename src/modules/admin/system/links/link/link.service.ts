@@ -89,6 +89,7 @@ export class LinkService {
     const data = await this.linkRepository.find({
       where: {
         linkType: body.linkType,
+        logicDel: ELogicDel.未删除,
       },
       skip: randomPage * pageSize,
       take: pageSize,
