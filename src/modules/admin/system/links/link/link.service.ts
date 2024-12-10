@@ -79,8 +79,13 @@ export class LinkService {
   }
 
   async getRandomPageData(body: CLinkListDto) {
-    const pageSize = body?.pageSize || 15;
-    const totalRecords = await this.linkRepository.count();
+    const pageSize = body?.pageSize || 3;
+    const totalRecords = await this.linkRepository.count({
+      where: {
+        linkType: body.linkType,
+        logicDel: ELogicDel.未删除,
+      },
+    });
 
     const totalPages = Math.ceil(totalRecords / pageSize);
     const randomPage = Math.floor(Math.random() * totalPages);
