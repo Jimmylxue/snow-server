@@ -420,4 +420,22 @@ export class UserService {
 
     return { phones };
   }
+
+  async getAccountInfo(id: number) {
+    const user = await this.getDetailById(id);
+    const phone = user.phone;
+    const list = await this.userRepository.find({
+      where: {
+        phone,
+      },
+    });
+    const sendCount = list.filter(
+      (item) => item.accountType === AccountType.满赠,
+    ).length;
+    const registerCount = list.length - sendCount;
+    return {
+      sendCount,
+      registerCount,
+    };
+  }
 }

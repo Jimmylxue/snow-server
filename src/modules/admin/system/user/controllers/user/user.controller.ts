@@ -540,4 +540,16 @@ export class UserController {
       result: list,
     };
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('account_info')
+  async accountInfo(@Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const info = await this.usersService.getAccountInfo(userId);
+    return {
+      code: 200,
+      result: info,
+    };
+  }
 }
