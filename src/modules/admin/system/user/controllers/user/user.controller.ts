@@ -295,6 +295,13 @@ export class UserController {
       };
     }
 
+    if (_user?.id && !_user?.inviterPhone && body.inviterPhone) {
+      return {
+        code: 10000,
+        result: '该账号是原始账号，不可绑定邀请人',
+      };
+    }
+
     // 库中没有这个手机号的用户，或者说是 有这个用户 且邀请人 与 输入的邀请人相同，再加入一条
     const _password = this.usersService.generateUserNameNonceStr();
 
