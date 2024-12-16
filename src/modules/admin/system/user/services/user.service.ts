@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AccountType, Level, User } from '../entities/user.entity';
-import { Between, Repository } from 'typeorm';
+import { AccountType, Level, LoginStatus, User } from '../entities/user.entity';
+import { Between, LessThan, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import {
   ChangePasswordDto,
@@ -17,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { BcryptService } from '../../auth/auth.service';
 import { SendLetterService } from '../../siteLetter/sendLetter/sendLetter.service';
 import { EPlatform } from '../../siteLetter/entities/letter.entity';
+import { LoggerService } from '@src/modules/shared/service/Logger.service';
 
 @Injectable()
 export class UserService {
@@ -28,6 +29,7 @@ export class UserService {
     private readonly configService: ConfigService,
     private readonly sendLetterService: SendLetterService,
     private readonly bcryptService: BcryptService,
+    @Inject(LoggerService) private readonly logger: LoggerService,
   ) {}
 
   findAll(): Promise<User[]> {
@@ -437,5 +439,27 @@ export class UserService {
       sendCount,
       registerCount,
     };
+  }
+
+  async cleanUpCheck() {
+    // const inactiveDuration = 30 * 60 * 1000;
+    const inactiveDuration = 20 * 1000;
+    const now = new Date();
+
+    const inactiveUsers = await this.userRepository.find({
+      where: {
+        loginStatus: LoginStatus.在线,
+        lastActive: LessThan(new Date(now.getTime() - inactiveDuration)),
+      },
+    });
+
+    for (const user of inactiveUsers) {
+      user.loginStatus = LoginStatus.下线;
+      await this.userRepository.save(user);
+    }
+
+    this.logger.log(`清理了 ${inactiveUsers.length} 个长时间未活动用户`);
+
+    return `清理了 ${inactiveUsers.length} 个长时间未活动用户`;
   }
 }

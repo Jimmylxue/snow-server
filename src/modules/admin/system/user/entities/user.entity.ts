@@ -24,6 +24,11 @@ export enum AccountType {
   满赠,
 }
 
+export enum LoginStatus {
+  下线 = 1,
+  在线,
+}
+
 @Entity('user', { schema: 'snow-server' })
 export class User {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
@@ -120,4 +125,15 @@ export class User {
     comment: '邀请人手机号',
   })
   inviterPhone: string;
+
+  @Column({
+    type: 'enum',
+    enum: LoginStatus,
+    default: LoginStatus.下线,
+    name: 'loginStatus',
+  })
+  loginStatus: number;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  lastActive: Date;
 }

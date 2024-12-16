@@ -8,7 +8,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './schedule/task.module';
 import { EventsModule } from './modules/socket/event.module';
 import { UploadModule } from './modules/upload/upload.module';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './modules/admin/system/auth/constats';
 import { BcryptService } from './modules/admin/system/auth/auth.service';
 import { JwtStrategy } from './modules/admin/system/auth/jwtStrategy.service';
@@ -17,6 +17,9 @@ import { LoggerService } from './modules/shared/service/Logger.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { resolve } from 'path';
 import { StaticModule } from './modules/static/static.module';
+import { UserService } from './modules/admin/system/user/services/user.service';
+import { User } from './modules/admin/system/user/entities/user.entity';
+import { HttpService } from '@nestjs/axios';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -40,6 +43,7 @@ import { StaticModule } from './modules/static/static.module';
         };
       },
     }),
+
     AdminModule,
     WxModule,
     ScheduleModule.forRoot(),
@@ -53,9 +57,11 @@ import { StaticModule } from './modules/static/static.module';
         expiresIn: '30d',
       },
     }),
+    TypeOrmModule.forFeature([User]),
   ],
   controllers: [CatchErrorController],
   providers: [
+    // JwtService,
     // {
     //   provide: APP_INTERCEPTOR,
     //   useClass: LoggingInterceptor,

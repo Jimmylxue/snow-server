@@ -35,7 +35,7 @@ import {
   UserListByPhoneDto,
   UserListDto,
 } from '../../dto/update.dto';
-import { AccountType, Role } from '../../entities/user.entity';
+import { AccountType, LoginStatus, Role } from '../../entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -99,17 +99,27 @@ export class UserController {
       };
     }
     if (noEncrypt) {
-      /**
-       * id 为 28是最后一个明文密码用户
-       */
       const compareRes = password === user.password;
-      if (compareRes) {
-        return await this.usersService.createToken(user);
+      if (!compareRes) {
+        return {
+          code: 10000,
+          result: '账号或密码错误~',
+        };
       }
-      return {
-        code: 10000,
-        result: '账号或密码错误',
-      };
+
+      if (user.loginStatus === LoginStatus.在线) {
+        return {
+          code: 10000,
+          result: '账户已登录，请先退出登录',
+        };
+      }
+
+      await this.usersService.updateUser({
+        userId: user.id,
+        loginStatus: LoginStatus.在线,
+        lastActive: new Date(),
+      });
+      return await this.usersService.createToken(user);
     } else {
       /**
        * id 大于 28 都是 加密密码 使用 atob 获取原密码
@@ -131,6 +141,9 @@ export class UserController {
     }
   }
 
+  /**
+   * 后台登录 管理员不做 心跳检测
+   */
   @Post('login_by_admin')
   async loginByAdmin(@Body() body: LoginByIdDto) {
     const { id, password, noEncrypt } = body;
@@ -557,6 +570,50 @@ export class UserController {
     return {
       code: 200,
       result: info,
+    };
+  }
+
+  /**
+   * 退出登录
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('logout')
+  async logout(@Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    await this.usersService.updateUser({
+      userId,
+      loginStatus: LoginStatus.下线,
+    });
+    return {
+      code: 200,
+      result: '退出登录成功',
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('heartbeat')
+  async heartbeat(@Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    await this.usersService.updateUser({
+      userId,
+      lastActive: new Date(),
+      loginStatus: LoginStatus.在线,
+    });
+    return {
+      code: 200,
+      result: '心跳成功',
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('clean_up')
+  async clean_up() {
+    const res = await this.usersService.cleanUpCheck();
+    return {
+      code: 200,
+      result: res,
     };
   }
 }

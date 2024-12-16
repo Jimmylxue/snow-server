@@ -15,6 +15,8 @@ import { SendLetterService } from '../../siteLetter/sendLetter/sendLetter.servic
 import { SendRecord } from '../../siteLetter/entities/sendRecord.entity';
 import { LetterService } from '../../siteLetter/letter/letter.service';
 import { Letter } from '../../siteLetter/entities/letter.entity';
+import { UserCleanupService } from '../services/userCleanup.service';
+import { LoggerService } from '@src/modules/shared/service/Logger.service';
 
 @Module({
   imports: [
@@ -36,12 +38,14 @@ import { Letter } from '../../siteLetter/entities/letter.entity';
     }),
   ],
   providers: [
+    LoggerService,
     UserService,
     BcryptService,
     JwtStrategy,
     BcryptService,
     SendLetterService,
     LetterService,
+    UserCleanupService,
   ],
   controllers: [UserController],
   exports: [UserService],
