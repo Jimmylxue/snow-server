@@ -36,9 +36,9 @@ export class LinkListDto {
   @IsNumber()
   linkId: number;
 
-  @IsOptional()
-  @IsEnum(ELinkType)
-  linkType: number;
+  @IsNotEmpty()
+  @IsNumber()
+  linkTypeId: number;
 
   @IsOptional()
   @IsNumber()
@@ -67,8 +67,8 @@ export class AddLinkDto {
   title: string;
 
   @IsNotEmpty()
-  @IsEnum(ELinkType)
-  linkType: number;
+  @IsNumber()
+  linkTypeId: number;
 
   @IsNotEmpty()
   @IsString()
@@ -137,8 +137,8 @@ export class CLinkListDto {
   pageSize: number;
 
   @IsNotEmpty()
-  @IsEnum(ELinkType)
-  linkType: number;
+  @IsNumber()
+  linkTypeId: number;
 }
 
 export class LinkDetailDto {

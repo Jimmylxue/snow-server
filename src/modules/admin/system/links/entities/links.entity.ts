@@ -3,9 +3,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { LinkPlatform } from './linkPlatform.entity';
 
 export enum ELinkType {
   淘宝 = 1,
@@ -48,17 +51,19 @@ export class Link {
   })
   logicDel: number;
 
-  @Column({
-    type: 'enum',
-    enum: ELinkType,
-    default: ELinkType.淘宝,
-    name: 'linkType',
-  })
-  linkType: number;
-
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })
   createdTime: Date;
 
   @UpdateDateColumn({ comment: '更新时间', type: 'timestamp' })
   updateTime: Date;
+
+  @Column({ type: 'int', name: 'linkType' })
+  linkTypeId: number;
+
+  // 当letter表的 letterId删除之后 这边会同步一起删除掉
+  // @ManyToOne(() => LinkPlatform, (linkPlatform) => linkPlatform.linkTypeId, {
+  //   onDelete: 'CASCADE',
+  // })
+  // @JoinColumn({ name: 'linkType' })
+  // linkType: number;
 }
