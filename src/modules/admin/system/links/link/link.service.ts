@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, Repository } from 'typeorm';
+import { Between, In, Repository } from 'typeorm';
 import { Link } from '../entities/links.entity';
 import { formatFullTime } from '@src/utils';
 import {
@@ -67,16 +67,26 @@ export class LinkService {
   }
 
   async updateLink(body: UpdateLinkDto) {
-    const { linkId, ...params } = body;
-    await this.linkRepository.update(linkId, {
-      ...params,
-    });
+    const { linkIds, ...params } = body;
+    await this.linkRepository.update(
+      {
+        linkId: In(linkIds),
+      },
+      {
+        ...params,
+      },
+    );
   }
 
   async delLink(body: DelLinkDto) {
-    await this.linkRepository.update(body.linkId, {
-      logicDel: ELogicDel.逻辑删除,
-    });
+    await this.linkRepository.update(
+      {
+        linkId: In(body.linkIds),
+      },
+      {
+        logicDel: ELogicDel.逻辑删除,
+      },
+    );
   }
 
   async getRandomPageData(body: CLinkListDto) {

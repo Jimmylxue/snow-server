@@ -32,7 +32,12 @@ export class Link {
   @Column('int', { name: 'price', comment: '商品价格' })
   price: number;
 
-  @Column('int', { name: 'coin', comment: '金币', nullable: true, default: 1 })
+  @Column('int', {
+    name: 'coin',
+    comment: '金币',
+    nullable: true,
+    default: 0.01,
+  })
   coin: number;
 
   @Column('int', {

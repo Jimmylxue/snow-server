@@ -1,4 +1,6 @@
 import {
+  ArrayNotEmpty,
+  IsArray,
   IsEnum,
   IsIn,
   IsInt,
@@ -95,14 +97,18 @@ export class AddLinkDto {
 
 export class DelLinkDto {
   @IsNotEmpty()
-  @IsNumber()
-  linkId: number;
+  @IsArray() // 确保是数组
+  @ArrayNotEmpty() // 确保数组不为空
+  @IsNumber({}, { each: true }) // 确保数组中的每个元素都是数字
+  linkIds: number[];
 }
 
 export class UpdateLinkDto {
   @IsNotEmpty()
-  @IsNumber()
-  linkId: number;
+  @IsArray() // 确保是数组
+  @ArrayNotEmpty() // 确保数组不为空
+  @IsNumber({}, { each: true }) // 确保数组中的每个元素都是数字
+  linkIds: number[];
 
   @IsOptional()
   @IsString()

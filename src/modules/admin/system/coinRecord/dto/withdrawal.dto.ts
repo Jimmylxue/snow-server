@@ -44,8 +44,7 @@ export class WithdrawalRecordDto extends CWithdrawalRecordDto {
 export class CarryWithdrawalDto {
   @IsNotEmpty()
   @IsNumber()
-  @Min(10)
-  @Max(300)
+  @Min(1000)
   withdrawalCoin: number;
 }
 
