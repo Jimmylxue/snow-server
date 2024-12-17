@@ -18,12 +18,15 @@ import { BcryptService } from '../../auth/auth.service';
 import { SendLetterService } from '../../siteLetter/sendLetter/sendLetter.service';
 import { EPlatform } from '../../siteLetter/entities/letter.entity';
 import { LoggerService } from '@src/modules/shared/service/Logger.service';
+import { PhoneCoin } from '../../coinRecord/entities/phoneCoin.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(PhoneCoin)
+    private readonly phoneCoinRepository: Repository<PhoneCoin>,
     private readonly jwtService: JwtService,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
@@ -368,7 +371,9 @@ export class UserService {
     // 获取分组后的结果
     const result = await this.userRepository
       .createQueryBuilder('user')
-      .select('user.phone, COUNT(user.id) as count')
+      .select(
+        'user.phone, COUNT(user.id) as count, COUNT(CASE WHEN user.accountType = 2 THEN 1 END) as accountType2Count,(SELECT COUNT(*) FROM user u WHERE u.inviterPhone = user.phone) as inviterCount',
+      )
       .where(where)
       .groupBy('user.phone')
       .orderBy('user.phone', 'DESC')
@@ -383,12 +388,30 @@ export class UserService {
       .where('user.phone IN (:...phones)', { phones })
       .getMany();
 
+    const phoneCoins = await this.phoneCoinRepository
+      .createQueryBuilder('phoneCoin')
+      .where('phoneCoin.phone IN (:...phones)', { phones })
+      .getMany();
+
     // 将结果格式化为需要的结构
-    const formattedResult = result.map((item) => ({
-      phone: item.phone,
-      count: parseInt(item.count, 10), // 转换为整数
-      children: childrenData.filter((child) => child.phone === item.phone), // 过滤出对应的用户数据
-    }));
+    // const formattedResult = result.map((item) => ({
+    //   phone: item.phone,
+    //   count: parseInt(item.count, 10), // 转换为整数
+    //   children: childrenData.filter((child) => child.phone === item.phone), // 过滤出对应的用户数据
+    // }));
+
+    // 将结果格式化为需要的结构
+    const formattedResult = result.map((item) => {
+      const coinData = phoneCoins.find((coin) => coin.phone === item.phone);
+      return {
+        phone: item.phone,
+        count: parseInt(item.count), // 转换为整数
+        sendAccountCount: parseInt(item.accountType2Count, 10),
+        inviterCount: parseInt(item.inviterCount, 10),
+        coin: coinData ? coinData.coin : 0, // 如果没有找到对应的 coin，默认为 0
+        children: childrenData.filter((child) => child.phone === item.phone), // 过滤出对应的用户数据
+      };
+    });
 
     // 获取总的不同 phone 的数量
     const total = await this.userRepository

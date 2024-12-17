@@ -17,6 +17,7 @@ import { LetterService } from '../../siteLetter/letter/letter.service';
 import { Letter } from '../../siteLetter/entities/letter.entity';
 import { UserCleanupService } from '../services/userCleanup.service';
 import { LoggerService } from '@src/modules/shared/service/Logger.service';
+import { PhoneCoin } from '../../coinRecord/entities/phoneCoin.entity';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { LoggerService } from '@src/modules/shared/service/Logger.service';
       ManagerSetting,
       SendRecord,
       Letter,
+      PhoneCoin,
     ]),
     // user模块需要派发 token 所以这里必须得引用 jwt Module
     JwtModule.register({

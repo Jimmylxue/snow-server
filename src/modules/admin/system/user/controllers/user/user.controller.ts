@@ -26,6 +26,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RedisInstance } from '@src/instance';
 import { isQQMail } from '@src/utils';
 import {
+  BResetPassDto,
   CChangePassDto,
   ChangePassDto,
   ChangePasswordDto,
@@ -324,7 +325,7 @@ export class UserController {
       createTime: Date.now(),
     });
 
-    this.usersService.subAccountCallBack(body.phone);
+    // this.usersService.subAccountCallBack(body.phone);
 
     if (_user?.inviterPhone && params.accountType === AccountType.自己注册) {
       this.usersService.successInviterCallBack(_user);
@@ -614,6 +615,34 @@ export class UserController {
     return {
       code: 200,
       result: res,
+    };
+  }
+
+  /**
+   * b 端 重置密码
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('b_reset_pass')
+  async resetPassword(@Body() body: BResetPassDto) {
+    const userId = body.userId;
+    const _user = await this.usersService.getDetailById(userId);
+    if (!_user?.id) {
+      return {
+        code: 500,
+        result: '账号异常，请联系管理员',
+      };
+    }
+
+    const password =
+      body.newPassword || this.usersService.generateUserNameNonceStr();
+
+    await this.usersService.updateUser({ userId, password: password });
+
+    return {
+      code: 200,
+      result: {
+        password,
+      },
     };
   }
 }
