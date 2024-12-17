@@ -38,7 +38,7 @@ export class LinkListDto {
   @IsNumber()
   linkId: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   linkTypeId: number;
 

@@ -62,7 +62,7 @@ export class Link {
   @UpdateDateColumn({ comment: '更新时间', type: 'timestamp' })
   updateTime: Date;
 
-  @Column({ type: 'int', name: 'linkType' })
+  @Column({ type: 'int', name: 'linkTypeid' })
   linkTypeId: number;
 
   // 当letter表的 letterId删除之后 这边会同步一起删除掉
