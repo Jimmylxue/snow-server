@@ -2,7 +2,7 @@ import { generateRandomCode } from '@src/utils';
 import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Role {
-  '未定义',
+  '未定义' = 1,
   '普通用户',
   '管理员',
   '超级管理员',

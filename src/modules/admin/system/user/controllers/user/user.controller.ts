@@ -156,7 +156,7 @@ export class UserController {
       };
     }
 
-    if (user.role !== Role.管理员) {
+    if (![Role.管理员, Role.超级管理员].includes(user.role)) {
       return {
         code: 10000,
         result: '请登录管理员员账号',
