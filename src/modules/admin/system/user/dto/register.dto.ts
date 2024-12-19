@@ -91,4 +91,8 @@ export class GenerateDto {
   @IsOptional()
   @IsString()
   wxName: string;
+
+  @IsOptional()
+  @IsString()
+  codeUrl: string;
 }

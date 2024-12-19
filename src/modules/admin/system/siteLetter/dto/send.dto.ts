@@ -18,6 +18,10 @@ export class sendLetterDto {
 
   @IsString()
   content: string;
+
+  @IsOptional()
+  @IsString()
+  imgUrl?: string;
 }
 
 export class sendSomeDto {
@@ -56,6 +60,10 @@ export class quickSendDto {
   @IsArray()
   @IsString({ each: true }) // 验证每个元素都是字符串
   phones: string[];
+
+  @IsOptional()
+  @IsString()
+  imgUrl?: string;
 }
 
 export class sendAllDto {

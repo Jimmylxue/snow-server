@@ -33,6 +33,9 @@ export class Letter {
   @Column('text', { name: 'content' })
   content: string;
 
+  @Column('text', { name: 'imgUrl', nullable: true, comment: '配图地址' })
+  imgUrl: string;
+
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })
   createdTime: Date;
 

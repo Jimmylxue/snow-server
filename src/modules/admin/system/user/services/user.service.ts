@@ -372,7 +372,7 @@ export class UserService {
     const result = await this.userRepository
       .createQueryBuilder('user')
       .select(
-        'user.phone, COUNT(user.id) as count, COUNT(CASE WHEN user.accountType = 2 THEN 1 END) as accountType2Count,(SELECT COUNT(*) FROM user u WHERE u.inviterPhone = user.phone) as inviterCount',
+        'user.phone, COUNT(user.id) as count, COUNT(CASE WHEN user.accountType = 2 THEN 1 END) as accountType2Count,COUNT(CASE WHEN user.loginStatus = 2 THEN 1 END) as loginStatus2Count,(SELECT COUNT(*) FROM user u WHERE u.inviterPhone = user.phone) as inviterCount',
       )
       .where(where)
       .groupBy('user.phone')
@@ -394,13 +394,6 @@ export class UserService {
       .getMany();
 
     // 将结果格式化为需要的结构
-    // const formattedResult = result.map((item) => ({
-    //   phone: item.phone,
-    //   count: parseInt(item.count, 10), // 转换为整数
-    //   children: childrenData.filter((child) => child.phone === item.phone), // 过滤出对应的用户数据
-    // }));
-
-    // 将结果格式化为需要的结构
     const formattedResult = result.map((item) => {
       const coinData = phoneCoins.find((coin) => coin.phone === item.phone);
       return {
@@ -417,6 +410,15 @@ export class UserService {
     const total = await this.userRepository
       .createQueryBuilder('user')
       .select('COUNT(DISTINCT user.phone)', 'count')
+      .addSelect(
+        'COUNT(CASE WHEN user.loginStatus = 2 THEN 1 END)',
+        'loginStatus2Count',
+      )
+      .addSelect(
+        'COUNT(DISTINCT CASE WHEN user.loginStatus = 2 THEN user.phone END)',
+        'phoneLoginStatus2Count',
+      )
+      .addSelect('COUNT(*)', 'subAccountTotal')
       .where(where)
       .getRawOne();
 
@@ -424,6 +426,9 @@ export class UserService {
       page: page,
       result: formattedResult,
       total: total.count,
+      subAccountTotal: total.subAccountTotal,
+      loginTotal: total.loginStatus2Count,
+      phoneLoginTotal: total.phoneLoginStatus2Count,
     };
   }
 

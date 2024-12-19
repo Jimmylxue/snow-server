@@ -316,6 +316,20 @@ export class UserController {
       };
     }
 
+    if (!!_user?.codeUrl && body.codeUrl) {
+      return {
+        code: 10000,
+        result: '收款码绑定异常 - 该账号已绑定了收款码，请勿重复绑定',
+      };
+    }
+
+    if (!_user?.codeUrl && body.codeUrl) {
+      await this.usersService.updateUser({
+        userId: _user.id,
+        codeUrl: body.codeUrl,
+      });
+    }
+
     // 库中没有这个手机号的用户，或者说是 有这个用户 且邀请人 与 输入的邀请人相同，再加入一条
     const _password = this.usersService.generateUserNameNonceStr();
 
@@ -554,7 +568,7 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post('list_by_phone')
-  async userListByPhone(@Body() body: UserListByPhoneDto, @Req() auth) {
+  async userListByPhone(@Body() body: UserListByPhoneDto) {
     const list = await this.usersService.getUserListByPhone(body);
     return {
       code: 200,

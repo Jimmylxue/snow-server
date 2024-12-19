@@ -63,6 +63,9 @@ export class User {
   })
   avatar: string;
 
+  @Column('text', { name: 'codeUrl', comment: '收款码地址', nullable: true })
+  codeUrl: string;
+
   @Column({
     type: 'enum',
     enum: Role,

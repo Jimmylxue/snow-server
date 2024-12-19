@@ -48,6 +48,7 @@ export class LetterService {
     letter.title = params.title;
     letter.content = params.content;
     letter.platform = params.platform;
+    letter.imgUrl = params.imgUrl;
     return await this.letterRepository.save(letter);
   }
 
