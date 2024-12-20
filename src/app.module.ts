@@ -26,6 +26,7 @@ import { ExamSystemModule } from './modules/exam/examSystem.module';
 import { StaticModule } from './modules/static/static.module';
 import { CourseSystemModule } from './modules/course/CourseSystem.module';
 import { ShoppingSystemModule } from './modules/shopping/shoppingSystem.module';
+import { User } from './modules/admin/system/user/entities/user.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -72,6 +73,7 @@ import { ShoppingSystemModule } from './modules/shopping/shoppingSystem.module';
         expiresIn: '30d',
       },
     }),
+    TypeOrmModule.forFeature([User]),
   ],
   controllers: [CatchErrorController],
   providers: [

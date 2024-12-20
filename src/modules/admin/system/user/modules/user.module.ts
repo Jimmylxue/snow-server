@@ -21,6 +21,8 @@ import { ChildrenRecordController } from '../controllers/user/childrenRecord.con
 import { ManagerSettingService } from '../services/managerSetting.service';
 import { ManagerSettingController } from '../controllers/user/managerSetting.controller';
 import { ManagerSetting } from '../entities/managerSetting.entity';
+import { UserCleanupService } from '../services/userCleanup.service';
+import { LoggerService } from '@src/modules/shared/service/Logger.service';
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { ManagerSetting } from '../entities/managerSetting.entity';
     LocationService,
     ChildrenRecordService,
     ManagerSettingService,
+    UserCleanupService,
+    LoggerService,
   ],
   controllers: [
     UserController,

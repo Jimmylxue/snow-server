@@ -18,6 +18,11 @@ export enum Level {
   专职,
 }
 
+export enum LoginStatus {
+  下线 = 1,
+  在线,
+}
+
 @Entity('user', { schema: 'snow-server' })
 export class User {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
@@ -104,4 +109,15 @@ export class User {
 
   @Column('int', { name: 'inviter', nullable: true, comment: '邀请注册人' })
   inviter: number;
+
+  @Column({
+    type: 'enum',
+    enum: LoginStatus,
+    default: LoginStatus.下线,
+    name: 'loginStatus',
+  })
+  loginStatus: number;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  lastActive: Date;
 }
