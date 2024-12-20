@@ -4,6 +4,7 @@ import { AccountType, Level, LoginStatus, User } from '../entities/user.entity';
 import { Between, LessThan, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import {
+  BUpdateCodeUrlDto,
   ChangePasswordDto,
   DelUserDto,
   UpdateMailDto,
@@ -488,5 +489,16 @@ export class UserService {
     this.logger.log(`清理了 ${inactiveUsers.length} 个长时间未活动用户`);
 
     return `清理了 ${inactiveUsers.length} 个长时间未活动用户`;
+  }
+
+  async updateCodeUrl(params: BUpdateCodeUrlDto) {
+    await this.userRepository.update(
+      {
+        phone: params.phone,
+      },
+      {
+        codeUrl: params.codeUrl,
+      },
+    );
   }
 }

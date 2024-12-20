@@ -121,6 +121,16 @@ export class BResetPassDto {
   newPassword: string;
 }
 
+export class BUpdateCodeUrlDto {
+  @IsNotEmpty()
+  @IsString()
+  phone: string;
+
+  @IsNotEmpty()
+  @IsString()
+  codeUrl: string;
+}
+
 export class UserListByPhoneDto {
   @IsOptional()
   @IsMobilePhone('zh-CN')

@@ -6,7 +6,7 @@ import { UserService } from './user.service';
 export class UserCleanupService {
   constructor(private userService: UserService) {}
   // 每半小时执行一次
-  @Cron('0 */30 * * * *', {
+  @Cron('*/1 * * * *', {
     name: 'every_hour_check',
     timeZone: 'Asia/Chongqing',
   })

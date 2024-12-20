@@ -27,6 +27,7 @@ import { RedisInstance } from '@src/instance';
 import { isQQMail } from '@src/utils';
 import {
   BResetPassDto,
+  BUpdateCodeUrlDto,
   CChangePassDto,
   ChangePassDto,
   ChangePasswordDto,
@@ -657,6 +658,29 @@ export class UserController {
       result: {
         password,
       },
+    };
+  }
+
+  /**
+   * 更新 手机号级别的 收款码
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('update_code_url')
+  async updateCodeUrl(@Body() body: BUpdateCodeUrlDto) {
+    const phone = body.phone;
+    const _user = await this.usersService.findUserByPhone(phone);
+    if (!_user?.id) {
+      return {
+        code: 500,
+        result: '账号异常，请联系管理员',
+      };
+    }
+
+    await this.usersService.updateCodeUrl(body);
+
+    return {
+      code: 200,
+      result: '操作成功',
     };
   }
 }
