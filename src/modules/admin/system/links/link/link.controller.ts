@@ -7,6 +7,7 @@ import {
   DelLinkDto,
   LinkDetailDto,
   LinkListDto,
+  UpdateLinkAllDto,
   UpdateLinkDto,
 } from '../dto/link.dto';
 
@@ -77,6 +78,19 @@ export class LinkController {
     return {
       code: 200,
       result: lists,
+    };
+  }
+
+  /**
+   * 更新所有的链接
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/update_all')
+  async updateLinkAll(@Body() body: UpdateLinkAllDto) {
+    await this.linkService.updateLinkAll(body);
+    return {
+      code: 200,
+      result: '编辑成功',
     };
   }
 }

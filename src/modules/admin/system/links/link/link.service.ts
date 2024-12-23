@@ -9,6 +9,7 @@ import {
   DelLinkDto,
   LinkDetailDto,
   LinkListDto,
+  UpdateLinkAllDto,
   UpdateLinkDto,
 } from '../dto/link.dto';
 import { ELogicDel } from '@src/types/base';
@@ -112,5 +113,15 @@ export class LinkService {
     });
 
     return data;
+  }
+
+  async updateLinkAll(body: UpdateLinkAllDto) {
+    const { ...params } = body;
+    await this.linkRepository.update(
+      {},
+      {
+        ...params,
+      },
+    );
   }
 }

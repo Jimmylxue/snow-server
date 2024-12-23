@@ -128,7 +128,7 @@ export class UpdateLinkDto {
 
   @IsOptional()
   @Min(0.01)
-  @Max(50)
+  // @Max(50)
   coin: number;
 
   @IsOptional()
@@ -151,4 +151,32 @@ export class LinkDetailDto {
   @IsNotEmpty()
   @IsInt()
   linkId: number;
+}
+
+export class UpdateLinkAllDto {
+  @IsOptional()
+  @IsString()
+  title: string;
+
+  @IsOptional()
+  @IsString()
+  mainImage: string;
+
+  @IsOptional()
+  @IsString()
+  fullLink: string;
+
+  @IsOptional()
+  @IsNumber()
+  price: number;
+
+  @IsOptional()
+  @Min(0.01)
+  // @Max(50)
+  coin: number;
+
+  @IsOptional()
+  @Min(1)
+  @Max(60)
+  visitTime: number;
 }

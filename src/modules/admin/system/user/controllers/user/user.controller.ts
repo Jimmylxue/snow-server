@@ -324,7 +324,7 @@ export class UserController {
       };
     }
 
-    if (!_user?.codeUrl && body.codeUrl) {
+    if (_user && !_user?.codeUrl && body.codeUrl) {
       await this.usersService.updateUser({
         userId: _user.id,
         codeUrl: body.codeUrl,
