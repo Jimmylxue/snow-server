@@ -338,6 +338,7 @@ export class UserController {
       ...params,
       password: _password,
       createTime: Date.now(),
+      codeUrl: body.codeUrl || _user.codeUrl,
     });
 
     // this.usersService.subAccountCallBack(body.phone);

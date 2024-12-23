@@ -16,7 +16,9 @@ export class GainCoinRecord {
   /**
    * 绑定 userId
    */
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.id, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   user: number;
 
