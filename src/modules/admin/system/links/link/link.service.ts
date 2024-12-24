@@ -116,9 +116,9 @@ export class LinkService {
   }
 
   async updateLinkAll(body: UpdateLinkAllDto) {
-    const { ...params } = body;
+    const { linkTypeId, ...params } = body;
     await this.linkRepository.update(
-      {},
+      { linkTypeId },
       {
         ...params,
       },

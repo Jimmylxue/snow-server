@@ -158,6 +158,10 @@ export class UpdateLinkAllDto {
   @IsString()
   title: string;
 
+  @IsNotEmpty()
+  @IsNumber()
+  linkTypeId: number;
+
   @IsOptional()
   @IsString()
   mainImage: string;
