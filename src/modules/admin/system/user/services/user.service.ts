@@ -326,7 +326,7 @@ export class UserService {
       const managerPhone = '14455556666';
       await this.sendLetterService.sendQuickLetterToPhone({
         title: '条件达成通知',
-        content: `手机号：${user.phone}已达成邀请${total}个账号成就，额外获得一个账号`,
+        content: `手机号：${user.phone}已达成邀请${total}个账号成就，${user.inviterPhone}额外获得一个账号`,
         platform: EPlatform.系统消息,
         phones: [superManagerPhone, managerPhone, user.inviterPhone],
       });
