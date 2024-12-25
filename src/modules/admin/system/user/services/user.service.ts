@@ -320,13 +320,14 @@ export class UserService {
     /**
      * 是否 是 10 的倍数
      */
-    const isFullPlusOne = registerPhoneCount % 3 === 0;
+    const isFullPlusOne = registerPhoneCount % 10 === 0;
     if (isFullPlusOne) {
       const superManagerPhone = '13344445555';
       const managerPhone = '14455556666';
       await this.sendLetterService.sendQuickLetterToPhone({
         title: '条件达成通知',
-        content: `手机号：${user.phone}已达成邀请${total}个账号成就，${user.inviterPhone}额外获得一个账号`,
+        // content: `手机号：${user.phone}已达成邀请${total}个账号成就，${user.inviterPhone}额外获得一个账号`,
+        content: `手机号：${user.phone}已达成满10送1，${user.inviterPhone}额外获得一个账号`,
         platform: EPlatform.系统消息,
         phones: [superManagerPhone, managerPhone, user.inviterPhone],
       });
