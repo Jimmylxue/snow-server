@@ -124,4 +124,14 @@ export class LinkService {
       },
     );
   }
+
+  async deleteLinkAll(body: { linkTypeId: number }) {
+    const { linkTypeId } = body;
+    await this.linkRepository.update(
+      { linkTypeId },
+      {
+        logicDel: ELogicDel.逻辑删除,
+      },
+    );
+  }
 }

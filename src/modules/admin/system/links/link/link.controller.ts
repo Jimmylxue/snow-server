@@ -93,4 +93,17 @@ export class LinkController {
       result: '编辑成功',
     };
   }
+
+  /**
+   * 更新所有的链接
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/del_all')
+  async deleteLinkAll(@Body() body: { linkTypeId: number }) {
+    await this.linkService.deleteLinkAll(body);
+    return {
+      code: 200,
+      result: '删除成功',
+    };
+  }
 }
