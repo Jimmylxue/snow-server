@@ -38,7 +38,9 @@ import {
   UserListDto,
 } from '../../dto/update.dto';
 import { AccountType, LoginStatus, Role } from '../../entities/user.entity';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('user')
 export class UserController {
   constructor(
@@ -90,6 +92,7 @@ export class UserController {
     }
   }
 
+  @Throttle({ default: { limit: 1, ttl: 1000 * 2 } })
   @Post('login_by_id')
   async loginById(@Body() body: LoginByIdDto) {
     const { id, password, noEncrypt } = body;
