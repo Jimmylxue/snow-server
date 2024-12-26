@@ -91,7 +91,7 @@ export class AddLinkDto {
 
   @IsOptional()
   @Min(1)
-  @Max(60)
+  @Max(180)
   visitTime: number;
 }
 
@@ -133,7 +133,7 @@ export class UpdateLinkDto {
 
   @IsOptional()
   @Min(1)
-  @Max(60)
+  @Max(180)
   visitTime: number;
 }
 
@@ -181,6 +181,6 @@ export class UpdateLinkAllDto {
 
   @IsOptional()
   @Min(1)
-  @Max(60)
+  @Max(180)
   visitTime: number;
 }

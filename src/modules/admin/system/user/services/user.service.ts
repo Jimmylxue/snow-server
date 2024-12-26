@@ -283,7 +283,7 @@ export class UserService {
     for (let i = 0; i < 8; i++) {
       nonceStr += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    return nonceStr;
+    return nonceStr.slice(0, 6);
   }
 
   /**
