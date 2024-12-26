@@ -38,111 +38,98 @@ import {
   UserListDto,
 } from '../../dto/update.dto';
 import { AccountType, LoginStatus, Role } from '../../entities/user.entity';
-import { SkipThrottle, Throttle } from '@nestjs/throttler';
 @Controller('user')
 export class UserController {
+  private queue: (() => Promise<any>)[] = []; // 请求队列
+  private isProcessing = false; // 处理状态标志
   constructor(
     private readonly usersService: UserService,
     private readonly bcryptService: BcryptService,
   ) {}
 
-  @Post('login')
-  async login(@Body() body: LoginDto) {
-    const { phone, password, noEncrypt } = body;
-    let user = await this.usersService.findUserByPhone(phone);
-    if (!user) {
-      return {
-        code: 10000,
-        result: '账号或密码错误',
-      };
-    }
-    if (noEncrypt) {
-      /**
-       * id 为 28是最后一个明文密码用户
-       */
-      console.log('noEncrypt：', phone);
-      const compareRes = password === user.password;
-      if (compareRes) {
-        return await this.usersService.createToken(user);
+  private async processQueue() {
+    if (this.isProcessing) return; // 如果正在处理，则不再处理
+    this.isProcessing = true;
+
+    while (this.queue.length > 0) {
+      const request = this.queue.shift(); // 从队列中取出请求
+      if (request) {
+        await request(); // 执行请求
+        await this.delay(200); // 等待 500 毫秒
       }
-      return {
-        code: 10000,
-        result: '账号或密码错误',
-      };
-    } else {
-      /**
-       * id 大于 28 都是 加密密码 使用 atob 获取原密码
-       */
-      const originUserPassword = atob(user.password).split(
-        'snow-todoList',
-      )?.[0];
-      const compareHashSuccess = await this.bcryptService.compare(
-        originUserPassword,
-        password,
-      );
-      if (compareHashSuccess) {
-        return await this.usersService.createToken(user);
-      }
-      return {
-        code: 10000,
-        result: '账号或密码错误',
-      };
     }
+
+    this.isProcessing = false; // 处理完毕，重置状态
   }
 
-  @Throttle({ default: { limit: 1, ttl: 1000 } })
+  private delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms)); // 延迟函数
+  }
+
+  // @Throttle({ default: { limit: 1, ttl: 1000 } })
   @Post('login_by_id')
   async loginById(@Body() body: LoginByIdDto) {
-    const { id, password, noEncrypt } = body;
-    // await this.usersService.sleep(1000);
-    let user = await this.usersService.getDetailById(Number(id));
-    if (!user?.id) {
-      return {
-        code: 10000,
-        result: '账号或密码错误',
-      };
-    }
-    if (noEncrypt) {
-      const compareRes = password === user.password;
-      if (!compareRes) {
-        return {
-          code: 10000,
-          result: '账号或密码错误~',
-        };
-      }
+    return new Promise((resolve) => {
+      const requestHandler = async () => {
+        const { id, password, noEncrypt } = body;
+        let user = await this.usersService.getDetailById(Number(id));
+        if (!user?.id) {
+          resolve({
+            code: 10000,
+            result: '账号或密码错误',
+          });
+          return;
+        }
+        if (noEncrypt) {
+          const compareRes = password === user.password;
+          if (!compareRes) {
+            resolve({
+              code: 10000,
+              result: '账号或密码错误~',
+            });
+            return;
+          }
 
-      if (user.loginStatus === LoginStatus.在线) {
-        return {
-          code: 10000,
-          result: '账户已登录，请先退出登录',
-        };
-      }
+          if (user.loginStatus === LoginStatus.在线) {
+            resolve({
+              code: 10000,
+              result: '账户已登录，请先退出登录',
+            });
+            return;
+          }
 
-      await this.usersService.updateUser({
-        userId: user.id,
-        loginStatus: LoginStatus.在线,
-        lastActive: new Date(),
-      });
-      return await this.usersService.createToken(user);
-    } else {
-      /**
-       * id 大于 28 都是 加密密码 使用 atob 获取原密码
-       */
-      const originUserPassword = atob(user.password).split(
-        'snow-todoList',
-      )?.[0];
-      const compareHashSuccess = await this.bcryptService.compare(
-        originUserPassword,
-        password,
-      );
-      if (compareHashSuccess) {
-        return await this.usersService.createToken(user);
-      }
-      return {
-        code: 10000,
-        result: '账号或密码错误',
+          await this.usersService.updateUser({
+            userId: user.id,
+            loginStatus: LoginStatus.在线,
+            lastActive: new Date(),
+          });
+          const token = await this.usersService.createToken(user);
+          resolve(token); // 返回token
+          return;
+        } else {
+          const originUserPassword = atob(user.password).split(
+            'snow-todoList',
+          )?.[0];
+          const compareHashSuccess = await this.bcryptService.compare(
+            originUserPassword,
+            password,
+          );
+          if (compareHashSuccess) {
+            const token = await this.usersService.createToken(user);
+            resolve(token); // 返回token
+            return;
+          }
+          resolve({
+            code: 10000,
+            result: '账号或密码错误',
+          });
+          return;
+        }
       };
-    }
+
+      this.queue.push(requestHandler); // 将请求处理函数添加到队列
+      this.processQueue(); // 启动队列处理
+    });
   }
 
   /**
@@ -197,77 +184,6 @@ export class UserController {
         result: '账号或密码错误',
       };
     }
-  }
-
-  @Post('login_by_username')
-  async loginByUserName(@Body() body: LoginByUserNameDto) {
-    const { username, password, noEncrypt } = body;
-    let user = await this.usersService.findUserByPhone(username);
-    if (!user) {
-      return {
-        code: 10000,
-        result: '账号或密码错误',
-      };
-    }
-    if (noEncrypt) {
-      const compareRes = password === user.password;
-      if (compareRes) {
-        return await this.usersService.createToken(user);
-      }
-      return {
-        code: 10000,
-        result: '账号或密码错误',
-      };
-    } else {
-      const originUserPassword = atob(user.password).split(
-        'snow-todoList',
-      )?.[0];
-      const compareHashSuccess = await this.bcryptService.compare(
-        originUserPassword,
-        password,
-      );
-      if (compareHashSuccess) {
-        return await this.usersService.createToken(user);
-      }
-      return {
-        code: 10000,
-        result: '账号或密码错误',
-      };
-    }
-  }
-
-  @Post('login_by_mail')
-  async loginByMail(@Body() body: LoginByMailDto) {
-    const { code, mail } = body;
-    if (!isQQMail(mail)) {
-      return { code: 500, result: '邮箱格式验证异常，请校验' };
-    }
-    let user = await this.usersService.findUserByMail(mail);
-    if (!user) {
-      return {
-        code: 10000,
-        result: '该邮箱未创建用户，请检查地址，或为该邮箱注册一个用户',
-      };
-    }
-    const redis = await RedisInstance.initRedis();
-    const key = `snow-server-mail-verification-code-${mail}`;
-    const redisCode = await redis.get(key);
-    if (redisCode !== code.toUpperCase()) {
-      return {
-        code: 500,
-        result: '验证码校验失败，请重新发送验证码进行校验',
-      };
-    }
-    if (redisCode) {
-      await redis.del(key);
-    }
-    return await this.usersService.createToken(user);
-  }
-
-  @Post('login_by_mini_program')
-  @HttpCode(200)
-  async loginByMiniProgram(@Body() body: LoginByMiniProgram) {
-    return await this.usersService.miniProgramLogin(body);
   }
 
   @Post('register')
@@ -356,49 +272,6 @@ export class UserController {
         password: _password,
       },
     };
-  }
-
-  @Post('register_by_mail')
-  async registerByMail(@Body() body: RegisterByMailDto) {
-    // 注册时 传的密码 使用的是 btoa 处理过的密码
-    const params = body;
-    const { mail } = params;
-    if (!isQQMail(mail)) {
-      return { code: 500, result: '邮箱格式验证异常，请校验' };
-    }
-    let res1 = await this.usersService.findUserByMail(body.mail);
-    if (res1) {
-      return {
-        code: 10000,
-        result: '该邮箱已被注册',
-      };
-    }
-
-    const redis = await RedisInstance.initRedis();
-    const key = `snow-server-mail-verification-code-${body.mail}`;
-    const redisCode = await redis.get(key);
-    if (redisCode !== body.code.toUpperCase()) {
-      return {
-        code: 500,
-        result: '验证码校验失败，请重新发送验证码进行校验',
-      };
-    }
-
-    if (redisCode) {
-      await redis.del(key);
-    }
-
-    await this.usersService.addUser({
-      ...params,
-      createTime: Date.now(),
-    });
-
-    let user = await this.usersService.findUserByMail(body.mail);
-
-    /** todo-list 项目副作用，用户自动创建基础数据 */
-    this.usersService.addUserSuccessHandle(user);
-
-    return await this.usersService.createToken(user);
   }
 
   @UseGuards(AuthGuard('jwt'))

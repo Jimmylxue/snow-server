@@ -33,12 +33,12 @@ import { APP_GUARD } from '@nestjs/core';
       Letter,
       PhoneCoin,
     ]),
-    ThrottlerModule.forRoot([
-      {
-        ttl: 60000,
-        limit: 3,
-      },
-    ]),
+    // ThrottlerModule.forRoot([
+    //   {
+    //     ttl: 60000,
+    //     limit: 3,
+    //   },
+    // ]),
     // user模块需要派发 token 所以这里必须得引用 jwt Module
     JwtModule.register({
       secret: jwtConstants.secret,
@@ -56,10 +56,10 @@ import { APP_GUARD } from '@nestjs/core';
     SendLetterService,
     LetterService,
     UserCleanupService,
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: ThrottlerGuard,
+    // },
   ],
   controllers: [UserController],
   exports: [UserService],
