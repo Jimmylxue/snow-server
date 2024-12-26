@@ -36,6 +36,7 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
+    console.log('jjj');
     if (status != HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.systemInfo(exception);
     } else {
@@ -43,6 +44,7 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
     }
 
     if (exception instanceof SystemException) {
+      console.log(111);
       response.status(status).json({
         code: exception.getErrorCode(),
         message: exception.getErrorMessage(),
@@ -56,6 +58,8 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
         result: exception.getOtherMessage(),
       });
     } else if (exception instanceof UnauthorizedException) {
+      console.log(222);
+
       const token = request.headers['authorization']?.split(' ')?.[1];
       let userId = null;
       if (token) {
@@ -84,6 +88,8 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
         },
       });
     } else {
+      console.log(333);
+
       // @ts-ignore
       // @ts-ignore
       const errorResponse = exception?.response?.message;

@@ -7,8 +7,8 @@ const data = {
 
 function request() {
   // 发送 POST 请求
-  // fetch('http://127.0.0.1:9999/user/login_by_id', {
-  fetch('http://112.124.42.218:9999/user/login_by_id', {
+  fetch('http://127.0.0.1:9999/user/login_by_id', {
+    // fetch('http://112.124.42.218:9999/user/login_by_id', {
     method: 'POST', // 请求方法
     headers: {
       'Content-Type': 'application/json', // 指定请求体的内容类型
@@ -29,6 +29,15 @@ function request() {
     });
 }
 
+request();
+request();
+request();
+request();
+request();
+request();
+request();
+request();
+request();
 request();
 request();
 request();

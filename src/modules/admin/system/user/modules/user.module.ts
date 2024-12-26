@@ -18,6 +18,8 @@ import { Letter } from '../../siteLetter/entities/letter.entity';
 import { UserCleanupService } from '../services/userCleanup.service';
 import { LoggerService } from '@src/modules/shared/service/Logger.service';
 import { PhoneCoin } from '../../coinRecord/entities/phoneCoin.entity';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -30,6 +32,12 @@ import { PhoneCoin } from '../../coinRecord/entities/phoneCoin.entity';
       SendRecord,
       Letter,
       PhoneCoin,
+    ]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 3,
+      },
     ]),
     // user模块需要派发 token 所以这里必须得引用 jwt Module
     JwtModule.register({
@@ -48,6 +56,10 @@ import { PhoneCoin } from '../../coinRecord/entities/phoneCoin.entity';
     SendLetterService,
     LetterService,
     UserCleanupService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
   controllers: [UserController],
   exports: [UserService],
