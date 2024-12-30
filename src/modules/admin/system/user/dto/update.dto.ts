@@ -101,6 +101,16 @@ export class ChangePassDto {
   newPassword: string;
 }
 
+export class ChangePhonePassDto {
+  @IsMobilePhone('zh-CN')
+  @IsNotEmpty()
+  phone: string;
+
+  @IsNotEmpty()
+  @IsString()
+  newPassword: string;
+}
+
 export class CChangePassDto {
   @IsNotEmpty()
   @IsString()

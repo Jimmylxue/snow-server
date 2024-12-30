@@ -269,6 +269,17 @@ export class UserService {
     };
   }
 
+  async updatePassByPhone(phone: string, password: string) {
+    await this.userRepository.update(
+      {
+        phone,
+      },
+      {
+        password,
+      },
+    );
+  }
+
   /**
    * 注册成功后副作用
    * @param user
@@ -284,6 +295,17 @@ export class UserService {
       nonceStr += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return nonceStr.slice(0, 6);
+  }
+
+  getPasswordByUserPhone(phone: string) {
+    const phoneNumber = String(phone);
+    // 确保输入是字符串，并去掉空格
+    const sanitizedPhoneNumber = phoneNumber.toString().trim();
+
+    // 获取后 6 位数
+    const lastSixDigits = sanitizedPhoneNumber.slice(-6);
+
+    return lastSixDigits;
   }
 
   /**

@@ -1,26 +1,7 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  UseGuards,
-  Req,
-  HttpCode,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { UserService } from '../../services/user.service';
-import {
-  GenerateDto,
-  RegisterByMailDto,
-  RegisterDto,
-  UpdateDto,
-} from '../../dto/register.dto';
-import {
-  LoginByIdDto,
-  LoginByMailDto,
-  LoginByMiniProgram,
-  LoginByUserNameDto,
-  LoginDto,
-} from '../../dto/login.dto';
+import { GenerateDto, RegisterDto, UpdateDto } from '../../dto/register.dto';
+import { LoginByIdDto } from '../../dto/login.dto';
 import { BcryptService } from '../../../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { RedisInstance } from '@src/instance';
@@ -31,6 +12,7 @@ import {
   CChangePassDto,
   ChangePassDto,
   ChangePasswordDto,
+  ChangePhonePassDto,
   DelUserDto,
   UpdateMailDto,
   UpdatePhoneDto,
@@ -250,7 +232,9 @@ export class UserController {
     }
 
     // 库中没有这个手机号的用户，或者说是 有这个用户 且邀请人 与 输入的邀请人相同，再加入一条
-    const _password = this.usersService.generateUserNameNonceStr();
+    const _password = _user?.phone
+      ? this.usersService.getPasswordByUserPhone(_user?.phone)
+      : this.usersService.generateUserNameNonceStr();
 
     await this.usersService.addUser({
       ...params,
@@ -271,16 +255,6 @@ export class UserController {
         ...body,
         password: _password,
       },
-    };
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Post('list')
-  async userList(@Body() body: UserListDto, @Req() auth) {
-    const list = await this.usersService.getUserList(body);
-    return {
-      code: 200,
-      result: list,
     };
   }
 
@@ -356,31 +330,6 @@ export class UserController {
   }
 
   /**
-   * 修改邮箱
-   */
-  @UseGuards(AuthGuard('jwt'))
-  @Post('update_mail')
-  async updateMail(@Body() body: UpdateMailDto, @Req() auth) {
-    // 注册时 传的密码 使用的是 btoa 处理过的密码
-    // const  = body;
-    const { user } = auth;
-    const userId = user.userId;
-    if (body.mail && !isQQMail(body.mail)) {
-      return { code: 500, result: '邮箱格式验证异常，请校验' };
-    }
-    if (!isQQMail(body.newMail)) {
-      return { code: 500, result: '邮箱格式验证异常，请校验' };
-    }
-    const redis = await RedisInstance.initRedis();
-    const key = `snow-server-mail-verification-code-${body.newMail}`;
-    const redisCode = await redis.get(key);
-    if (redisCode) {
-      await redis.del(key);
-    }
-    return this.usersService.updateUserMail(body, userId, redisCode);
-  }
-
-  /**
    * quick_app 后台使用的修改账号
    */
   @UseGuards(AuthGuard('jwt'))
@@ -396,6 +345,17 @@ export class UserController {
     }
 
     await this.usersService.updateUser({ userId, password: body.newPassword });
+
+    return {
+      code: 200,
+      result: '更新成功',
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('change_phone_pass')
+  async changePhonePass(@Body() body: ChangePhonePassDto) {
+    await this.usersService.updatePassByPhone(body?.phone, body.newPassword);
 
     return {
       code: 200,
