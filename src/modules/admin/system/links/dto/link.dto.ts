@@ -86,12 +86,12 @@ export class AddLinkDto {
 
   @IsOptional()
   @Min(0.01)
-  @Max(50)
+  @Max(300)
   coin: number;
 
   @IsOptional()
   @Min(1)
-  @Max(180)
+  @Max(300)
   visitTime: number;
 }
 
