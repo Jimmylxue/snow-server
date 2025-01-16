@@ -1,5 +1,6 @@
 import {
   IsEnum,
+  IsMobilePhone,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -64,4 +65,11 @@ export class WithdrawalDetailDto {
   @IsNotEmpty()
   @IsNumber()
   recordId: number;
+}
+
+export class WithdrawSummaryDto {
+  @IsNotEmpty()
+  @IsMobilePhone('zh-CN')
+  @IsNotEmpty({ message: 'phone不能为空' })
+  phone: string;
 }

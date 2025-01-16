@@ -7,6 +7,7 @@ import {
   CompleteWithdrawalDto,
   CWithdrawalRecordDto,
   WithdrawalRecordDto,
+  WithdrawSummaryDto,
 } from '../../dto/withdrawal.dto';
 import { UserService } from '../../../user/services/user.service';
 import { getCurrentMonthTimestamps } from '@src/utils';
@@ -167,6 +168,19 @@ export class WithdrawalController {
     return {
       code: 200,
       result: '取消申请成功',
+    };
+  }
+
+  /**
+   * B 端  完成支付 接口
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/withdraw_summary')
+  async summary(@Body() body: WithdrawSummaryDto) {
+    const res = await this.withdrawalService.getUserWithdrawSummary(body.phone);
+    return {
+      code: 200,
+      result: res,
     };
   }
 }

@@ -87,4 +87,21 @@ export class WithdrawalService {
   async cancelWithdrawal(params: CompleteWithdrawalDto) {
     return this.withdrawalRepository.delete({ recordId: params.recordId });
   }
+
+  async getUserWithdrawSummary(phone: string) {
+    const result = await this.withdrawalRepository
+      .createQueryBuilder('withdrawalRecord')
+      .select([
+        'SUM(CASE WHEN withdrawalRecord.payStatus = :unpaid THEN withdrawalRecord.withdrawalCoin ELSE 0 END) AS unpaidTotal',
+        'SUM(CASE WHEN withdrawalRecord.payStatus = :paid THEN withdrawalRecord.withdrawalCoin ELSE 0 END) AS paidTotal',
+      ])
+      .where('withdrawalRecord.phone = :phone', { phone })
+      .setParameters({
+        unpaid: EPayStatus.未支付,
+        paid: EPayStatus.已支付,
+      })
+      .getRawOne();
+
+    return result;
+  }
 }
