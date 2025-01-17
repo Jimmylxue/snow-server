@@ -21,6 +21,9 @@ import { EPlatform } from '../../siteLetter/entities/letter.entity';
 import { LoggerService } from '@src/modules/shared/service/Logger.service';
 import { PhoneCoin } from '../../coinRecord/entities/phoneCoin.entity';
 
+const superManagerPhone = '13344445555';
+const managerPhone = '14455556666';
+
 @Injectable()
 export class UserService {
   constructor(
@@ -344,8 +347,6 @@ export class UserService {
      */
     const isFullPlusOne = registerPhoneCount % 10 === 0;
     if (isFullPlusOne) {
-      const superManagerPhone = '13344445555';
-      const managerPhone = '14455556666';
       await this.sendLetterService.sendQuickLetterToPhone({
         title: '条件达成通知',
         // content: `手机号：${user.phone}已达成邀请${total}个账号成就，${user.inviterPhone}额外获得一个账号`,
@@ -398,7 +399,10 @@ export class UserService {
       .select(
         'user.phone, COUNT(user.id) as count, COUNT(CASE WHEN user.accountType = 2 THEN 1 END) as accountType2Count,COUNT(CASE WHEN user.loginStatus = 2 THEN 1 END) as loginStatus2Count,(SELECT COUNT(*) FROM user u WHERE u.inviterPhone = user.phone) as inviterCount',
       )
-      .where(where)
+      .where('user.phone NOT IN (:...phoneList)', {
+        phoneList: [superManagerPhone, managerPhone],
+      })
+      .andWhere(where)
       .groupBy('user.phone')
       .orderBy('user.phone', 'DESC')
       .skip((page - 1) * pageSize)
@@ -443,7 +447,10 @@ export class UserService {
         'phoneLoginStatus2Count',
       )
       .addSelect('COUNT(*)', 'subAccountTotal')
-      .where(where)
+      .where('user.phone NOT IN (:...phoneList)', {
+        phoneList: [superManagerPhone, managerPhone],
+      })
+      .andWhere(where)
       .getRawOne();
 
     return {
