@@ -17,6 +17,7 @@ import {
   EditAddressDto,
   EditConfigDto,
   FBDto,
+  GenerateMoreLinkDto,
 } from '../../dto/address.dto';
 import { Response as Res } from 'express';
 
@@ -210,6 +211,22 @@ export class AddressController {
   @Post('generate')
   async generate() {
     return await this.addressService.generateLink();
+  }
+
+  /**
+   * 生成链接
+   */
+  @Post('generateMore')
+  async generateMore(@Body() body: GenerateMoreLinkDto, @Response() res: Res) {
+    const zipContent = await this.addressService.generateMoreLink(body);
+    if (zipContent.code === 500) {
+      throw new Error('生成链接失败');
+    }
+    res.set({
+      'Content-Type': 'application/zip',
+      'Content-Disposition': 'attachment; filename=qrcodes.zip',
+    });
+    res.send(zipContent); // 发送 ZIP 文件
   }
 
   /**

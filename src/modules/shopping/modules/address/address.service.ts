@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { Address } from '../../entities/address.entity';
 import {
   AddAddressDto,
@@ -9,6 +9,7 @@ import {
   ECheckLinkDto,
   EditAddressDto,
   EditConfigDto,
+  GenerateMoreLinkDto,
 } from '../../dto/address.dto';
 // @ts-ignore
 import { SystemConfig } from '../../entities/systemConfig.entity';
@@ -18,7 +19,10 @@ import * as geoip from 'geoip-lite';
 import { ELinkStatus, TempLink } from '../../entities/tempLink.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
-
+import { resolve } from 'path';
+const QRCode = require('qrcode');
+const JSZip = require('jszip');
+const { createCanvas, loadImage } = require('canvas');
 const bizSdk = require('facebook-nodejs-business-sdk');
 
 const keyList = [
@@ -549,11 +553,92 @@ export class AddressService {
       await this.tempLinkRepository.save(link);
       return {
         code: 200,
-        result: `${linkUrl}/#/luck?shareMemberCode=${uuid}${
+        result: `${linkUrl}/#/app?shareMemberCode=${uuid}${
           isSubSite ? `&subSite=${subSite}` : ''
         }`,
       };
     } catch (error) {
+      return {
+        code: 500,
+        result: '临时链接生成失败',
+      };
+    }
+  }
+
+  async generateMoreLink(body: GenerateMoreLinkDto) {
+    const count = body.count || 1; // 默认值为1
+    const linkUrl = this.configService.get('LINK_URL');
+    const subSite = this.configService.get('SUB_SITE');
+    const isSubSite = subSite !== '0';
+
+    try {
+      const zip = new JSZip(); // 创建 ZIP 实例
+      const promises = Array.from({ length: count }, async (_, index) => {
+        const uuid = uuidv4(); // 每次生成新的UUID
+        const link = this.tempLinkRepository.create();
+        link.linkCode = uuid;
+        link.linkStatus = ELinkStatus.未消费;
+
+        await this.tempLinkRepository.save(link); // 保存链接
+
+        // 构建链接
+        const linkResult = `${linkUrl}/#/luck?shareMemberCode=${uuid}${
+          isSubSite ? `&subSite=${subSite}` : ''
+        }`;
+
+        // 生成二维码
+        const qrCodeDataURL = await QRCode.toDataURL(linkResult, {
+          width: 225,
+          height: 225,
+        });
+        const base64Data = qrCodeDataURL.split(',')[1]; // 提取 Base64 数据
+        const buffer = Buffer.from(base64Data, 'base64'); // 转换为 Buffer
+
+        // // 将二维码图片添加到 ZIP 文件
+        zip.file(`qrcode_${index + 1}_${uuid}.png`, buffer); // 使用索引命名文件
+
+        return linkResult; // 返回链接
+
+        // --------
+
+        // 加载海报图片
+        const posterImage = await loadImage(
+          resolve(process.cwd(), './public/bg.jpg'),
+        ); // 替换为你的海报路径
+        const qrCodeImage = await loadImage(qrCodeDataURL); // 加载二维码
+
+        // 创建一个 canvas
+        const canvas = createCanvas(posterImage.width, posterImage.height);
+        const ctx = canvas.getContext('2d');
+
+        // 绘制海报
+        ctx.drawImage(posterImage, 0, 0);
+
+        // 将二维码绘制到海报的指定位置
+        const qrCodePositionX = 110; // 右下角，留20px边距
+        const qrCodePositionY = 960; // 右下角，留20px边距
+        ctx.drawImage(qrCodeImage, qrCodePositionX, qrCodePositionY);
+
+        // 导出合成的图片
+        const finalImageBuffer = canvas.toBuffer('image/png');
+        zip.file(
+          `poster_with_qrcode_${index + 1}_${uuid}.png`,
+          finalImageBuffer,
+        ); // 使用索引命名文件
+
+        return linkResult; // 返回链接
+      });
+
+      // 等待所有链接和二维码生成完成
+      await Promise.all(promises);
+
+      // 生成 ZIP 文件
+      const zipContent = await zip.generateAsync({ type: 'nodebuffer' });
+
+      return zipContent;
+      // 设置响应头，返回 ZIP 文件
+    } catch (error) {
+      console.log(error);
       return {
         code: 500,
         result: '临时链接生成失败',

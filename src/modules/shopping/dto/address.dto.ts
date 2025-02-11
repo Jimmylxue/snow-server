@@ -130,3 +130,9 @@ export class ECheckLinkDto {
   @IsString()
   linkCode: string;
 }
+
+export class GenerateMoreLinkDto {
+  @IsNotEmpty()
+  @IsNumber()
+  count: number;
+}
