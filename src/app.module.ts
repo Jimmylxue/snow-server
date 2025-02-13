@@ -27,7 +27,7 @@ import { StaticModule } from './modules/static/static.module';
 import { CourseSystemModule } from './modules/course/CourseSystem.module';
 import { ShoppingSystemModule } from './modules/shopping/shoppingSystem.module';
 import { User } from './modules/admin/system/user/entities/user.entity';
-import { DeepSeekModule } from './modules/deepseek/deepseek.module';
+import { AiModule } from './modules/ai/ai.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -57,7 +57,7 @@ import { DeepSeekModule } from './modules/deepseek/deepseek.module';
     CheckInModule,
     // MiniProgramModule,
     GptModule,
-    DeepSeekModule,
+    AiModule,
     ScheduleModule.forRoot(),
     TasksModule,
     EventsModule,
