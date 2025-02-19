@@ -225,9 +225,9 @@ export class UserService {
           ...userInfo,
           openid: res.data.openid,
           createTime: Date.now(),
-          username: userInfo.username || `游客${lastData.id + 1}`,
+          username: userInfo.username || `游客${lastData?.id || 0 + 1}`,
         });
-        let user = await this.getUserByOpenId(res.data.openid);
+        const user = await this.getUserByOpenId(res.data.openid);
         this.addUserSuccessHandle(user);
         return await this.createToken(user);
       }

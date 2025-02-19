@@ -8,6 +8,19 @@ export class DoubaoController {
 
   @Post('process-image')
   async processImage(@Body() body: DoubaoProcessImageDto) {
-    return await this.doubaoService.processImage(body.imageUrls, body.prompt);
+    const res = await this.doubaoService.processImage(
+      body.imageUrls,
+      body.prompt,
+    );
+    if (res.code === 10000) {
+      return {
+        code: 200,
+        result: res?.data?.image_urls,
+      };
+    }
+    return {
+      code: 500,
+      message: res?.message,
+    };
   }
 }
