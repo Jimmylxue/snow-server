@@ -80,6 +80,10 @@ export class WithdrawalController {
   @UseGuards(AuthGuard('jwt'))
   @Post('/carry')
   async carry(@Body() body: CarryWithdrawalDto, @Req() auth) {
+    return {
+      code: 200,
+      result: '提现功能正在维护',
+    };
     const { user } = auth;
     const userId = user.userId;
     const _userInfo = await this.userService.getDetailById(userId);
