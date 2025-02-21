@@ -1,4 +1,10 @@
-import { IsArray, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsBoolean,
+} from 'class-validator';
 
 export class DoubaoProcessImageDto {
   @IsOptional()
@@ -9,4 +15,8 @@ export class DoubaoProcessImageDto {
   @IsNotEmpty()
   @IsString()
   prompt: string;
+
+  @IsOptional()
+  @IsBoolean()
+  returnUrl: boolean;
 }

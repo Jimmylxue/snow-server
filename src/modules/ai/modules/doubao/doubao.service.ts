@@ -48,7 +48,7 @@ export class DoubaoService {
     return await this.hmacSHA256(kService, 'request');
   }
 
-  async processImage(imageUrls: string[], prompt: string) {
+  async processImage(imageUrls: string[], prompt: string, returnUrl: boolean) {
     const method = 'POST';
     const action = 'CVProcess';
     const version = '2022-08-31';
@@ -58,7 +58,7 @@ export class DoubaoService {
       req_key: 'img2img_anime_accelerated_maintain_id_for_smart_drawing_anime',
       image_urls: imageUrls,
       positive_prompt: prompt,
-      return_url: true,
+      return_url: returnUrl,
     });
 
     const xContentSha256 = await this.hashSHA256(body);
@@ -127,10 +127,12 @@ export class DoubaoService {
           Authorization: `HMAC-SHA256 Credential=${this.ak}/${credentialScope}, SignedHeaders=${signHeader}, Signature=${signature}`,
         },
       });
-
+      console.log('response', response.data);
       return response.data;
-    } catch (error) {
-      throw new Error(`Request failed: ${error.message}`);
+    } catch (error: any) {
+      throw new Error(
+        `Request failed: ${error.message} - ${error?.response?.data?.message}`,
+      );
     }
   }
 }

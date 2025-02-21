@@ -11,13 +11,17 @@ export class DoubaoController {
     const res = await this.doubaoService.processImage(
       body.imageUrls,
       body.prompt,
+      body.returnUrl,
     );
     if (res.code === 10000) {
       return {
         code: 200,
-        result: res?.data?.image_urls,
+        result: body.returnUrl
+          ? res?.data?.image_urls
+          : res?.data?.binary_data_base64,
       };
     }
+    console.log('dddd', res);
     return {
       code: 500,
       message: res?.message,
