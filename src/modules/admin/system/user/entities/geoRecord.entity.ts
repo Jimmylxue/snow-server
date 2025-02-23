@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 
-@Entity('userGeoRecord', { schema: 'snow-server' })
+@Entity('usergeorecord', { schema: 'snow-server' })
 export class UserGeoRecord {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;

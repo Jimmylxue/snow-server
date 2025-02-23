@@ -14,7 +14,7 @@ export enum EStatus {
   已读 = 2,
 }
 
-@Entity('sendRecord', { schema: 'snow-server' })
+@Entity('sendrecord', { schema: 'snow-server' })
 export class SendRecord {
   @PrimaryGeneratedColumn({ type: 'int', name: 'recordId' })
   recordId: number;

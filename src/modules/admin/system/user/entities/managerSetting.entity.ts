@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 
-@Entity('managerSetting', { schema: 'snow-server' })
+@Entity('managersetting', { schema: 'snow-server' })
 export class ManagerSetting {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;

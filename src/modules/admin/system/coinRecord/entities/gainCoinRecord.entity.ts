@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('GainCoinRecord', { schema: 'snow-server' })
+@Entity('gaincoinrecord', { schema: 'snow-server' })
 export class GainCoinRecord {
   @PrimaryGeneratedColumn({ type: 'int', name: 'recordId' })
   recordId: number;

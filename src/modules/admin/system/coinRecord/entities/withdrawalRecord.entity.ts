@@ -14,7 +14,7 @@ export enum EPayStatus {
   已支付 = 2,
 }
 
-@Entity('withdrawalRecord', { schema: 'snow-server' })
+@Entity('withdrawalrecord', { schema: 'snow-server' })
 export class WithdrawalRecord {
   @PrimaryGeneratedColumn({ type: 'int', name: 'recordId' })
   recordId: number;

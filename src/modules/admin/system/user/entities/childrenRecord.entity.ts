@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 
-@Entity('childrenRecord', { schema: 'snow-server' })
+@Entity('childrenrecord', { schema: 'snow-server' })
 export class ChildrenRecord {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;

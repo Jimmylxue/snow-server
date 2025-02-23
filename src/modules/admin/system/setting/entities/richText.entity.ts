@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('richText', { schema: 'snow-server' })
+@Entity('richtext', { schema: 'snow-server' })
 export class RichText {
   @PrimaryGeneratedColumn({ type: 'int', name: 'richTextId' })
   richTextId: number;

@@ -12,7 +12,7 @@ export enum ELinkOpenStatus {
   关闭,
 }
 
-@Entity('linkPlatform', { schema: 'snow-server' })
+@Entity('linkplatform', { schema: 'snow-server' })
 export class LinkPlatform {
   @PrimaryGeneratedColumn({
     type: 'int',

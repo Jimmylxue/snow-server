@@ -18,7 +18,7 @@ export enum EPayStatus {
 /**
  * 维护 手机号 跟 金币的关系
  */
-@Entity('phoneCoin', { schema: 'snow-server' })
+@Entity('phonecoin', { schema: 'snow-server' })
 export class PhoneCoin {
   @PrimaryColumn({ type: 'varchar', name: 'phone' })
   phone: string;
