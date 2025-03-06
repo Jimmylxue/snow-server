@@ -23,6 +23,13 @@ import { ManagerSettingController } from '../controllers/user/managerSetting.con
 import { ManagerSetting } from '../entities/managerSetting.entity';
 import { UserCleanupService } from '../services/userCleanup.service';
 import { LoggerService } from '@src/modules/shared/service/Logger.service';
+import { RegisterEffectService } from '../services/registerEffect.service';
+import { TBExpenseUserType } from '@src/modules/bills/entities/expenseUserType.entity';
+import { ExpensesTypeService } from '@src/modules/bills/modules/expenses/expenseType/expenseType.service';
+import { TBExpenseSystemType } from '@src/modules/bills/entities/expenseSystemType.entity';
+import { TBIncomeUserType } from '@src/modules/bills/entities/incomeUserType.entity';
+import { TBIncomeSystemType } from '@src/modules/bills/entities/incomeSystemType.entity';
+import { IncomeTypeService } from '@src/modules/bills/modules/incomes/incomeType/incomeType.service';
 
 @Module({
   imports: [
@@ -33,6 +40,10 @@ import { LoggerService } from '@src/modules/shared/service/Logger.service';
       UserGeoRecord,
       ChildrenRecord,
       ManagerSetting,
+      TBExpenseUserType,
+      TBExpenseSystemType,
+      TBIncomeUserType,
+      TBIncomeSystemType,
     ]),
     // user模块需要派发 token 所以这里必须得引用 jwt Module
     JwtModule.register({
@@ -54,6 +65,9 @@ import { LoggerService } from '@src/modules/shared/service/Logger.service';
     ManagerSettingService,
     UserCleanupService,
     LoggerService,
+    ExpensesTypeService,
+    IncomeTypeService,
+    RegisterEffectService,
   ],
   controllers: [
     UserController,

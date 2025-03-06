@@ -28,6 +28,7 @@ import { CourseSystemModule } from './modules/course/CourseSystem.module';
 import { ShoppingSystemModule } from './modules/shopping/shoppingSystem.module';
 import { User } from './modules/admin/system/user/entities/user.entity';
 import { AiModule } from './modules/ai/ai.module';
+import { BillsSystemModule } from './modules/bills/billsSystem.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -69,6 +70,7 @@ import { AiModule } from './modules/ai/ai.module';
     StaticModule,
     CourseSystemModule,
     ShoppingSystemModule,
+    BillsSystemModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: {

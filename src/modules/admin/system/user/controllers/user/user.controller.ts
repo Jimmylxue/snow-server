@@ -2,7 +2,6 @@ import {
   Controller,
   Post,
   Body,
-  Get,
   UseGuards,
   Req,
   HttpCode,
@@ -32,18 +31,20 @@ import {
   UserListDto,
 } from '../../dto/update.dto';
 import { Role } from '../../entities/user.entity';
+import { RegisterEffectService } from '../../services/registerEffect.service';
 
 @Controller('user')
 export class UserController {
   constructor(
     private readonly usersService: UserService,
     private readonly bcryptService: BcryptService,
+    private readonly registerEffectService: RegisterEffectService,
   ) {}
 
   @Post('login')
   async login(@Body() body: LoginDto) {
     const { phone, password, noEncrypt } = body;
-    let user = await this.usersService.findUserByPhone(phone);
+    const user = await this.usersService.findUserByPhone(phone);
     if (!user) {
       return {
         code: 10000,
@@ -87,7 +88,7 @@ export class UserController {
   @Post('login_by_admin')
   async loginByAdmin(@Body() body: LoginDto) {
     const { phone, password, noEncrypt } = body;
-    let user = await this.usersService.findUserByPhone(phone);
+    const user = await this.usersService.findUserByPhone(phone);
     if (!user) {
       return {
         code: 10000,
@@ -139,7 +140,7 @@ export class UserController {
   @Post('login_by_username')
   async loginByUserName(@Body() body: LoginByUserNameDto) {
     const { username, password, noEncrypt } = body;
-    let user = await this.usersService.findUserByPhone(username);
+    const user = await this.usersService.findUserByPhone(username);
     if (!user) {
       return {
         code: 10000,
@@ -179,7 +180,7 @@ export class UserController {
     if (!isQQMail(mail)) {
       return { code: 500, result: '邮箱格式验证异常，请校验' };
     }
-    let user = await this.usersService.findUserByMail(mail);
+    const user = await this.usersService.findUserByMail(mail);
     if (!user) {
       return {
         code: 10000,
@@ -204,7 +205,9 @@ export class UserController {
   @Post('login_by_mini_program')
   @HttpCode(200)
   async loginByMiniProgram(@Body() body: LoginByMiniProgram) {
-    return await this.usersService.miniProgramLogin(body);
+    const res = await this.usersService.miniProgramLogin(body);
+    await this.registerEffectService.registerEffectCallBack(res.result.user.id);
+    return res;
   }
 
   @Post('register')
@@ -212,7 +215,7 @@ export class UserController {
     // 注册时 传的密码 使用的是 btoa 处理过的密码
     const params = body;
 
-    let res1 = await this.usersService.findUserByPhone(body.phone);
+    const res1 = await this.usersService.findUserByPhone(body.phone);
     if (res1) {
       return {
         code: 10000,
@@ -225,9 +228,11 @@ export class UserController {
       createTime: Date.now(),
     });
 
-    let user = await this.usersService.findUserByPhone(body.phone);
+    const user = await this.usersService.findUserByPhone(body.phone);
 
     this.usersService.addUserSuccessHandle(user);
+
+    this.registerEffectService.registerEffectCallBack(user.id);
 
     return {
       code: 200,
@@ -240,7 +245,7 @@ export class UserController {
     // 注册时 传的密码 使用的是 btoa 处理过的密码
     const params = body;
 
-    let res1 = await this.usersService.findUserByPhone(body.phone);
+    const res1 = await this.usersService.findUserByPhone(body.phone);
     if (res1) {
       return {
         code: 10000,
@@ -256,7 +261,7 @@ export class UserController {
       createTime: Date.now(),
     });
 
-    let user = await this.usersService.findUserByPhone(body.phone);
+    const user = await this.usersService.findUserByPhone(body.phone);
 
     this.usersService.addUserSuccessHandle(user);
 
@@ -269,39 +274,6 @@ export class UserController {
     };
   }
 
-  // @Post('generate')
-  // async generate() {
-  //   // 注册时 传的密码 使用的是 btoa 处理过的密码
-  //   let _username: string;
-  //   const checkOnly = async () => {
-  //     _username = this.usersService.generateUserNameNonceStr();
-  //     const _user = await this.usersService.findUserByUserName(_username);
-  //     if (_user?.id) {
-  //       checkOnly();
-  //     }
-  //   };
-  //   checkOnly();
-  //   const _password = this.usersService.generateUserNameNonceStr();
-  //   await this.usersService.addUser({
-  //     username: _username,
-  //     password: _password,
-  //     createTime: Date.now(),
-  //   });
-
-  //   let user = await this.usersService.findUserByUserName(_username);
-
-  //   this.usersService.addUserSuccessHandle(user);
-
-  //   return {
-  //     code: 200,
-  //     result: {
-  //       username: _username,
-  //       password: _password,
-  //     },
-  //     message: '注册成功',
-  //   };
-  // }
-
   @Post('register_by_mail')
   async registerByMail(@Body() body: RegisterByMailDto) {
     // 注册时 传的密码 使用的是 btoa 处理过的密码
@@ -310,7 +282,7 @@ export class UserController {
     if (!isQQMail(mail)) {
       return { code: 500, result: '邮箱格式验证异常，请校验' };
     }
-    let res1 = await this.usersService.findUserByMail(body.mail);
+    const res1 = await this.usersService.findUserByMail(body.mail);
     if (res1) {
       return {
         code: 10000,
@@ -337,7 +309,7 @@ export class UserController {
       createTime: Date.now(),
     });
 
-    let user = await this.usersService.findUserByMail(body.mail);
+    const user = await this.usersService.findUserByMail(body.mail);
 
     /** todo-list 项目副作用，用户自动创建基础数据 */
     this.usersService.addUserSuccessHandle(user);
@@ -347,7 +319,7 @@ export class UserController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post('list')
-  async userList(@Body() body: UserListDto, @Req() auth) {
+  async userList(@Body() body: UserListDto) {
     const list = await this.usersService.getUserList(body);
     return {
       code: 200,
@@ -375,7 +347,7 @@ export class UserController {
    */
   @UseGuards(AuthGuard('jwt'))
   @Post('edit')
-  async editUser(@Body() body: UpdateDto, @Req() auth) {
+  async editUser(@Body() body: UpdateDto) {
     // 注册时 传的密码 使用的是 btoa 处理过的密码
     // const  = body;
     const params = body;
