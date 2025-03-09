@@ -8,6 +8,7 @@ import {
 } from '../dto/income.dto';
 import { formatFullTime } from '@src/utils';
 import { TBIncome } from '@src/modules/bills/entities/income.entity';
+import { BillsType } from '@src/modules/bills/billsSystem.module';
 
 @Injectable()
 export class IncomeService {
@@ -21,19 +22,23 @@ export class IncomeService {
     const [result, total] = await this.incomeRepository.findAndCount({
       where: {
         ...where,
-        createdTime: startTime
+        use_time: startTime
           ? Between(
               formatFullTime(Number(startTime)),
               formatFullTime(Number(endTime)),
             )
           : undefined,
       },
+      relations: ['type'],
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
     return {
       page: page,
-      result,
+      result: result.map((item) => ({
+        ...item,
+        billsType: BillsType.收入,
+      })),
       total,
     };
   }
@@ -53,6 +58,8 @@ export class IncomeService {
     item.incomeTypeId = params.typeId;
     item.userId = userId;
     item.user = userId;
+    item.use_time = new Date(params.use_time);
+    console.log(item);
     await this.incomeRepository.save(item);
   }
 

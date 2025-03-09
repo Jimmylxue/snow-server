@@ -40,6 +40,9 @@ export class TBExpense {
   @Column('text', { name: 'description', comment: '备注', nullable: true })
   description: string;
 
+  @Column('timestamp', { name: 'use_time', comment: '支出时间' })
+  use_time: Date;
+
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })
   createdTime: Date;
 

@@ -8,10 +8,13 @@ import {
   ExpenseTypeListDTO,
   ExpenseTypeUpdateDTO,
 } from '../dto/expenseType.dto';
-
+import { UserService } from '@src/modules/admin/system/user/services/user.service';
 @Controller('bill_system/expense_type')
 export class ExpensesTypeController {
-  constructor(private readonly expenseTypeService: ExpensesTypeService) {}
+  constructor(
+    private readonly expenseTypeService: ExpensesTypeService,
+    private readonly userService: UserService,
+  ) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/list')
@@ -68,6 +71,19 @@ export class ExpensesTypeController {
   @Post('/update')
   async updateTask(@Body() req: ExpenseTypeUpdateDTO) {
     await this.expenseTypeService.updateType(req);
+    return {
+      code: 200,
+      result: '更新成功',
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/add_system_type_to_all_user')
+  async addSystemTypeToUserType() {
+    const userIdList = await this.userService.findAllId();
+    for (const userId of userIdList) {
+      await this.expenseTypeService.addSystemTypeToUserType(userId);
+    }
     return {
       code: 200,
       result: '更新成功',

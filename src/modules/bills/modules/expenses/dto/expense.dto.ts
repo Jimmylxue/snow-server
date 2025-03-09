@@ -48,6 +48,10 @@ export class ExpenseAddDTO {
   @IsNotEmpty()
   @IsInt()
   price: number;
+
+  @IsNotEmpty()
+  @IsString()
+  use_time: string;
 }
 
 export class ExpenseUpdateDTO {
@@ -74,6 +78,10 @@ export class ExpenseUpdateDTO {
   @IsOptional()
   @IsString()
   cover: string;
+
+  @IsOptional()
+  @IsString()
+  use_time: string;
 }
 
 export class ExpenseDelDTO {

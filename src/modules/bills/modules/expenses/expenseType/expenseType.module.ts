@@ -4,8 +4,12 @@ import { ExpensesTypeService } from './expenseType.service';
 import { ExpensesTypeController } from './expenseType.controller';
 import { TBExpenseUserType } from '../../../entities/expenseUserType.entity';
 import { TBExpenseSystemType } from '@src/modules/bills/entities/expenseSystemType.entity';
+import { UsersModule } from '@src/modules/admin/system/user/modules/user.module';
 @Module({
-  imports: [TypeOrmModule.forFeature([TBExpenseUserType, TBExpenseSystemType])],
+  imports: [
+    UsersModule,
+    TypeOrmModule.forFeature([TBExpenseUserType, TBExpenseSystemType]),
+  ],
   providers: [ExpensesTypeService],
   controllers: [ExpensesTypeController],
 })

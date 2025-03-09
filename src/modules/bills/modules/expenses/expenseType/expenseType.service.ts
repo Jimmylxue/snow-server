@@ -62,7 +62,16 @@ export class ExpensesTypeService {
    */
   async addSystemTypeToUserType(userId: number) {
     const systemType = await this.expenseSystemTypeRepository.find();
+    const userType = await this.expenseUserTypeRepository.find({
+      where: {
+        userId,
+      },
+    });
     for (const type of systemType) {
+      const isExist = userType.find((item) => item.name === type.name);
+      if (isExist) {
+        continue;
+      }
       await this.expenseUserTypeRepository.save({
         name: type.name,
         description: type.description,

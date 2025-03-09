@@ -62,7 +62,16 @@ export class IncomeTypeService {
    */
   async addSystemTypeToUserType(userId: number) {
     const systemType = await this.incomeSystemTypeRepository.find();
+    const userType = await this.incomeTypeRepository.find({
+      where: {
+        userId,
+      },
+    });
     for (const type of systemType) {
+      const isExist = userType.find((item) => item.name === type.name);
+      if (isExist) {
+        continue;
+      }
       await this.incomeTypeRepository.save({
         name: type.name,
         description: type.description,

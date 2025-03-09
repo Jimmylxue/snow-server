@@ -48,6 +48,10 @@ export class IncomeAddDTO {
   @IsNotEmpty()
   @IsInt()
   price: number;
+
+  @IsOptional()
+  @IsString()
+  use_time: string;
 }
 
 export class IncomeUpdateDTO {
@@ -74,6 +78,10 @@ export class IncomeUpdateDTO {
   @IsOptional()
   @IsString()
   cover: string;
+
+  @IsOptional()
+  @IsString()
+  use_time: string;
 }
 
 export class IncomeDelDTO {

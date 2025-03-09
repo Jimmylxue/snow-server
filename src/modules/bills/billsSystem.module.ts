@@ -5,3 +5,8 @@ import { IncomesModule } from './modules/incomes/incomes.module';
   imports: [ExpensesModule, IncomesModule],
 })
 export class BillsSystemModule {}
+
+export enum BillsType {
+  支出 = 1,
+  收入,
+}

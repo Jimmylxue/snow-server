@@ -8,10 +8,14 @@ import {
   IncomeTypeListDTO,
   IncomeTypeUpdateDTO,
 } from '../dto/incomeType.dto';
+import { UserService } from '@src/modules/admin/system/user/services/user.service';
 
 @Controller('bill_system/income_type')
 export class IncomeTypeController {
-  constructor(private readonly incomeTypeService: IncomeTypeService) {}
+  constructor(
+    private readonly incomeTypeService: IncomeTypeService,
+    private readonly userService: UserService,
+  ) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/list')
@@ -68,6 +72,22 @@ export class IncomeTypeController {
   @Post('/update')
   async updateTask(@Body() req: IncomeTypeUpdateDTO) {
     await this.incomeTypeService.updateType(req);
+    return {
+      code: 200,
+      result: '更新成功',
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/add_system_type_to_all_user')
+  async addSystemTypeToUserType() {
+    const userIdList = await this.userService.findAllId();
+
+    console.log(userIdList);
+    for (const userId of userIdList) {
+      console.log(userId);
+      await this.incomeTypeService.addSystemTypeToUserType(userId);
+    }
     return {
       code: 200,
       result: '更新成功',

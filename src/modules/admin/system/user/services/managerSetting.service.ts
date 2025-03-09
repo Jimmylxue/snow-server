@@ -18,7 +18,6 @@ export class ManagerSettingService {
 
   async saveSetting(params: SaveSettingDto, userId: number) {
     if (params.disabledEndHour < params.disabledStartHour) {
-      console.log('sajdlkasndjk');
       return {
         code: 500,
         result: '结束时间必须大于开始时间',

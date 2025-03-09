@@ -8,6 +8,7 @@ import {
   ExpenseUpdateDTO,
 } from '../dto/expense.dto';
 import { formatFullTime } from '@src/utils';
+import { BillsType } from '@src/modules/bills/billsSystem.module';
 
 @Injectable()
 export class ExpenseService {
@@ -22,19 +23,23 @@ export class ExpenseService {
       where: {
         ...where,
         userId,
-        createdTime: startTime
+        use_time: startTime
           ? Between(
               formatFullTime(Number(startTime)),
               formatFullTime(Number(endTime)),
             )
           : undefined,
       },
+      relations: ['type'],
       skip: (page - 1) * pageSize,
       take: pageSize,
     });
     return {
       page: page,
-      result,
+      result: result.map((item) => ({
+        ...item,
+        billsType: BillsType.支出,
+      })),
       total,
     };
   }
@@ -54,6 +59,7 @@ export class ExpenseService {
     item.expenseTypeId = params.typeId;
     item.userId = userId;
     item.user = userId;
+    item.use_time = new Date(params.use_time);
     await this.expenseRepository.save(item);
   }
 
