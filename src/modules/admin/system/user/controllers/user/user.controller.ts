@@ -30,18 +30,23 @@ export class UserController {
   ) {}
 
   private async processQueue() {
-    if (this.isProcessing) return; // 如果正在处理，则不再处理
+    if (this.isProcessing) return;
     this.isProcessing = true;
 
     while (this.queue.length > 0) {
-      const request = this.queue.shift(); // 从队列中取出请求
+      const request = this.queue.shift();
       if (request) {
-        await request(); // 执行请求
-        await this.delay(200); // 等待 500 毫秒
+        try {
+          await request();
+        } catch (error) {
+          console.error('Queue processing error:', error);
+          // 错误发生时继续处理队列，不中断
+        }
+        await this.delay(200);
       }
     }
 
-    this.isProcessing = false; // 处理完毕，重置状态
+    this.isProcessing = false;
   }
 
   private delay(ms: number) {
@@ -53,64 +58,72 @@ export class UserController {
   async loginById(@Body() body: LoginByIdDto) {
     return new Promise((resolve) => {
       const requestHandler = async () => {
-        const { id, password, noEncrypt } = body;
-        let user = await this.usersService.getDetailById(Number(id));
-        if (!user?.id) {
-          resolve({
-            code: 10000,
-            result: '账号或密码错误',
-          });
-          return;
-        }
-        if (noEncrypt) {
-          const compareRes = password === user.password;
-          if (!compareRes) {
+        try {
+          const { id, password, noEncrypt } = body;
+          const user = await this.usersService.getDetailById(Number(id));
+          if (!user?.id) {
             resolve({
               code: 10000,
-              result: '账号或密码错误~',
+              result: '账号或密码错误',
             });
             return;
           }
+          if (noEncrypt) {
+            const compareRes = password === user.password;
+            if (!compareRes) {
+              resolve({
+                code: 10000,
+                result: '账号或密码错误~',
+              });
+              return;
+            }
 
-          if (user.loginStatus === LoginStatus.在线) {
-            resolve({
-              code: 10000,
-              result: '账户已登录，请先退出登录',
+            if (user.loginStatus === LoginStatus.在线) {
+              resolve({
+                code: 10000,
+                result: '账户已登录，请先退出登录',
+              });
+              return;
+            }
+
+            await this.usersService.updateUser({
+              userId: user.id,
+              loginStatus: LoginStatus.在线,
+              lastActive: new Date(),
             });
-            return;
-          }
-
-          await this.usersService.updateUser({
-            userId: user.id,
-            loginStatus: LoginStatus.在线,
-            lastActive: new Date(),
-          });
-          const token = await this.usersService.createToken(user);
-          resolve(token); // 返回token
-          return;
-        } else {
-          const originUserPassword = atob(user.password).split(
-            'snow-todoList',
-          )?.[0];
-          const compareHashSuccess = await this.bcryptService.compare(
-            originUserPassword,
-            password,
-          );
-          if (compareHashSuccess) {
             const token = await this.usersService.createToken(user);
             resolve(token); // 返回token
             return;
+          } else {
+            const originUserPassword = atob(user.password).split(
+              'snow-todoList',
+            )?.[0];
+            const compareHashSuccess = await this.bcryptService.compare(
+              originUserPassword,
+              password,
+            );
+            if (compareHashSuccess) {
+              const token = await this.usersService.createToken(user);
+              resolve(token); // 返回token
+              return;
+            }
+            resolve({
+              code: 10000,
+              result: '账号或密码错误',
+            });
+            return;
           }
+        } catch (error) {
+          console.error('Login error:', error);
           resolve({
             code: 10000,
-            result: '账号或密码错误',
+            result: '登录处理发生错误，请重试',
           });
-          return;
         }
       };
 
-      this.queue.push(requestHandler); // 将请求处理函数添加到队列
-      this.processQueue(); // 启动队列处理
+      this.queue.push(requestHandler);
+      this.processQueue();
     });
   }
 
