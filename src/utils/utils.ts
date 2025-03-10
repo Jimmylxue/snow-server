@@ -70,15 +70,15 @@ export function splitArrayByKey(arr, key) {
  * 获取进一周 日期数据
  */
 export function getNearWeekDateMessage() {
-  let result: { date: string; dayOfWeek: string }[] = [];
-  let today = new Date();
-  let chineseDayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+  const result: { date: string; dayOfWeek: string }[] = [];
+  const today = new Date();
+  const chineseDayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
   for (let i = 0; i < 7; i++) {
-    let pastDate = new Date(today);
+    const pastDate = new Date(today);
     pastDate.setDate(today.getDate() - i);
-    let day = pastDate.getDay();
-    let dayOfWeek = '星期' + chineseDayOfWeek[day];
-    let formattedDate =
+    const day = pastDate.getDay();
+    const dayOfWeek = '星期' + chineseDayOfWeek[day];
+    const formattedDate =
       pastDate.getFullYear() +
       '-' +
       String(pastDate.getMonth() + 1).padStart(2, '0') +

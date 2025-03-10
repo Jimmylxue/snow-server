@@ -24,10 +24,7 @@ export class ExpenseService {
         ...where,
         userId,
         use_time: startTime
-          ? Between(
-              formatFullTime(Number(startTime)),
-              formatFullTime(Number(endTime)),
-            )
+          ? Between(formatFullTime(startTime), formatFullTime(endTime))
           : undefined,
       },
       relations: ['type'],

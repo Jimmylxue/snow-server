@@ -8,14 +8,18 @@ import {
   IncomeDelDTO,
   IncomeUpdateDTO,
 } from '../dto/income.dto';
+import { Admin } from '@src/decorators/admin.decorator';
 @Controller('bill_system/income')
 export class IncomeController {
   constructor(private readonly incomeService: IncomeService) {}
 
   @UseGuards(AuthGuard('jwt'))
+  @Admin()
   @Post('/list')
-  async getUserType(@Body() req: IncomeListDTO) {
-    const list = await this.incomeService.getList(req);
+  async getUserType(@Body() req: IncomeListDTO, @Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const list = await this.incomeService.getList(req, userId);
     return {
       code: 200,
       result: list,

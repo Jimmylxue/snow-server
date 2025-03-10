@@ -5,6 +5,7 @@ export enum Role {
   '未定义',
   '普通用户',
   '管理员',
+  '超级管理员',
 }
 
 export enum Sex {

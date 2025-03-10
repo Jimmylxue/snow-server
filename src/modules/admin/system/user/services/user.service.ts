@@ -184,6 +184,7 @@ export class UserService {
       username: user.username,
       userId: user.id,
       avatar: user.avatar,
+      role: user.role,
     };
     delete user.password;
     delete user.openid;

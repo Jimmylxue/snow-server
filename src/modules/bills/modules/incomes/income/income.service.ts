@@ -17,16 +17,14 @@ export class IncomeService {
     private readonly incomeRepository: Repository<TBIncome>,
   ) {}
 
-  async getList(params: IncomeListDTO) {
+  async getList(params: IncomeListDTO, userId: number) {
     const { pageSize, page, startTime, endTime, ...where } = params;
     const [result, total] = await this.incomeRepository.findAndCount({
       where: {
         ...where,
+        userId,
         use_time: startTime
-          ? Between(
-              formatFullTime(Number(startTime)),
-              formatFullTime(Number(endTime)),
-            )
+          ? Between(formatFullTime(startTime), formatFullTime(endTime))
           : undefined,
       },
       relations: ['type'],

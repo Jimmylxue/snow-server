@@ -84,10 +84,13 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
         },
       });
     } else {
-      // @ts-ignore
-      // @ts-ignore
-      const errorResponse = exception?.response?.message;
-      // @ts-ignore
+      interface ErrorWithResponse {
+        response?: {
+          message?: string | string[];
+        };
+      }
+
+      const errorResponse = (exception as ErrorWithResponse)?.response?.message;
       const dtoErrorMessage =
         typeof errorResponse === 'string'
           ? errorResponse

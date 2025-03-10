@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminModule } from './modules/admin/admin.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { HttpExceptionFilter } from './exception/http-exception.filter';
 import { WxModule } from './modules/wx/wx.module';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -29,6 +29,7 @@ import { ShoppingSystemModule } from './modules/shopping/shoppingSystem.module';
 import { User } from './modules/admin/system/user/entities/user.entity';
 import { AiModule } from './modules/ai/ai.module';
 import { BillsSystemModule } from './modules/bills/billsSystem.module';
+import { AdminInterceptor } from './interceptors/admin.interceptor';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -81,13 +82,13 @@ import { BillsSystemModule } from './modules/bills/billsSystem.module';
   ],
   controllers: [CatchErrorController],
   providers: [
-    // {
-    //   provide: APP_INTERCEPTOR,
-    //   useClass: LoggingInterceptor,
-    // },
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AdminInterceptor,
     },
     BcryptService,
     JwtStrategy,
