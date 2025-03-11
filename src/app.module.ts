@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminModule } from './modules/admin/admin.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { HttpExceptionFilter } from './exception/http-exception.filter';
 import { WxModule } from './modules/wx/wx.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './schedule/task.module';
 import { EventsModule } from './modules/socket/event.module';
 import { UploadModule } from './modules/upload/upload.module';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './modules/admin/system/auth/constats';
 import { BcryptService } from './modules/admin/system/auth/auth.service';
 import { JwtStrategy } from './modules/admin/system/auth/jwtStrategy.service';
@@ -17,9 +17,8 @@ import { LoggerService } from './modules/shared/service/Logger.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { resolve } from 'path';
 import { StaticModule } from './modules/static/static.module';
-import { UserService } from './modules/admin/system/user/services/user.service';
 import { User } from './modules/admin/system/user/entities/user.entity';
-import { HttpService } from '@nestjs/axios';
+import { AdminInterceptor } from './interceptors/admin.interceptor';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -69,6 +68,10 @@ import { HttpService } from '@nestjs/axios';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AdminInterceptor,
     },
     BcryptService,
     JwtStrategy,

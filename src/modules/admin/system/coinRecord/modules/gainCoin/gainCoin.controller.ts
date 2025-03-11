@@ -9,6 +9,8 @@ import {
   GainCoinRecordDto,
 } from '../../dto/gainCoin.dto';
 import { LinkService } from '../../../links/link/link.service';
+import { Admin } from '@src/decorators/admin.decorator';
+import { Role } from '../../../user/entities/user.entity';
 
 @Controller('gainCoin')
 export class GainCoinController {
@@ -22,6 +24,7 @@ export class GainCoinController {
    * B 端 查询 浏览 记录
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.管理员)
   @Post('/list')
   async addHabit(@Body() body: GainCoinRecordDto) {
     const records = await this.gainCoinService.getUserPhoneGainCoinRecord(

@@ -3,6 +3,8 @@ import { PhoneCoinService } from './phoneCoin.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from '../../../user/services/user.service';
 import { PhoneCoinListDto } from '../../dto/phoneCoin.dto';
+import { Admin } from '@src/decorators/admin.decorator';
+import { Role } from '../../../user/entities/user.entity';
 
 @Controller('phone_coin')
 export class PhoneCoinController {
@@ -42,6 +44,7 @@ export class PhoneCoinController {
    * B 端 查询记录 -> 根据手机号查询
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.管理员)
   @Post('/list')
   async addHabit(@Body() body: PhoneCoinListDto) {
     const records = await this.phoneCoinService.getPhoneCoinList(body);

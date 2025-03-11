@@ -20,10 +20,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!payload.userId) {
       return false;
     }
-    let user = {
+    const user = {
       username: payload.username,
       // password: payload.password,
       userId: payload.userId,
+      /**
+       * 将角色返回
+       */
+      role: payload.role,
     };
     //返回后可在req中得到返回的值
     return user;

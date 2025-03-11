@@ -12,6 +12,8 @@ import {
 import { UserService } from '../../../user/services/user.service';
 import { getCurrentMonthTimestamps } from '@src/utils';
 import { PhoneCoinService } from '../phoneCoin/phoneCoin.service';
+import { Admin } from '@src/decorators/admin.decorator';
+import { Role } from '../../../user/entities/user.entity';
 
 @Controller('withdrawal')
 export class WithdrawalController {
@@ -24,6 +26,7 @@ export class WithdrawalController {
    * B 端 查询记录
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.管理员)
   @Post('/list')
   async addHabit(@Body() body: WithdrawalRecordDto) {
     const records = await this.withdrawalService.getUserPhoneWithdrawalRecord(
@@ -40,6 +43,7 @@ export class WithdrawalController {
    * B 端  完成支付 接口
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('/complete')
   async complete(@Body() body: CompleteWithdrawalDto) {
     await this.withdrawalService.completeWithdrawal(body);
@@ -175,6 +179,7 @@ export class WithdrawalController {
    * B 端  完成支付 接口
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('/withdraw_summary')
   async summary(@Body() body: WithdrawSummaryDto) {
     const res = await this.withdrawalService.getUserWithdrawSummary(body.phone);

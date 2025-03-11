@@ -10,6 +10,8 @@ import {
   UpdateLinkAllDto,
   UpdateLinkDto,
 } from '../dto/link.dto';
+import { Admin } from '@src/decorators/admin.decorator';
+import { Role } from '../../user/entities/user.entity';
 
 @Controller('link')
 export class LinkController {
@@ -19,6 +21,7 @@ export class LinkController {
    * 所有 链接 数据
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.管理员)
   @Post('/list')
   async getList(@Body() body: LinkListDto) {
     const lists = await this.linkService.getLinkList(body);
@@ -39,6 +42,7 @@ export class LinkController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('/add')
   async addLink(@Body() body: AddLinkDto) {
     await this.linkService.addLink(body);
@@ -49,6 +53,7 @@ export class LinkController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('/update')
   async updateLetter(@Body() body: UpdateLinkDto) {
     await this.linkService.updateLink(body);
@@ -59,6 +64,7 @@ export class LinkController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('/del')
   async delLetter(@Body() body: DelLinkDto) {
     await this.linkService.delLink(body);
@@ -85,6 +91,7 @@ export class LinkController {
    * 更新所有的链接
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('/update_all')
   async updateLinkAll(@Body() body: UpdateLinkAllDto) {
     await this.linkService.updateLinkAll(body);
@@ -98,6 +105,7 @@ export class LinkController {
    * 更新所有的链接
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('/del_all')
   async deleteLinkAll(@Body() body: { linkTypeId: number }) {
     await this.linkService.deleteLinkAll(body);

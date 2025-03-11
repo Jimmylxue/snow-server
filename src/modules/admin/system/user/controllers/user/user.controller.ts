@@ -4,8 +4,6 @@ import { GenerateDto, RegisterDto, UpdateDto } from '../../dto/register.dto';
 import { LoginByIdDto } from '../../dto/login.dto';
 import { BcryptService } from '../../../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { RedisInstance } from '@src/instance';
-import { isQQMail } from '@src/utils';
 import {
   BResetPassDto,
   BUpdateCodeUrlDto,
@@ -14,12 +12,11 @@ import {
   ChangePasswordDto,
   ChangePhonePassDto,
   DelUserDto,
-  UpdateMailDto,
   UpdatePhoneDto,
   UserListByPhoneDto,
-  UserListDto,
 } from '../../dto/update.dto';
 import { AccountType, LoginStatus, Role } from '../../entities/user.entity';
+import { Admin } from '@src/decorators/admin.decorator';
 @Controller('user')
 export class UserController {
   private queue: (() => Promise<any>)[] = []; // 请求队列
@@ -133,7 +130,7 @@ export class UserController {
   @Post('login_by_admin')
   async loginByAdmin(@Body() body: LoginByIdDto) {
     const { id, password, noEncrypt } = body;
-    let user = await this.usersService.getDetailById(Number(id));
+    const user = await this.usersService.getDetailById(Number(id));
     if (!user) {
       return {
         code: 10000,
@@ -186,7 +183,7 @@ export class UserController {
     // 注册时 传的密码 使用的是 btoa 处理过的密码
     const params = body;
 
-    let res1 = await this.usersService.findUserByPhone(body.phone);
+    const res1 = await this.usersService.findUserByPhone(body.phone);
     if (res1) {
       return {
         code: 10000,
@@ -199,7 +196,7 @@ export class UserController {
       createTime: Date.now(),
     });
 
-    let user = await this.usersService.findUserByPhone(body.phone);
+    const user = await this.usersService.findUserByPhone(body.phone);
 
     this.usersService.addUserSuccessHandle(user);
 
@@ -209,12 +206,14 @@ export class UserController {
     };
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('generate')
   async generates(@Body() body: GenerateDto) {
     // 注册时 传的密码 使用的是 btoa 处理过的密码
     const params = body;
 
-    let _user = await this.usersService.findUserByPhone(body.phone);
+    const _user = await this.usersService.findUserByPhone(body.phone);
 
     if (_user?.inviterPhone && _user?.inviterPhone !== body.inviterPhone) {
       return {
@@ -290,10 +289,9 @@ export class UserController {
    * 管理员端使用的更新
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('edit')
-  async editUser(@Body() body: UpdateDto, @Req() auth) {
-    // 注册时 传的密码 使用的是 btoa 处理过的密码
-    // const  = body;
+  async editUser(@Body() body: UpdateDto) {
     const params = body;
     await this.usersService.editUser({ ...params });
     return {
@@ -320,6 +318,7 @@ export class UserController {
    * 管理员删除用户
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('/del')
   async delLetter(@Body() body: DelUserDto) {
     await this.usersService.delUser(body);
@@ -346,6 +345,7 @@ export class UserController {
    * quick_app 后台使用的修改账号
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('change_pass')
   async changePass(@Body() body: ChangePassDto) {
     const userId = body.userId;
@@ -417,6 +417,7 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.管理员)
   @Post('list_by_phone')
   async userListByPhone(@Body() body: UserListByPhoneDto) {
     const list = await this.usersService.getUserListByPhone(body);
@@ -486,6 +487,7 @@ export class UserController {
    * b 端 重置密码
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('b_reset_pass')
   async resetPassword(@Body() body: BResetPassDto) {
     const userId = body.userId;
@@ -514,6 +516,7 @@ export class UserController {
    * 更新 手机号级别的 收款码
    */
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('update_code_url')
   async updateCodeUrl(@Body() body: BUpdateCodeUrlDto) {
     const phone = body.phone;

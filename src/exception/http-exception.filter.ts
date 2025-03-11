@@ -36,7 +36,6 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    console.log('jjj');
     if (status != HttpStatus.INTERNAL_SERVER_ERROR) {
       this.logger.systemInfo(exception);
     } else {
@@ -44,7 +43,6 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
     }
 
     if (exception instanceof SystemException) {
-      console.log(111);
       response.status(status).json({
         code: exception.getErrorCode(),
         message: exception.getErrorMessage(),
@@ -58,8 +56,6 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
         result: exception.getOtherMessage(),
       });
     } else if (exception instanceof UnauthorizedException) {
-      console.log(222);
-
       const token = request.headers['authorization']?.split(' ')?.[1];
       let userId = null;
       if (token) {
@@ -88,19 +84,23 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
         },
       });
     } else {
-      console.log(333);
-
-      // @ts-ignore
-      // @ts-ignore
-      const errorResponse = exception?.response?.message;
-      // @ts-ignore
+      console.log(exception);
+      interface ErrorWithResponse {
+        response?: {
+          message?: string | string[];
+        };
+      }
+      const errorResponse = (exception as ErrorWithResponse)?.response?.message;
       const dtoErrorMessage =
         typeof errorResponse === 'string'
           ? errorResponse
           : errorResponse?.join('-');
       // dot拦截时触发的错误 => 参数错误 => 手动赋值一个参数错误
       response.status(status).json({
-        code: ErrorCode.REQUEST_PARAMS_ERROR_CODE,
+        code:
+          status === 403
+            ? ErrorCode.NO_AUTH_ERROR_CODE
+            : ErrorCode.REQUEST_PARAMS_ERROR_CODE,
         message: dtoErrorMessage || exception.message,
         data: {
           date:

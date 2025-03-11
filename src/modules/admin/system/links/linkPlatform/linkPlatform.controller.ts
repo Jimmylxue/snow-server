@@ -8,6 +8,8 @@ import {
   LinkTypeListDto,
   UpdateLinkTypeDto,
 } from '../dto/linkPlatform.dto';
+import { Admin } from '@src/decorators/admin.decorator';
+import { Role } from '../../user/entities/user.entity';
 
 @Controller('link_platform')
 export class LinkPlatformController {
@@ -34,6 +36,7 @@ export class LinkPlatformController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('/add')
   async addLink(@Body() body: AddLinkTypeDto) {
     await this.linkService.addLink(body);
@@ -44,6 +47,7 @@ export class LinkPlatformController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('/update')
   async updateLetter(@Body() body: UpdateLinkTypeDto) {
     await this.linkService.updateLink(body);
@@ -54,6 +58,7 @@ export class LinkPlatformController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Admin(Role.超级管理员)
   @Post('/del')
   async delLetter(@Body() body: DelLinkTypeDto) {
     await this.linkService.delLink(body);
