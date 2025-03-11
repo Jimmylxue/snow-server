@@ -7,5 +7,6 @@ import { IncomeController } from './income.controller';
   imports: [TypeOrmModule.forFeature([TBIncome])],
   providers: [IncomeService],
   controllers: [IncomeController],
+  exports: [IncomeService],
 })
 export class IncomeModule {}

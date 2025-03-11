@@ -7,5 +7,6 @@ import { ExpenseController } from './expense.controller';
   imports: [TypeOrmModule.forFeature([TBExpense])],
   providers: [ExpenseService],
   controllers: [ExpenseController],
+  exports: [ExpenseService],
 })
 export class ExpenseModule {}

@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { IncomesModule } from './modules/incomes/incomes.module';
+import { BusinessModule } from './modules/business/business.module';
 @Module({
-  imports: [ExpensesModule, IncomesModule],
+  imports: [ExpensesModule, IncomesModule, BusinessModule],
 })
 export class BillsSystemModule {}
 

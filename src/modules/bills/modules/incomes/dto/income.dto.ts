@@ -3,11 +3,11 @@ import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 export class IncomeListDTO {
   @IsOptional()
   @IsInt()
-  typeId: number;
+  typeId?: number;
 
   @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @IsNotEmpty()
   @IsInt()
