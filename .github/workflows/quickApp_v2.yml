@@ -1,10 +1,10 @@
-name: 打包quick_app
+name: 打包quick_app_v2
 
 on:
   push:
     # push 代码的时候 哪个分支会受到影响 这里是 master 主分支
     branches:
-      - app/quick_app
+      - app/quick_app_v2
   workflow_dispatch:
 
 # 推送之后执行一系列的任务
@@ -17,9 +17,9 @@ jobs:
         # 使用action库 action/checkout获取代码
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.QUICK_APP_HOST }}
+          host: ${{ secrets.QUICK_APP_HOST_V2 }}
           username: root
-          password: ${{ secrets.QUICK_APP_PASSWORD }}
+          password: ${{ secrets.QUICK_APP_PASSWORD_V2 }}
           port: 22
           script: |
             cd /me/snow-server/
