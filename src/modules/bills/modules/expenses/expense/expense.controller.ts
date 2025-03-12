@@ -9,7 +9,6 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ExpenseService } from './expense.service';
 import { AdminInterceptor } from '@src/interceptors/admin.interceptor';
-import { Admin } from '@src/decorators/admin.decorator';
 import {
   ExpenseListDTO,
   ExpenseDetailDTO,
@@ -17,7 +16,6 @@ import {
   ExpenseDelDTO,
   ExpenseUpdateDTO,
 } from '../dto/expense.dto';
-import { Role } from '@src/modules/admin/system/user/entities/user.entity';
 
 @Controller('bill_system/expense')
 @UseInterceptors(AdminInterceptor)
@@ -25,7 +23,6 @@ export class ExpenseController {
   constructor(private readonly expenseService: ExpenseService) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Admin(Role.管理员)
   @Post('/list')
   async getUserType(@Body() req: ExpenseListDTO, @Req() auth) {
     const { user } = auth;
