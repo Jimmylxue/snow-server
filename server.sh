@@ -1,3 +1,5 @@
+git status
+
 # 切换分支
 git checkout app/quick_app_v2
 
