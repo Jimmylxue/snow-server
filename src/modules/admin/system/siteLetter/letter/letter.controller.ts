@@ -9,8 +9,6 @@ import {
 import { sendLetterDto } from '../dto/send.dto';
 import { SendLetterService } from '../sendLetter/sendLetter.service';
 import { EStatus } from '../entities/sendRecord.entity';
-import { Admin } from '@src/decorators/admin.decorator';
-import { Role } from '../../user/entities/user.entity';
 
 @Controller('message')
 export class LetterController {
@@ -48,7 +46,6 @@ export class LetterController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Admin(Role.超级管理员)
   @Post('/add')
   async addLetter(@Body() body: sendLetterDto) {
     const letter = await this.letterService.addLetter(body);
@@ -59,7 +56,6 @@ export class LetterController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Admin(Role.超级管理员)
   @Post('/update')
   async updateLetter(@Body() body: UpdateLetterDto) {
     const letter = await this.letterService.updateLetter(body);
@@ -72,7 +68,6 @@ export class LetterController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Admin(Role.超级管理员)
   @Post('/del')
   async delLetter(@Body() body: DelLetterDto) {
     await this.letterService.delLetter(body);
