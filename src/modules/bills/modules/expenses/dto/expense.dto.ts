@@ -1,4 +1,10 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class ExpenseListDTO {
   @IsOptional()
@@ -46,7 +52,7 @@ export class ExpenseAddDTO {
   cover: string;
 
   @IsNotEmpty()
-  @IsInt()
+  @IsNumber()
   price: number;
 
   @IsNotEmpty()
