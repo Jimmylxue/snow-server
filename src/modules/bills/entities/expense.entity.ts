@@ -34,7 +34,7 @@ export class TBExpense {
   @Column('text', { name: 'cover', nullable: true, comment: '配图' })
   cover: string;
 
-  @Column('int', { name: 'price', comment: '支付金额' })
+  @Column('float', { name: 'price', comment: '支付金额' })
   price: number;
 
   @Column('text', { name: 'description', comment: '备注', nullable: true })
