@@ -1,11 +1,8 @@
-import { generateRandomCode } from '@src/utils';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Role {
-  '未定义',
-  '普通用户',
+  '学生',
   '管理员',
-  '超级管理员',
 }
 
 export enum Sex {
@@ -14,65 +11,26 @@ export enum Sex {
   '女',
 }
 
-export enum Level {
-  新人 = 1,
-  专职,
-}
-
-export enum LoginStatus {
-  下线 = 1,
-  在线,
-}
-
-@Entity('user', { schema: 'snow-server' })
+@Entity('user', { schema: 'snow-server', comment: '用户表' })
 export class User {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
+  @PrimaryGeneratedColumn({ type: 'int', name: 'id', comment: '用户id' })
   id: number;
 
-  @Column({ type: 'varchar', name: 'openid', nullable: true })
-  openid: string;
-
-  @Column('varchar', { name: 'username', length: 45, nullable: true })
-  username: string;
-
   @Column('varchar', {
-    name: 'wxName',
+    name: 'username',
     length: 45,
     nullable: true,
-    comment: '微信号',
+    comment: '用户名',
   })
-  wxName: string;
-
-  @Column('varchar', {
-    name: 'nickname',
-    length: 45,
-    default: `游客${Math.floor(Date.now() / 1000)}`,
-  })
-  nickname: string;
-
-  @Column('varchar', {
-    name: 'avatar',
-    length: 200,
-    default:
-      'https://image.jimmyxuexue.top/upload/1712285958404vIXPMlNqPXor7394172beb8b1c598b1aafbed556158e.',
-  })
-  avatar: string;
+  username: string;
 
   @Column({
     type: 'enum',
     enum: Role,
-    default: Role.未定义,
+    default: Role.学生,
     name: 'role',
   })
   role: number;
-
-  @Column({
-    type: 'enum',
-    enum: Level,
-    default: Level.新人,
-    name: 'level',
-  })
-  level: number;
 
   @Column({
     type: 'enum',
@@ -89,36 +47,25 @@ export class User {
   })
   phone: string;
 
-  /**
-   * 邮箱地址
-   */
-  @Column('varchar', { name: 'mail', length: 60, nullable: true })
-  mail: string;
-
-  @Column('int', { name: 'coin', default: 0 })
-  coin: number;
-
   @Column('varchar', { name: 'createTime', length: 45 })
   createTime: string;
 
   @Column('varchar', {
     name: 'password',
     length: 200,
-    default: generateRandomCode(),
+    nullable: false,
+    comment: '密码',
   })
   password: string;
 
-  @Column('int', { name: 'inviter', nullable: true, comment: '邀请注册人' })
-  inviter: number;
-
-  @Column({
-    type: 'enum',
-    enum: LoginStatus,
-    default: LoginStatus.下线,
-    name: 'loginStatus',
+  @Column('varchar', {
+    name: 'exam_year',
+    length: 45,
+    nullable: true,
+    comment: '考研年份',
   })
-  loginStatus: number;
+  exam_year: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  lastActive: Date;
+  @Column('int', { name: 'exam_count', comment: '考试次数', nullable: true })
+  exam_count: number;
 }

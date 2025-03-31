@@ -1,21 +1,15 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LoginStatus, User } from '../entities/user.entity';
-import { Between, LessThan, Repository } from 'typeorm';
+import { User } from '../entities/user.entity';
+import { Between, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import {
   ChangePasswordDto,
   DelUserDto,
-  UpdateMailDto,
   UpdatePhoneDto,
   UserListDto,
 } from '../dto/update.dto';
-import { LoginByMiniProgram } from '../dto/login.dto';
-import { HttpService } from '@nestjs/axios';
-import { TaskTypeService } from '@src/modules/todolist/modules/taskType/taskType.service';
-import { ConfigService } from '@nestjs/config';
 import { BcryptService } from '../../auth/auth.service';
-import { LoggerService } from '@src/modules/shared/service/Logger.service';
 
 @Injectable()
 export class UserService {
@@ -23,11 +17,7 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
-    private readonly httpService: HttpService,
-    private readonly taskType: TaskTypeService,
-    private readonly configService: ConfigService,
     private readonly bcryptService: BcryptService,
-    @Inject(LoggerService) private readonly logger: LoggerService,
   ) {}
 
   findAll(): Promise<User[]> {
@@ -54,25 +44,8 @@ export class UserService {
     return await this.userRepository.findOneBy({ phone });
   }
 
-  async findUserByMail(mail: string) {
-    return await this.userRepository.findOneBy({ mail });
-  }
-
   async getDetailById(id: number) {
     return await this.userRepository.findOneBy({ id });
-  }
-
-  async getUserByOpenId(openid: string) {
-    return await this.userRepository.findOneBy({ openid });
-  }
-
-  async getUserCoin(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
-    return user.coin;
-  }
-
-  async updateUserCoin(userId: number, coin: number) {
-    await this.userRepository.update(userId, { coin });
   }
 
   async getUserList(body: UserListDto) {
@@ -144,41 +117,6 @@ export class UserService {
     };
   }
 
-  /**
-   * 修改邮箱
-   */
-  async updateUserMail(
-    params: UpdateMailDto,
-    userId: number,
-    redisCode: string,
-  ) {
-    const loginUserInfo = await this.getDetailById(userId);
-    if (loginUserInfo?.mail && loginUserInfo.mail !== params.mail) {
-      return {
-        code: 500,
-        result: '您的邮箱有误',
-      };
-    }
-    const user = await this.findUserByMail(params.newMail);
-    if (user) {
-      return {
-        code: 500,
-        result: '更改的邮箱已被注册',
-      };
-    }
-    if (redisCode !== params.code) {
-      return {
-        code: 500,
-        result: '验证码校验失败',
-      };
-    }
-    await this.updateUser({ mail: params.newMail, userId });
-    return {
-      code: 200,
-      result: '操作成功',
-    };
-  }
-
   async createToken(user) {
     const payload = {
       username: user.username,
@@ -199,48 +137,6 @@ export class UserService {
         token,
       },
     };
-  }
-
-  async miniProgramLogin(body: LoginByMiniProgram) {
-    const appID = this.configService.get('WX_MINI_PROGRAM_APPID');
-    const AppSecret = this.configService.get('WX_MINI_PROGRAM_APPSECRET');
-    const { code, ...userInfo } = body;
-    const res = await this.httpService.axiosRef.get<{
-      openid: string;
-      session_key: string;
-    }>(
-      `https://api.weixin.qq.com/sns/jscode2session?appid=${appID}&secret=${AppSecret}&js_code=${code}&grant_type=authorization_code`,
-    );
-    if (res.status === 200 && res.data.openid) {
-      /**
-       * 判断是否是系统内用户
-       *  如果是 -> 返回用户信息
-       *  如果不是 -> 根据openid 注册一个
-       */
-      const checkUser = await this.getUserByOpenId(res.data.openid);
-      if (checkUser?.id) {
-        return await this.createToken(checkUser);
-      } else {
-        const lastData = await this.getLastData();
-        await this.addUser({
-          ...userInfo,
-          openid: res.data.openid,
-          createTime: Date.now(),
-          username: userInfo.username || `游客${lastData?.id || 0 + 1}`,
-        });
-        const user = await this.getUserByOpenId(res.data.openid);
-        this.addUserSuccessHandle(user);
-        return await this.createToken(user);
-      }
-    }
-  }
-
-  /**
-   * 获取表中最后一条数据
-   */
-  async getLastData() {
-    const qb = this.userRepository.createQueryBuilder('user');
-    return await qb.orderBy('user.id', 'DESC').getOne();
   }
 
   /**
@@ -271,51 +167,5 @@ export class UserService {
       code: 200,
       message: '更新成功',
     };
-  }
-
-  /**
-   * 注册成功后副作用
-   * @param user
-   */
-  addUserSuccessHandle(user: User) {
-    const registerUserId = user.id;
-
-    this.taskType.addUserTaskType({
-      userId: registerUserId,
-      typeName: '工作',
-      createTime: Date.now() + '',
-    });
-  }
-
-  generateUserNameNonceStr() {
-    const chars =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let nonceStr = '';
-    for (let i = 0; i < 8; i++) {
-      nonceStr += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return nonceStr;
-  }
-
-  async cleanUpCheck() {
-    // const inactiveDuration = 30 * 60 * 1000;
-    const inactiveDuration = 20 * 1000;
-    const now = new Date();
-
-    const inactiveUsers = await this.userRepository.find({
-      where: {
-        loginStatus: LoginStatus.在线,
-        lastActive: LessThan(new Date(now.getTime() - inactiveDuration)),
-      },
-    });
-
-    for (const user of inactiveUsers) {
-      user.loginStatus = LoginStatus.下线;
-      await this.userRepository.save(user);
-    }
-
-    this.logger.log(`清理了 ${inactiveUsers.length} 个长时间未活动用户`);
-
-    return `清理了 ${inactiveUsers.length} 个长时间未活动用户`;
   }
 }

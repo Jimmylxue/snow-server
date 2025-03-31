@@ -27,6 +27,10 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   wxName: string;
+
+  @IsNotEmpty({ message: '考研年份不能为空' })
+  @IsString()
+  exam_year: string;
 }
 
 export class RegisterByMailDto {

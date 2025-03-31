@@ -5,11 +5,9 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ClubMember } from './clubMember.entity';
 
 /**
  * 社团
@@ -37,7 +35,4 @@ export class Club {
 
   @UpdateDateColumn({ comment: '更新时间', type: 'timestamp' })
   updateTime: Date;
-
-  @OneToMany(() => ClubMember, (clubMember) => clubMember.club)
-  clubMembers: ClubMember[];
 }

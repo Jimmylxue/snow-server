@@ -119,4 +119,8 @@ export class RandomQuestionDto {
   @IsOptional()
   @IsNumber()
   count: number;
+
+  @IsOptional()
+  @IsNumber()
+  typeId: number;
 }

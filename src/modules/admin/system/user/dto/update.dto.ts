@@ -6,7 +6,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { Role, Sex } from '../entities/user.entity';
+import { Role } from '../entities/user.entity';
 
 export class UserListDto {
   @IsOptional()
@@ -20,10 +20,6 @@ export class UserListDto {
   @IsOptional()
   @IsEnum(Role)
   role: number;
-
-  @IsOptional()
-  @IsEnum(Sex)
-  sex: number;
 
   @IsOptional()
   @IsString()

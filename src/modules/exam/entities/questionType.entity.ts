@@ -7,17 +7,21 @@ import {
 } from 'typeorm';
 
 /**
- * 社团
+ * 考试题库类型
  */
 @Entity('questionType', { schema: 'snow-server' })
 export class QuestionType {
-  @PrimaryGeneratedColumn({ type: 'int', name: 'id', comment: '题目类型id' })
+  @PrimaryGeneratedColumn({
+    type: 'int',
+    name: 'examTypeId',
+    comment: '考试题库类型id',
+  })
   id: number;
 
-  @Column('varchar', { name: 'name', length: 45, comment: '题目类型' })
+  @Column('varchar', { name: 'name', length: 45, comment: '考试题库类型' })
   name: string;
 
-  @Column('text', { name: 'desc', nullable: true, comment: '类型描述' })
+  @Column('text', { name: 'desc', nullable: true, comment: '考试题库类型描述' })
   desc: string;
 
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })

@@ -1,6 +1,6 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { QuestionService } from './question.service';
+import { StudyRoomService } from './studyRoom.service';
 import {
   AddQuestionDto,
   AddQuestionTypeDto,
@@ -13,14 +13,14 @@ import {
   RandomQuestionDto,
 } from '../../dto/question.dto';
 
-@Controller('question')
-export class QuestionController {
-  constructor(private readonly questionService: QuestionService) {}
+@Controller('studyRoom')
+export class StudyRoomController {
+  constructor(private readonly studyRoomService: StudyRoomService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post('/listType')
   async getTypeList(@Body() body: QuestionTypeListDto) {
-    const list = await this.questionService.getAllList(body);
+    const list = await this.studyRoomService.getAllList(body);
     if (list) {
       return {
         code: 200,
@@ -35,7 +35,7 @@ export class QuestionController {
   @UseGuards(AuthGuard('jwt'))
   @Post('/addType')
   async addQuestionType(@Body() body: AddQuestionTypeDto) {
-    const letter = await this.questionService.addQuestionType(body);
+    const letter = await this.studyRoomService.addQuestionType(body);
     if (letter) {
       return {
         code: 200,
@@ -50,7 +50,7 @@ export class QuestionController {
   @UseGuards(AuthGuard('jwt'))
   @Post('/delType')
   async deleteQuestionType(@Body() body: DelQuestionTypeDto) {
-    const res = await this.questionService.delQuestionType(body);
+    const res = await this.studyRoomService.delQuestionType(body);
     // @ts-ignore
     if (res.affected === 0) {
       return {
@@ -67,7 +67,7 @@ export class QuestionController {
   @UseGuards(AuthGuard('jwt'))
   @Post('/editType')
   async editQuestionType(@Body() body: EditQuestionTypeDto) {
-    const letter = await this.questionService.editQuestionType(body);
+    const letter = await this.studyRoomService.editQuestionType(body);
     if (letter) {
       return {
         code: 200,
@@ -79,7 +79,7 @@ export class QuestionController {
   @UseGuards(AuthGuard('jwt'))
   @Post('/listQuestion')
   async getQuestionList(@Body() body: QuestionListDto) {
-    const list = await this.questionService.getAllQuestionList(body);
+    const list = await this.studyRoomService.getAllQuestionList(body);
     if (list) {
       return {
         code: 200,
@@ -94,7 +94,7 @@ export class QuestionController {
   @UseGuards(AuthGuard('jwt'))
   @Post('/addQuestion')
   async addQuestion(@Body() body: AddQuestionDto) {
-    const question = await this.questionService.addQuestion(body);
+    const question = await this.studyRoomService.addQuestion(body);
     if (question) {
       return {
         code: 200,
@@ -109,7 +109,7 @@ export class QuestionController {
   @UseGuards(AuthGuard('jwt'))
   @Post('/delQuestion')
   async delQuestion(@Body() body: DelQuestionDto) {
-    const res = await this.questionService.delQuestion(body);
+    const res = await this.studyRoomService.delQuestion(body);
     if (res.affected === 0) {
       return {
         code: 500,
@@ -125,7 +125,7 @@ export class QuestionController {
   @UseGuards(AuthGuard('jwt'))
   @Post('/editQuestion')
   async editCourse(@Body() body: EditQuestionDto) {
-    const letter = await this.questionService.editQuestion(body);
+    const letter = await this.studyRoomService.editQuestion(body);
     if (letter) {
       return {
         code: 200,
@@ -140,7 +140,7 @@ export class QuestionController {
   @UseGuards(AuthGuard('jwt'))
   @Post('/randomQuestion')
   async getRandomQuestion(@Body() body: RandomQuestionDto) {
-    const questionList = await this.questionService.getRandomQuestion(body);
+    const questionList = await this.studyRoomService.getRandomQuestion(body);
     if (questionList) {
       return {
         code: 200,

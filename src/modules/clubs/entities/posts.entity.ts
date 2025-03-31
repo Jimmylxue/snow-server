@@ -43,12 +43,6 @@ export class ClubPosts {
   @JoinColumn()
   user: number;
 
-  // /**
-  //  * 点赞的 - userId
-  //  */
-  // @ManyToOne(() => User)
-  // @JoinColumn()
-
   @Column('text', { name: 'title', nullable: true, comment: '帖子标题' })
   title: string;
 

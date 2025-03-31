@@ -4,18 +4,13 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
-  Inject,
   UnauthorizedException,
 } from '@nestjs/common';
 import { SystemException } from '.';
 import { ErrorCode } from './errorCode';
-import { LoggerService } from '@src/modules/shared/service/Logger.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  LoginStatus,
-  User,
-} from '@src/modules/admin/system/user/entities/user.entity';
+import { User } from '@src/modules/admin/system/user/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 
 @Catch()
@@ -23,7 +18,6 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @Inject(LoggerService) private readonly logger: LoggerService,
     private jwtService: JwtService,
   ) {}
 
@@ -35,12 +29,6 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
-
-    if (status != HttpStatus.INTERNAL_SERVER_ERROR) {
-      this.logger.systemInfo(exception);
-    } else {
-      this.logger.systemError(exception);
-    }
 
     if (exception instanceof SystemException) {
       response.status(status).json({
@@ -67,11 +55,6 @@ export class HttpExceptionFilter implements ExceptionFilter<Error> {
         } catch (error) {}
       }
 
-      if (userId) {
-        this.userRepository.update(userId, {
-          loginStatus: LoginStatus.下线,
-        });
-      }
       response.status(status).json({
         code: 401,
         message: exception.message,

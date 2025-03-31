@@ -16,7 +16,7 @@ import {
 import { Question } from '../../entities/question.entity';
 
 @Injectable()
-export class QuestionService {
+export class StudyRoomService {
   constructor(
     @InjectRepository(QuestionType)
     private readonly questionTypeRepository: Repository<QuestionType>,
@@ -104,7 +104,6 @@ export class QuestionService {
     const qb = this.questionRepository.createQueryBuilder('question');
     return await qb
       .orderBy('RAND()')
-      .where('question.typeId = :typeId', { typeId: params.typeId })
       .take(params.count || 10)
       .getMany();
   }
