@@ -1,7 +1,6 @@
 import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { UserService } from '../../services/user.service';
 import { RegisterDto, UpdateDto } from '../../dto/register.dto';
-import { LoginDto } from '../../dto/login.dto';
 import { BcryptService } from '../../../auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -10,6 +9,7 @@ import {
   UpdatePhoneDto,
   UserListDto,
 } from '../../dto/update.dto';
+import { LoginDto } from '../../dto/login.dto';
 
 @Controller('user')
 export class UserController {
@@ -17,6 +17,50 @@ export class UserController {
     private readonly usersService: UserService,
     private readonly bcryptService: BcryptService,
   ) {}
+
+  @Post('login')
+  async login(@Body() body: LoginDto) {
+    const { phone, password, noEncrypt } = body;
+    const user = await this.usersService.findUserByPhone(phone);
+    if (!user) {
+      return {
+        code: 10000,
+        result: '账号或密码错误',
+      };
+    }
+    if (noEncrypt) {
+      /**
+       * id 为 28是最后一个明文密码用户
+       */
+      console.log('noEncrypt：', phone);
+      const compareRes = password === user.password;
+      if (compareRes) {
+        return await this.usersService.createToken(user);
+      }
+      return {
+        code: 10000,
+        result: '账号或密码错误',
+      };
+    } else {
+      /**
+       * id 大于 28 都是 加密密码 使用 atob 获取原密码
+       */
+      const originUserPassword = atob(user.password).split(
+        'snow-todoList',
+      )?.[0];
+      const compareHashSuccess = await this.bcryptService.compare(
+        originUserPassword,
+        password,
+      );
+      if (compareHashSuccess) {
+        return await this.usersService.createToken(user);
+      }
+      return {
+        code: 10000,
+        result: '账号或密码错误',
+      };
+    }
+  }
 
   @Post('register')
   async register(@Body() body: RegisterDto) {

@@ -23,7 +23,7 @@ export class Question {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id', comment: '题目id' })
   id: number;
 
-  @Column('varchar', { name: 'name', length: 45, comment: '题目标题' })
+  @Column('text', { name: 'name', comment: '题目标题' })
   name: string;
 
   @Column('text', { name: 'desc', nullable: true, comment: '题目意义' })
