@@ -66,6 +66,19 @@ export class User {
   })
   exam_year: string;
 
-  @Column('int', { name: 'exam_count', comment: '考试次数', nullable: true })
+  @Column('int', {
+    name: 'exam_count',
+    comment: '考试次数',
+    nullable: false,
+    default: 0,
+  })
   exam_count: number;
+
+  @Column('int', {
+    name: 'studyTime',
+    comment: '学习时间',
+    nullable: false,
+    default: 0,
+  })
+  studyTime: number;
 }

@@ -168,4 +168,114 @@ export class UserService {
       message: '更新成功',
     };
   }
+
+  /**
+   * 同时要 获取 所有用户的 的 studyTime 的值，
+   * 返回用户这个用户id的
+   * 学习时间、超越人数百分比、与上名考生的时间差距，以及与第一名考生的差距。
+   */
+  async getStudyStatus(userId: number) {
+    // 获取所有用户的学习时间，并按学习时间降序排序
+    const users = await this.userRepository.find({
+      select: ['id', 'studyTime'],
+      order: {
+        studyTime: 'DESC',
+      },
+    });
+
+    // 找到当前用户的信息和排名
+    const currentUserIndex = users.findIndex((user) => user.id === userId);
+    if (currentUserIndex === -1) {
+      return {
+        code: 404,
+        message: '未找到用户信息',
+      };
+    }
+
+    const currentUser = users[currentUserIndex];
+    const totalUsers = users.length;
+    const userRank = currentUserIndex + 1;
+
+    // 计算超越的人数百分比
+    const exceedPercentage = (
+      ((totalUsers - userRank) / totalUsers) *
+      100
+    ).toFixed(2);
+
+    // 计算与上一名的差距
+    const gapWithPrev =
+      currentUserIndex > 0
+        ? users[currentUserIndex - 1].studyTime - currentUser.studyTime
+        : 0;
+
+    // 计算与第一名的差距
+    const gapWithFirst = users[0].studyTime - currentUser.studyTime;
+
+    return {
+      code: 200,
+      data: {
+        studyTime: currentUser.studyTime,
+        rank: userRank,
+        exceedPercentage: `${exceedPercentage}%`,
+        gapWithPrev: currentUserIndex === 0 ? '已经是第一名' : gapWithPrev,
+        gapWithFirst: currentUserIndex === 0 ? 0 : gapWithFirst,
+        totalUsers,
+      },
+    };
+  }
+
+  /**
+   * 同时要 获取 所有用户的 的 exam 的值，
+   * 返回用户这个用户id的
+   * 学习时间、超越人数百分比、与上名考生的时间差距，以及与第一名考生的差距。
+   */
+  async getExamStatus(userId: number) {
+    // 获取所有用户的学习时间，并按学习时间降序排序
+    const users = await this.userRepository.find({
+      select: ['id', 'exam_count'],
+      order: {
+        exam_count: 'DESC',
+      },
+    });
+
+    // 找到当前用户的信息和排名
+    const currentUserIndex = users.findIndex((user) => user.id === userId);
+    if (currentUserIndex === -1) {
+      return {
+        code: 404,
+        message: '未找到用户信息',
+      };
+    }
+
+    const currentUser = users[currentUserIndex];
+    const totalUsers = users.length;
+    const userRank = currentUserIndex + 1;
+
+    // 计算超越的人数百分比
+    const exceedPercentage = (
+      ((totalUsers - userRank) / totalUsers) *
+      100
+    ).toFixed(2);
+
+    // 计算与上一名的差距
+    const gapWithPrev =
+      currentUserIndex > 0
+        ? users[currentUserIndex - 1].exam_count - currentUser.exam_count
+        : 0;
+
+    // 计算与第一名的差距
+    const gapWithFirst = users[0].exam_count - currentUser.exam_count;
+
+    return {
+      code: 200,
+      data: {
+        exam_count: currentUser.exam_count,
+        rank: userRank,
+        exceedPercentage: `${exceedPercentage}%`,
+        gapWithPrev: currentUserIndex === 0 ? '已经是第一名' : gapWithPrev,
+        gapWithFirst: currentUserIndex === 0 ? 0 : gapWithFirst,
+        totalUsers,
+      },
+    };
+  }
 }

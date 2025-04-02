@@ -8,12 +8,13 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { StudyRoom } from './studyRoom.entity';
 
 /**
  * 学习室 - 学习记录
  */
 @Entity('studyRecord', { schema: 'snow-server' })
-export class StudyRoom {
+export class StudyRoomRecord {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id', comment: '学习室id' })
   id: number;
 
@@ -29,14 +30,27 @@ export class StudyRoom {
   /**
    * 学习开始时间
    */
-  @Column('int', { name: 'studyTime', comment: '学习时间' })
+  @Column('timestamp', { name: 'studyTime', comment: '学习时间' })
   studyTime: number;
 
   /**
    * 学习结束时间
    */
-  @Column('int', { name: 'endTime', comment: '学习结束时间' })
+  @Column('timestamp', {
+    name: 'endTime',
+    nullable: true,
+    comment: '学习结束时间',
+  })
   endTime: number;
+
+  @Column('int', { name: 'studyRoomId', comment: '学习室id' })
+  studyRoomId: number;
+
+  @ManyToOne(() => StudyRoom, (studyRoom) => studyRoom.id, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'studyRoomId' })
+  studyRoom: number;
 
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })
   createdTime: Date;
