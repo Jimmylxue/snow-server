@@ -37,20 +37,21 @@ export class StudyRoomService {
       },
     });
     if (record) {
+      record.studyTime = dayjs().toDate();
+      await this.studyRoomRecordRepository.update(record.id, {
+        studyTime: dayjs().toDate(),
+      });
       return {
         code: 200,
-        result: '您已加入学习室，请勿重复加入',
+        result: '更新加入时间',
       };
     }
 
     if (
-      body.studyRoomId === EStudyRoomType.统一自习模式 &&
+      room.studyRoomType === EStudyRoomType.统一自习模式 &&
       (dayjs().hour() < room.openTime || dayjs().hour() > room.closeTime)
     ) {
-      return {
-        code: 200,
-        result: '自习室已关闭，明日再来',
-      };
+      throw new Error('自习室已关闭，明日再来');
     }
     const study_record = this.studyRoomRecordRepository.create();
     study_record.userId = userId;
@@ -103,11 +104,21 @@ export class StudyRoomService {
     }
   }
 
+  async studyRoomDetail(studyRoomId: number) {
+    const room = await this.studyRoomRepository.findOne({
+      where: { id: studyRoomId },
+    });
+    return {
+      code: 200,
+      result: room,
+    };
+  }
+
   async studyStatus(userId: number) {
     const status = await this.userService.getStudyStatus(userId);
     return {
       code: 200,
-      result: status,
+      result: status.data,
     };
   }
 
@@ -115,7 +126,7 @@ export class StudyRoomService {
     const todayStart = dayjs().startOf('day').toDate();
     const todayEnd = dayjs().endOf('day').toDate();
     const record = await this.studyRoomRecordRepository.findOne({
-      where: { userId, createdTime: Between(todayStart, todayEnd) },
+      where: { userId, endTime: Between(todayStart, todayEnd) },
     });
     return {
       code: 200,

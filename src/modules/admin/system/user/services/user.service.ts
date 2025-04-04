@@ -75,6 +75,7 @@ export class UserService {
       .set(params)
       .where('user.id = :userId', { userId })
       .execute();
+    console.log('updateUser', updateParams);
     return { status: 1, message: '更新成功' };
   }
 
@@ -208,8 +209,16 @@ export class UserService {
         ? users[currentUserIndex - 1].studyTime - currentUser.studyTime
         : 0;
 
+    // 计算上一名的 studyTime
+    const prevUser = users[currentUserIndex - 1];
+    const prevUserStudyTime = prevUser ? prevUser.studyTime : 0;
+
     // 计算与第一名的差距
     const gapWithFirst = users[0].studyTime - currentUser.studyTime;
+
+    // 计算第一名的 studyTime
+    const firstUser = users[0];
+    const firstUserStudyTime = firstUser ? firstUser.studyTime : 0;
 
     return {
       code: 200,
@@ -217,8 +226,10 @@ export class UserService {
         studyTime: currentUser.studyTime,
         rank: userRank,
         exceedPercentage: `${exceedPercentage}%`,
-        gapWithPrev: currentUserIndex === 0 ? '已经是第一名' : gapWithPrev,
+        gapWithPrev: gapWithPrev,
+        prevUserStudyTime,
         gapWithFirst: currentUserIndex === 0 ? 0 : gapWithFirst,
+        firstUserStudyTime,
         totalUsers,
       },
     };
@@ -263,8 +274,15 @@ export class UserService {
         ? users[currentUserIndex - 1].exam_count - currentUser.exam_count
         : 0;
 
+    // 计算上一名的 exam_count
+    const prevUser = users[currentUserIndex - 1];
+    const prevUserExamCount = prevUser ? prevUser.exam_count : 0;
+
     // 计算与第一名的差距
     const gapWithFirst = users[0].exam_count - currentUser.exam_count;
+
+    // 第一名次数
+    const firstUserCount = users[0].exam_count;
 
     return {
       code: 200,
@@ -272,9 +290,11 @@ export class UserService {
         exam_count: currentUser.exam_count,
         rank: userRank,
         exceedPercentage: `${exceedPercentage}%`,
-        gapWithPrev: currentUserIndex === 0 ? '已经是第一名' : gapWithPrev,
+        gapWithPrev: gapWithPrev,
         gapWithFirst: currentUserIndex === 0 ? 0 : gapWithFirst,
         totalUsers,
+        firstUserCount,
+        prevUserExamCount,
       },
     };
   }

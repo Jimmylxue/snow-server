@@ -36,6 +36,12 @@ export class StudyRoomController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Post('/studyRoomDetail')
+  async studyRoomDetail(@Body() body: JoinStudyRoomDto) {
+    return this.studyRoomService.studyRoomDetail(body.studyRoomId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Post('/studyStatus')
   async studyStatus(@Req() auth) {
     const { user } = auth;

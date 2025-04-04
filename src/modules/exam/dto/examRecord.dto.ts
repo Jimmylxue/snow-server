@@ -1,10 +1,9 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
-import { EExamProjectType } from '../entities/examRecord.entity';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CompleteExamDto {
   @IsNotEmpty()
-  @IsEnum(EExamProjectType)
-  examType: number;
+  @IsNumber()
+  examProjectId: number;
 
   @IsNotEmpty()
   @IsString()
@@ -21,4 +20,19 @@ export class CompleteExamDto {
   @IsNotEmpty()
   @IsNumber()
   overTime: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  totalScore: number;
+}
+
+export class ExamScoreRankDto {
+  @IsNumber()
+  examProjectId: number;
+}
+
+export class ProjectDetailDto {
+  @IsNotEmpty()
+  @IsNumber()
+  examProjectId: number;
 }

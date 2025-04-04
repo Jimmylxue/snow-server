@@ -8,12 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
-export enum EExamProjectType {
-  数学 = 1,
-  英语,
-  政治,
-}
+import { ExamProject } from './examProject.entity';
 
 /**
  * 考试记录
@@ -32,13 +27,14 @@ export class ExamRecord {
   @JoinColumn({ name: 'userId' })
   user: number;
 
-  @Column({
-    type: 'int',
-    name: 'examType',
-    default: EExamProjectType.数学,
-    comment: '考试科目类型',
+  @ManyToOne(() => ExamProject, (examProject) => examProject.id, {
+    onDelete: 'CASCADE',
   })
-  examType: number;
+  @JoinColumn({ name: 'examProjectId' })
+  examProject: number;
+
+  @Column('int', { name: 'examProjectId', comment: '考试项目id' })
+  examProjectId: number;
 
   @Column('text', { name: 'desc', comment: '考试心得' })
   desc: string;
@@ -51,6 +47,12 @@ export class ExamRecord {
 
   @Column('int', { name: 'overTime', comment: '超时时间' })
   overTime: number;
+
+  @Column('int', { name: 'totalScore', comment: '总得分' })
+  totalScore: number;
+
+  @Column({ type: 'float', default: 0 })
+  score: number;
 
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })
   createdTime: Date;
