@@ -51,8 +51,8 @@ export class ExamRecord {
   @Column('int', { name: 'totalScore', comment: '总得分' })
   totalScore: number;
 
-  @Column({ type: 'float', default: 0 })
-  score: number;
+  @Column('text', { name: 'paperDesc', comment: '试卷名称' })
+  paperText: string;
 
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })
   createdTime: Date;
