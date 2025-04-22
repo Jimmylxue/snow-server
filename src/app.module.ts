@@ -30,6 +30,7 @@ import { User } from './modules/admin/system/user/entities/user.entity';
 import { AiModule } from './modules/ai/ai.module';
 import { BillsSystemModule } from './modules/bills/billsSystem.module';
 import { AdminInterceptor } from './interceptors/admin.interceptor';
+import { SseModule } from './modules/sse/sse.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -72,6 +73,7 @@ import { AdminInterceptor } from './interceptors/admin.interceptor';
     CourseSystemModule,
     ShoppingSystemModule,
     BillsSystemModule,
+    SseModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: {

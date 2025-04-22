@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NestJS SSE 测试</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      #events {
+        border: 1px solid #ccc;
+        padding: 10px;
+        height: 400px;
+        overflow-y: auto;
+        margin-top: 20px;
+      }
+      .event {
+        padding: 5px;
+        border-bottom: 1px solid #eee;
+      }
+      .event:nth-child(odd) {
+        background-color: #f9f9f9;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>NestJS SSE 测试</h1>
+    <button onclick="connect()">连接</button>
+    <button onclick="disconnect()">断开</button>
+    <div id="status"></div>
+    <div id="events"></div>
+
+    <script>
+      let eventSource = null;
+      const eventsDiv = document.getElementById('events');
+      const statusDiv = document.getElementById('status');
+
+      function connect() {
+        if (eventSource) {
+          return;
+        }
+
+        // 根据你的 NestJS 应用端口修改这个 URL
+        eventSource = new EventSource('http://localhost:9999/sse/events');
+        statusDiv.textContent = '已连接';
+
+        eventSource.onmessage = function (event) {
+          const data = JSON.parse(event.data);
+          const eventDiv = document.createElement('div');
+          eventDiv.className = 'event';
+          eventDiv.textContent = `序号: ${data.sequence}, 时间: ${data.timestamp}, 值: ${data.value}`;
+          eventsDiv.insertBefore(eventDiv, eventsDiv.firstChild);
+        };
+
+        eventSource.onerror = function (error) {
+          console.error('SSE 错误:', error);
+          statusDiv.textContent = '连接错误';
+        };
+      }
+
+      function disconnect() {
+        if (eventSource) {
+          eventSource.close();
+          eventSource = null;
+          statusDiv.textContent = '已断开';
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -6,6 +6,7 @@ import { generateNonceStr } from './core/util';
 import { WxConnectService } from './connect/connect.service';
 import { WxConfigParams } from './wx.dto';
 import { ConfigService } from '@nestjs/config';
+import { SseService } from '../sse/sse.service';
 const sha1 = require('sha1'); // 加密
 
 type TUrlLinkQuery = {
@@ -21,11 +22,15 @@ export class WxController {
     private readonly nodemailerService: NodeMailerService,
     private readonly wxConnectService: WxConnectService,
     private readonly configService: ConfigService,
+    private readonly sseService: SseService,
   ) {}
 
   // JS安全域名配置
   @Get('/')
   async today(@Query() req: TUrlLinkQuery) {
+    this.sseService.emit({
+      message: '你好呀，我是通过代码回复你的',
+    });
     const token = this.configService.get('WX_OFFICIAL_TOKEN');
     const { signature, nonce, timestamp, echostr } = req;
 

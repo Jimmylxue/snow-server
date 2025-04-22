@@ -5,9 +5,10 @@ import { NodeMailerService } from '../shared/service/nodermailer/nodemailer.serv
 import { WxConnectService } from './connect/connect.service';
 import { HttpModule } from '@nestjs/axios';
 import { LoggerService } from '../shared/service/Logger.service';
+import { SseModule } from '../sse/sse.module';
 
 @Module({
-  imports: [HttpModule, VitalityReminderModule],
+  imports: [HttpModule, VitalityReminderModule, SseModule],
   controllers: [WxController],
   providers: [LoggerService, NodeMailerService, WxConnectService],
 })
