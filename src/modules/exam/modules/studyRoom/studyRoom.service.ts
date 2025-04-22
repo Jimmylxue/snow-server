@@ -5,6 +5,7 @@ import { EStudyRoomType, StudyRoom } from '../../entities/studyRoom.entity';
 import { StudyRoomRecord } from '../../entities/studyRecord.entity';
 import { JoinStudyRoomDto } from '../../dto/studyRoom.dto';
 import { UserService } from '@src/modules/admin/system/user/services/user.service';
+import { Cron } from '@nestjs/schedule';
 const dayjs = require('dayjs');
 
 @Injectable()
@@ -142,5 +143,26 @@ export class StudyRoomService {
       code: 200,
       result: record,
     };
+  }
+
+  async getStudyRoomUserCount(studyRoomId: number) {
+    const count = await this.studyRoomRecordRepository.count({
+      where: { studyRoomId, endTime: IsNull() },
+    });
+    return {
+      code: 200,
+      result: count,
+    };
+  }
+
+  /**
+   * 每天的下午 18:00 定时删除 没有 endTime 的学习记录
+   */
+  @Cron('0 0 18 * * *')
+  async deleteStudyRecord() {
+    await this.studyRoomRecordRepository.delete({
+      endTime: IsNull(),
+      studyRoomId: 2,
+    });
   }
 }

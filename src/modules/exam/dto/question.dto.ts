@@ -13,6 +13,12 @@ export class QuestionTypeListDto {
   name: string;
 }
 
+export class QuestionTypeCompleteListDto {
+  @IsOptional()
+  @IsString()
+  name: string;
+}
+
 export class AddQuestionTypeDto {
   @IsNotEmpty()
   @IsString()
@@ -123,4 +129,20 @@ export class RandomQuestionDto {
   @IsOptional()
   @IsNumber()
   typeId: number;
+}
+
+export class AddQuestionTypeCompleteDto {
+  @IsNotEmpty()
+  @IsNumber()
+  questionTypeId: number;
+
+  @IsNotEmpty()
+  @IsNumber()
+  useTime: number;
+}
+
+export class QuestionTypeCompleteRankDto {
+  @IsOptional()
+  @IsNumber()
+  questionTypeId: number;
 }

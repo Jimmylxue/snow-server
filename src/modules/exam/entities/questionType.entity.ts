@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 
 /**
- * 考试题库类型
+ * 考研题库类型
  */
 @Entity('questionType', { schema: 'snow-server' })
 export class QuestionType {

@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ExamRecordService } from './examRecord.service';
 import {
   CompleteExamDto,
+  ExamPre100ScoreDto,
   ExamScoreRankDto,
   ProjectDetailDto,
 } from '../../dto/examRecord.dto';
@@ -51,6 +52,17 @@ export class ExamRecordController {
     const { user } = auth;
     const userId = user.userId;
     return this.examRecordService.examScoreRank(userId, body);
+  }
+
+  /**
+   * 获取前100名学生的成绩
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/examPre100Score')
+  async examPre100Score(@Req() auth, @Body() body: ExamPre100ScoreDto) {
+    const { user } = auth;
+    const userId = user.userId;
+    return this.examRecordService.examPre100Score(userId, body);
   }
 
   @UseGuards(AuthGuard('jwt'))

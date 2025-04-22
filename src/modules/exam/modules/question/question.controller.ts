@@ -3,12 +3,14 @@ import { AuthGuard } from '@nestjs/passport';
 import { QuestionService } from './question.service';
 import {
   AddQuestionDto,
+  AddQuestionTypeCompleteDto,
   AddQuestionTypeDto,
   DelQuestionDto,
   DelQuestionTypeDto,
   EditQuestionDto,
   EditQuestionTypeDto,
   QuestionListDto,
+  QuestionTypeCompleteRankDto,
   QuestionTypeListDto,
   RandomQuestionDto,
 } from '../../dto/question.dto';
@@ -147,5 +149,48 @@ export class QuestionController {
         result: questionList,
       };
     }
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/listComplete')
+  async getCompleteList(@Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    const list = await this.questionService.getCompleteList(userId);
+    if (list) {
+      return {
+        code: 200,
+        result: list,
+      };
+    }
+  }
+
+  /**
+   * 添加进度
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/addComplete')
+  async addComplete(@Body() body: AddQuestionTypeCompleteDto, @Req() auth) {
+    const { user } = auth;
+    const userId = user.userId;
+    return await this.questionService.addComplete(body, userId);
+  }
+
+  /**
+   * 获取进度排行版
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/getCompleteRank')
+  async getCompleteRank(
+    @Body() body: QuestionTypeCompleteRankDto,
+    @Req() auth,
+  ) {
+    const { user } = auth;
+    const userId = user.userId;
+    const rank = await this.questionService.getCompleteRank(userId, body);
+    return {
+      code: 200,
+      result: rank,
+    };
   }
 }

@@ -5,6 +5,7 @@ import { UserService } from '@src/modules/admin/system/user/services/user.servic
 import { ExamRecord } from '../../entities/examRecord.entity';
 import {
   CompleteExamDto,
+  ExamPre100ScoreDto,
   ExamScoreRankDto,
   ProjectDetailDto,
 } from '../../dto/examRecord.dto';
@@ -158,6 +159,31 @@ export class ExamRecordService {
     return {
       code: 200,
       result: record,
+    };
+  }
+
+  /**
+   * 获取前100名学生的成绩，一个学生如果有多条数据，只取分数最高的那一条。最后再按分数从高到低排序，取前100名
+   */
+  async examPre100Score(userId: number, body: ExamPre100ScoreDto) {
+    const { examProjectId } = body;
+    // 使用子查询获取每个学生的最高分数
+    const records = await this.examRecordRepository.find({
+      where: { userId, examProjectId },
+      relations: ['user'],
+    });
+    const sortedScores = records.sort((a, b) => b.totalScore - a.totalScore);
+    /**
+     * 过滤重复的的userId的数据，留第一个遍历到的userId的数据
+     */
+    const filterSameUserId = sortedScores.filter(
+      (record, index, self) =>
+        index === self.findIndex((t) => t.userId === record.userId),
+    );
+    const top100Scores = filterSameUserId.slice(0, 100);
+    return {
+      code: 200,
+      result: top100Scores,
     };
   }
 }

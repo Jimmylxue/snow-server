@@ -36,3 +36,9 @@ export class ProjectDetailDto {
   @IsNumber()
   examProjectId: number;
 }
+
+export class ExamPre100ScoreDto {
+  @IsNotEmpty()
+  @IsNumber()
+  examProjectId: number;
+}

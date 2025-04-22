@@ -64,4 +64,13 @@ export class StudyRoomController {
     const userId = user.userId;
     return this.studyRoomService.studyRecord(userId);
   }
+
+  /**
+   * 获取当前学习室的人数
+   */
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/getStudyRoomUserCount')
+  async getStudyRoomUserCount(@Body() body: JoinStudyRoomDto) {
+    return this.studyRoomService.getStudyRoomUserCount(body.studyRoomId);
+  }
 }
