@@ -16,7 +16,7 @@ type TUrlLinkQuery = {
   echostr: string;
 };
 
-@Controller('wx')
+@Controller('pay')
 export class WxController {
   constructor(
     private readonly nodemailerService: NodeMailerService,

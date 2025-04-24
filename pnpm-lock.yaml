@@ -65,6 +65,9 @@ importers:
       class-validator:
         specifier: ^0.13.2
         version: 0.13.2
+      crypto:
+        specifier: ^1.0.1
+        version: 1.0.1
       dayjs:
         specifier: ^1.11.10
         version: 1.11.11
@@ -91,7 +94,7 @@ importers:
         version: 6.9.13
       openai:
         specifier: ^4.83.0
-        version: 4.83.0
+        version: 4.83.0(ws@8.11.0)
       passport:
         specifier: 0.6.0
         version: 0.6.0
@@ -2049,6 +2052,10 @@ packages:
 
   crypt@0.0.2:
     resolution: {integrity: sha512-mCxBlsHFYh9C+HVpiEacem8FEBnMXgU9gy4zmNC+SXAZNB/1idgp/aulFJ4FgCi7GPEVbfyng092GqL2k2rmow==}
+
+  crypto@1.0.1:
+    resolution: {integrity: sha512-VxBKmeNcqQdiUQUW2Tzq0t377b54N2bMtXO/qiLa+6eRRmmC4qT3D4OnTGoT/U6O9aklQ/jTwbOtRMTTY8G0Ig==}
+    deprecated: This package is no longer supported. It's now a built-in Node module. If you've depended on crypto, you should switch to the one that's built-in.
 
   cssom@0.3.8:
     resolution: {integrity: sha512-b0tGHbfegbhPJpxpiBPU2sCkigAqtM9O121le6bbOlgyV+NyGyCmVfJ6QW9eRjz8CpNfWEOYBIMIGRYkLwsIYg==}
@@ -6954,6 +6961,8 @@ snapshots:
 
   crypt@0.0.2: {}
 
+  crypto@1.0.1: {}
+
   cssom@0.3.8: {}
 
   cssom@0.4.4: {}
@@ -8618,7 +8627,7 @@ snapshots:
     dependencies:
       mimic-fn: 2.1.0
 
-  openai@4.83.0:
+  openai@4.83.0(ws@8.11.0):
     dependencies:
       '@types/node': 18.19.75
       '@types/node-fetch': 2.6.12
@@ -8627,6 +8636,8 @@ snapshots:
       form-data-encoder: 1.7.2
       formdata-node: 4.4.1
       node-fetch: 2.7.0
+    optionalDependencies:
+      ws: 8.11.0
     transitivePeerDependencies:
       - encoding
 

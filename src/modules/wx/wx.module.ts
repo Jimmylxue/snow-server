@@ -8,7 +8,11 @@ import { LoggerService } from '../shared/service/Logger.service';
 import { SseModule } from '../sse/sse.module';
 
 @Module({
-  imports: [HttpModule, VitalityReminderModule, SseModule],
+  imports: [
+    HttpModule,
+    VitalityReminderModule,
+    SseModule, // 这里配置一下
+  ],
   controllers: [WxController],
   providers: [LoggerService, NodeMailerService, WxConnectService],
 })

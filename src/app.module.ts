@@ -31,6 +31,7 @@ import { AiModule } from './modules/ai/ai.module';
 import { BillsSystemModule } from './modules/bills/billsSystem.module';
 import { AdminInterceptor } from './interceptors/admin.interceptor';
 import { SseModule } from './modules/sse/sse.module';
+import { PaymentModule } from './modules/payment/payment.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -59,8 +60,8 @@ import { SseModule } from './modules/sse/sse.module';
     TodoListModule,
     CheckInModule,
     // MiniProgramModule,
-    GptModule,
-    AiModule,
+    // GptModule,
+    // AiModule,
     ScheduleModule.forRoot(),
     TasksModule,
     EventsModule,
@@ -74,6 +75,7 @@ import { SseModule } from './modules/sse/sse.module';
     ShoppingSystemModule,
     BillsSystemModule,
     SseModule,
+    PaymentModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: {
