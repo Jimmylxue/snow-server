@@ -59,3 +59,9 @@ export class LoginByMiniProgram {
   @IsString()
   avatar: string;
 }
+
+export class LoginByWxOfficial {
+  @IsNotEmpty()
+  @IsString()
+  code: string;
+}

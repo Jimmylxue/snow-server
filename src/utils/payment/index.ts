@@ -1,6 +1,4 @@
-const fs = require('fs');
 const crypto = require('crypto');
-import { resolve } from 'path';
 /**
  * 生成支付时需要的 唯一订单id
  */

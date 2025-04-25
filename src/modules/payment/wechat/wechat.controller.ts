@@ -1,8 +1,21 @@
 import { HttpService } from '@nestjs/axios';
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Headers,
+  Post,
+  RawBodyRequest,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { generateNonceStr } from '@src/modules/wx/core/util';
 import { generateOutTradeNo, generatePaySign } from '@src/utils/payment';
+import { AuthGuard } from '@nestjs/passport';
+import { UserService } from '@src/modules/admin/system/user/services/user.service';
+import { OrderService } from '@src/modules/admin/system/order/order.service';
+import { WeChatPaymentService } from './wechat.service';
 
 const PAY_PRICE = 0.01;
 
@@ -11,22 +24,28 @@ export class WeChatPaymentController {
   constructor(
     private httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly userService: UserService,
+    private readonly orderService: OrderService,
+    private readonly wechatPaymentService: WeChatPaymentService,
   ) {}
 
-  @Get('pay')
-  async prePayment(params: any) {
-    await generatePaySign({
-      appId: 'wx2421b1c4370ec43b',
-      timeStamp: '1554208460',
-      nonceStr: '593BEC0C930BF1AFEB40B4A08C8FB242',
-      prepay_id: 'wx201410272009395522657a690389285100',
-    });
+  @UseGuards(AuthGuard('jwt'))
+  @Post('pay')
+  async prePayment(@Req() req) {
+    const user = req.user;
+    const userId = user.id;
     const appid = this.configService.get('WX_SERVER_OFFICIAL_APPID');
     const mchid = this.configService.get('WX_MERCHANT_ID');
     const notify_url = this.configService.get('WX_PAY_SUCCESS_NOTIFY_URL');
     const out_trade_no = generateOutTradeNo();
     //这里的params就是小程序传递的相关参数
-    const { openid } = params;
+    const openid = await this.userService.getUserOpenId(userId);
+    if (!openid) {
+      return {
+        code: 401,
+        result: '请先注册',
+      };
+    }
     const options = {
       appid,
       mchid,
@@ -68,15 +87,101 @@ export class WeChatPaymentController {
     };
   }
 
-  @Post()
-  async notify_url(@Body() body: any) {
-    // 这个body中是更私密的支付信息,我们通过解密之后才能拿到
-    const v3 = '........'; // 解密密钥
-    const { resource } = body;
-    const { ciphertext, associated_data, nonce } = resource;
+  @Post('notify')
+  async notify_url(
+    @Headers('wechatpay-signature') signature: string,
+    @Headers('wechatpay-timestamp') timestamp: string,
+    @Headers('wechatpay-nonce') nonce: string,
+    @Headers('wechatpay-serial') serial: string,
+    @Req() req: RawBodyRequest<Request>,
+    @Res() res,
+  ) {
+    console.log('signature', signature);
+    console.log('timestamp', timestamp);
+    console.log('nonce', nonce);
+    console.log('serial', serial);
+    res.status(401).send('签名验证失败');
+    return;
+    try {
+      const verified = this.wechatPaymentService.verifySignature(
+        timestamp,
+        nonce,
+        req.rawBody.toString('utf8'),
+        signature,
+        serial,
+      );
+      if (!verified) {
+        res.status(401).send('签名验证失败');
+        return;
+      }
 
-    // TODO: 需要根据返回的不同支付状态调整订单的支付状态
+      const result = JSON.parse(req.body.toString());
+      const decryptedData = this.wechatPaymentService.decryptWechatPayData(
+        result.resource.ciphertext,
+        result.resource.associated_data,
+        result.resource.nonce,
+      );
 
-    // 到这里支付就算是完成了
+      // 3. 处理业务逻辑
+      console.log('解密后的通知数据:', decryptedData);
+
+      const transaction_id = decryptedData.transaction_id;
+      const out_trade_no = decryptedData.out_trade_no;
+      const openid = decryptedData.payer.openid;
+      const total_fee = decryptedData.amount.total;
+
+      const user = await this.userService.getUserByOpenId(openid);
+      if (!user) {
+        res.status(401).json({ code: 'FAIL', message: '用户不存在' });
+        return;
+      }
+
+      await this.orderService.createOrder(user.id, {
+        outTradeNo: out_trade_no,
+        transactionId: transaction_id,
+        totalFee: total_fee,
+      });
+
+      res.status(200).json({ code: 'SUCCESS', message: '成功' });
+    } catch (error) {
+      console.error('处理微信支付通知出错:', error);
+      res.status(500).json({ code: 'FAIL', message: '处理失败' });
+    }
+  }
+
+  @Get('notify')
+  async notify_url_old(@Req() req) {
+    try {
+      const { xml } = req.body;
+      const data: any = {};
+      for (const item in xml) {
+        data[item] = xml[item][0];
+      }
+
+      if (data.result_code === 'SUCCESS' && data.return_code === 'SUCCESS') {
+        const user = await this.userService.getUserByOpenId(data.openid);
+        const outTradeNo = data.out_trade_no; // 商户订单号
+        const transactionId = data.transaction_id; // 微信支付订单号
+        const totalFee = data.total_fee; // 支付金额(分)
+        await this.orderService.createOrder(user.id, {
+          outTradeNo,
+          transactionId,
+          totalFee,
+        });
+        return `<xml>
+        <return_code><![CDATA[SUCCESS]]></return_code>
+        <return_msg><![CDATA[OK]]></return_msg>
+      </xml>`;
+      }
+      return `<xml>
+        <return_code><![CDATA[FAIL]]></return_code>
+        <return_msg><![CDATA[处理失败]]></return_msg>
+      </xml>`;
+    } catch (error) {
+      return `<xml>
+        <return_code><![CDATA[FAIL]]></return_code>
+        <return_msg><![CDATA[处理失败2]]></return_msg>
+      </xml>`;
+    }
   }
 }

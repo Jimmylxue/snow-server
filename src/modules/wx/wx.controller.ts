@@ -6,7 +6,7 @@ import { generateNonceStr } from './core/util';
 import { WxConnectService } from './connect/connect.service';
 import { WxConfigParams } from './wx.dto';
 import { ConfigService } from '@nestjs/config';
-import { SseService } from '../sse/sse.service';
+import { TUserInfoParamsDto } from './dto/wx.dto';
 const sha1 = require('sha1'); // 加密
 
 type TUrlLinkQuery = {
@@ -22,7 +22,6 @@ export class WxController {
     private readonly nodemailerService: NodeMailerService,
     private readonly wxConnectService: WxConnectService,
     private readonly configService: ConfigService,
-    private readonly sseService: SseService,
   ) {}
 
   // JS安全域名配置
@@ -62,9 +61,21 @@ export class WxController {
     const str = `jsapi_ticket=${ticket}&noncestr=${noncestr}&timestamp=${timestamp}+&url=${body.url}`;
     const signature = sha1(str);
     return {
-      timestamp,
-      noncestr,
-      signature,
+      code: 200,
+      result: {
+        timestamp,
+        noncestr,
+        signature,
+      },
+    };
+  }
+
+  @Post('/user/openid')
+  async getUserInfo(@Body() body: TUserInfoParamsDto) {
+    const userToken = await this.wxConnectService.getUserOpenId(body);
+    return {
+      code: 200,
+      result: userToken,
     };
   }
 

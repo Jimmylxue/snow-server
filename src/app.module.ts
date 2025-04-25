@@ -6,37 +6,24 @@ import { HttpExceptionFilter } from './exception/http-exception.filter';
 import { WxModule } from './modules/wx/wx.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './schedule/task.module';
-import { EventsModule } from './modules/socket/event.module';
-import { GptModule } from './modules/gpt/gpt.module';
-import { TodoListModule } from './modules/todolist/todolist.module';
-import { UploadModule } from './modules/upload/upload.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './modules/admin/system/auth/constats';
 import { BcryptService } from './modules/admin/system/auth/auth.service';
 import { JwtStrategy } from './modules/admin/system/auth/jwtStrategy.service';
-import { CatchErrorController } from './modules/admin/system/catchError/catchError.controller';
 import { LoggerService } from './modules/shared/service/Logger.service';
-import { SnowMemoModule } from './modules/memo-word/memo.module';
-import { CheckInModule } from './modules/checkIn/checkIn.module';
-import { TrainModule } from './modules/12306/train.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { resolve } from 'path';
-import { ClubSystemModule } from './modules/clubs/clubSystem.module';
-import { ExamSystemModule } from './modules/exam/examSystem.module';
-import { StaticModule } from './modules/static/static.module';
-import { CourseSystemModule } from './modules/course/CourseSystem.module';
-import { ShoppingSystemModule } from './modules/shopping/shoppingSystem.module';
 import { User } from './modules/admin/system/user/entities/user.entity';
-import { AiModule } from './modules/ai/ai.module';
-import { BillsSystemModule } from './modules/bills/billsSystem.module';
 import { AdminInterceptor } from './interceptors/admin.interceptor';
-import { SseModule } from './modules/sse/sse.module';
 import { PaymentModule } from './modules/payment/payment.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [resolve(process.cwd(), '.env')],
+      envFilePath: [
+        resolve(process.cwd(), `.env.${process.env.NODE_ENV}`),
+        resolve(process.cwd(), '.env'),
+      ],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -57,24 +44,8 @@ import { PaymentModule } from './modules/payment/payment.module';
     }),
     AdminModule,
     WxModule,
-    TodoListModule,
-    CheckInModule,
-    // MiniProgramModule,
-    // GptModule,
-    // AiModule,
     ScheduleModule.forRoot(),
     TasksModule,
-    EventsModule,
-    UploadModule,
-    SnowMemoModule,
-    TrainModule,
-    ClubSystemModule,
-    ExamSystemModule,
-    StaticModule,
-    CourseSystemModule,
-    ShoppingSystemModule,
-    BillsSystemModule,
-    SseModule,
     PaymentModule,
     JwtModule.register({
       secret: jwtConstants.secret,
@@ -84,7 +55,7 @@ import { PaymentModule } from './modules/payment/payment.module';
     }),
     TypeOrmModule.forFeature([User]),
   ],
-  controllers: [CatchErrorController],
+  controllers: [],
   providers: [
     {
       provide: APP_FILTER,

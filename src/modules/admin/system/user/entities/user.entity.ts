@@ -1,5 +1,11 @@
 import { generateRandomCode } from '@src/utils';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 export enum Role {
   '未定义',
@@ -29,7 +35,7 @@ export class User {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
-  @Column({ type: 'varchar', name: 'openid', nullable: true })
+  @Column({ type: 'varchar', name: 'openid' })
   openid: string;
 
   @Column('varchar', { name: 'username', length: 45, nullable: true })
@@ -53,8 +59,7 @@ export class User {
   @Column('varchar', {
     name: 'avatar',
     length: 200,
-    default:
-      'https://image.jimmyxuexue.top/upload/1712285958404vIXPMlNqPXor7394172beb8b1c598b1aafbed556158e.',
+    nullable: true,
   })
   avatar: string;
 
@@ -98,9 +103,6 @@ export class User {
   @Column('int', { name: 'coin', default: 0 })
   coin: number;
 
-  @Column('varchar', { name: 'createTime', length: 45 })
-  createTime: string;
-
   @Column('varchar', {
     name: 'password',
     length: 200,
@@ -121,4 +123,10 @@ export class User {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   lastActive: Date;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createTime: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  updateTime: Date;
 }

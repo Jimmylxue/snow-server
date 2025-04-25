@@ -10,12 +10,12 @@ import {
   UpdatePhoneDto,
   UserListDto,
 } from '../dto/update.dto';
-import { LoginByMiniProgram } from '../dto/login.dto';
+import { LoginByMiniProgram, LoginByWxOfficial } from '../dto/login.dto';
 import { HttpService } from '@nestjs/axios';
-import { TaskTypeService } from '@src/modules/todolist/modules/taskType/taskType.service';
 import { ConfigService } from '@nestjs/config';
 import { BcryptService } from '../../auth/auth.service';
 import { LoggerService } from '@src/modules/shared/service/Logger.service';
+import { WxConnectService } from '@src/modules/wx/connect/connect.service';
 
 @Injectable()
 export class UserService {
@@ -24,9 +24,9 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
     private readonly httpService: HttpService,
-    private readonly taskType: TaskTypeService,
     private readonly configService: ConfigService,
     private readonly bcryptService: BcryptService,
+    private readonly wxConnectService: WxConnectService,
     @Inject(LoggerService) private readonly logger: LoggerService,
   ) {}
 
@@ -80,7 +80,9 @@ export class UserService {
     const [result, total] = await this.userRepository.findAndCount({
       where: {
         ...where,
-        createTime: startTime ? Between(startTime, endTime) : undefined,
+        createTime: startTime
+          ? Between(new Date(startTime), new Date(endTime))
+          : undefined,
       },
       order: {
         id: 'DESC',
@@ -236,6 +238,32 @@ export class UserService {
   }
 
   /**
+   * 公众号
+   */
+  async wxOfficialLogin(body: LoginByWxOfficial) {
+    const { openid } = await this.wxConnectService.getUserOpenId(body);
+    if (openid) {
+      const checkUser = await this.getUserByOpenId(openid);
+      if (checkUser?.id) {
+        return await this.createToken(checkUser);
+      } else {
+        const lastData = await this.getLastData();
+        await this.addUser({
+          openid,
+          username: `游客${lastData?.id || 0 + 1}`,
+        });
+        const user = await this.getUserByOpenId(openid);
+        return await this.createToken(user);
+      }
+    }
+  }
+
+  async getUserOpenId(userId: number) {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    return user.openid;
+  }
+
+  /**
    * 获取表中最后一条数据
    */
   async getLastData() {
@@ -279,12 +307,6 @@ export class UserService {
    */
   addUserSuccessHandle(user: User) {
     const registerUserId = user.id;
-
-    this.taskType.addUserTaskType({
-      userId: registerUserId,
-      typeName: '工作',
-      createTime: Date.now() + '',
-    });
   }
 
   generateUserNameNonceStr() {
