@@ -23,7 +23,7 @@ export function generateOutTradeNo(prefix = '') {
   return `${prefix}${timestamp}${randomNum}`;
 }
 
-const privateKey = `
+export const privateKey = `
 -----BEGIN PRIVATE KEY-----
 MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMqReT1BLNR5V2
 4c2ckXIfl8/I+b5lDG9iNKinv6rRC6B8IdGT1jLIagkLd3uzpuny79C1Jje8xooK

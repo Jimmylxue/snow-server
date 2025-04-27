@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { generateNonceStr } from '@src/modules/wx/core/util';
+import { privateKey } from '@src/utils/payment';
 import * as crypto from 'crypto';
 @Injectable()
 export class WeChatPaymentService {
@@ -63,5 +65,49 @@ ElLT8QY74opDMAn78gD+UewoC4c/Lex1RmCwvatojpip6ARcvvKfOX1H7Sjr+rAf
 3MQl9fVA5EMq6gwsPHEp9ma/90q0vhE9H2t8P8PLr5+UVccqW7A6nwcNawpOKMP/
 9QIDAQAB
 -----END PUBLIC KEY-----`;
+  }
+
+  getPayAuthorization(
+    method: string,
+    url: string,
+    body: string = '',
+    timestamp: string = Math.floor(Date.now() / 1000).toString(),
+  ) {
+    const merchantId = this.configService.get('WX_MERCHANT_ID');
+    const serial_no = this.configService.get('WX_MERCHANT_SERIAL_No');
+    const nonceStr = generateNonceStr();
+    const signature = this.generateSignature(
+      method,
+      url,
+      timestamp,
+      nonceStr,
+      body,
+    );
+    return (
+      `WECHATPAY2-SHA256-RSA2048 ` +
+      `mchid="${merchantId}",` +
+      `nonce_str="${nonceStr}",` +
+      `signature="${signature}",` +
+      `timestamp="${timestamp}",` +
+      `serial_no="${serial_no}"`
+    );
+  }
+
+  generateSignature(
+    method: string,
+    url: string,
+    timestamp: string,
+    nonceStr: string,
+    body: string,
+  ) {
+    const signStr =
+      `${method}\n` +
+      `${url}\n` +
+      `${timestamp}\n` +
+      `${nonceStr}\n` +
+      `${body}\n`;
+    const sign = crypto.createSign('RSA-SHA256');
+    sign.update(signStr);
+    return sign.sign(privateKey, 'base64');
   }
 }

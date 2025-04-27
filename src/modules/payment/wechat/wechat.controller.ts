@@ -18,6 +18,7 @@ import { OrderService } from '@src/modules/admin/system/order/order.service';
 import { WeChatPaymentService } from './wechat.service';
 
 const PAY_PRICE = 0.01;
+const total = Math.round(PAY_PRICE * 100); // 转为分（1 分）
 
 @Controller('wechatpay')
 export class WeChatPaymentController {
@@ -43,7 +44,7 @@ export class WeChatPaymentController {
     if (!openid) {
       return {
         code: 401,
-        result: '请先注册',
+        result: '请先注册~',
       };
     }
     const options = {
@@ -53,20 +54,40 @@ export class WeChatPaymentController {
       out_trade_no,
       notify_url,
       amount: {
-        total: PAY_PRICE, // 转化后的数据
+        total, // 转化后的数据
       },
       payer: {
         openid,
       },
     };
+
+    const url = 'https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi';
+    const method = 'POST';
+    const body = JSON.stringify(options);
+
+    const authorization = this.wechatPaymentService.getPayAuthorization(
+      method,
+      url,
+      body,
+    );
+
     // 使用axios 发起请求
     const res = await this.httpService.axiosRef.post(
       'https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi',
       options,
+      {
+        headers: {
+          Authorization: authorization,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'User-Agent': 'NestJS WeChatPay Client',
+        },
+      },
     );
     const timeStamp = Math.floor(Date.now() / 1000);
     const nonceStr = generateNonceStr();
 
+    console.log('res', res);
     const paySign = await generatePaySign({
       appId: appid,
       timeStamp: String(timeStamp),

@@ -84,11 +84,12 @@ export class LoggerService extends Logger {
       format.errors({ stack: true }),
       format.json(),
       format.printf((info) => {
+        console.log('info', info);
         const message =
           typeof info.message === 'string'
             ? info.message
             : JSON.stringify(info.message);
-        const data = JSON.stringify(info, null, 2);
+        const data = JSON.stringify(info.message, null, 2);
         return `${info.timestamp} ${info.level}: ${message}\n${data}\n`;
       }),
     ),

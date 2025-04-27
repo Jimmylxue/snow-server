@@ -260,6 +260,7 @@ export class UserService {
 
   async getUserOpenId(userId: number) {
     const user = await this.userRepository.findOneBy({ id: userId });
+    console.log('user', user);
     return user.openid;
   }
 
