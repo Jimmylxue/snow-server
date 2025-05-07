@@ -18,7 +18,12 @@ export class LoggerService extends Logger {
           typeof info.message === 'string'
             ? info.message
             : JSON.stringify(info.message);
-        const data = JSON.stringify(info, null, 2);
+        let data;
+        try {
+          data = JSON.stringify(info, null, 2);
+        } catch (error) {
+          data = `无法序列化日志数据: ${error.message}`;
+        }
         return `${info.timestamp} ${info.level}: ${message}\n${data}\n`;
       }),
     ),
@@ -53,7 +58,12 @@ export class LoggerService extends Logger {
           typeof info.message === 'string'
             ? info.message
             : JSON.stringify(info.message);
-        const data = JSON.stringify(info, null, 2);
+        let data;
+        try {
+          data = JSON.stringify(info, null, 2);
+        } catch (error) {
+          data = `无法序列化日志数据: ${error.message}`;
+        }
         return `${info.timestamp} ${info.level}: ${message}\n${data}\n`;
       }),
     ),
@@ -88,7 +98,12 @@ export class LoggerService extends Logger {
           typeof info.message === 'string'
             ? info.message
             : JSON.stringify(info.message);
-        const data = JSON.stringify(info, null, 2);
+        let data;
+        try {
+          data = JSON.stringify(info, null, 2);
+        } catch (error) {
+          data = `无法序列化日志数据: ${error.message}`;
+        }
         return `${info.timestamp} ${info.level}: ${message}\n${data}\n`;
       }),
     ),
@@ -123,7 +138,12 @@ export class LoggerService extends Logger {
           typeof info.message === 'string'
             ? info.message
             : JSON.stringify(info.message);
-        const data = JSON.stringify(info, null, 2);
+        let data;
+        try {
+          data = JSON.stringify(info, null, 2);
+        } catch (error) {
+          data = `无法序列化日志数据: ${error.message}`;
+        }
         return `${info.timestamp} ${info.level}: ${message}\n${data}\n`;
       }),
     ),
